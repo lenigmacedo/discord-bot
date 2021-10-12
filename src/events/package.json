@@ -1,0 +1,5 @@
+{
+	"name": "bot-events",
+	"description": "Functions that handle various events.",
+	"main": "index.ts"
+}
