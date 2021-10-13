@@ -22,6 +22,7 @@
 	},
 	"homepage": "https://github.com/jack3898/discord-youtube-bot-2#readme",
 	"dependencies": {
+		"@discordjs/builders": "^0.6.0",
 		"@discordjs/opus": "^0.5.3",
 		"@discordjs/rest": "^0.1.0-canary.0",
 		"@discordjs/voice": "^0.6.0",
