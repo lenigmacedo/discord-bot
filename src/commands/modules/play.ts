@@ -1,10 +1,8 @@
-import { createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel } from '@discordjs/voice';
+import { createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel } from '@discordjs/voice';
 import { globals } from 'bot-config';
 import { GuildMember } from 'discord.js';
 import ytdl from 'ytdl-core-discord';
 import { CommandHandler } from '../CommandHandler.types';
-
-const player = createAudioPlayer();
 
 const play: CommandHandler = async interaction => {
 	if (!interaction.guildId || !(interaction.member instanceof GuildMember)) return;

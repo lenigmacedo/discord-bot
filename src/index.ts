@@ -2,9 +2,9 @@ import { REST } from '@discordjs/rest';
 import config, { commands } from 'bot-config';
 import { interactionCreate, ready } from 'bot-events';
 import { Routes } from 'discord-api-types/v9';
-import { Client, Intents } from 'discord.js';
+import { Client } from 'discord.js';
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES] });
+const client = new Client({ intents: config.intents });
 const { discordToken, devClientId, devGuildId } = config;
 const rest = new REST({ version: '9' }).setToken(discordToken as string);
 
