@@ -22,5 +22,3 @@ registerCommands();
 client.on('ready', ready);
 client.on('interactionCreate', interactionCreate);
 client.login(discordToken);
-
-export default registerCommands;
