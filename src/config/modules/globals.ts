@@ -1,7 +1,8 @@
-import { createAudioPlayer } from '@discordjs/voice';
+import { Guild } from 'discord.js';
+import Queue from '../../classes/classes/Queue';
 
 const globals = {
-	audioPlayer: createAudioPlayer()
+	players: new Map<Guild['id'], Queue>()
 };
 
 export default globals;

@@ -9,7 +9,8 @@
 		"src/config",
 		"src/commands",
 		"src/events",
-		"src/functions"
+		"src/functions",
+		"src/classes"
 	],
 	"repository": {
 		"type": "git",

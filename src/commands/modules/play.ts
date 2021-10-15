@@ -1,5 +1,5 @@
 import { createAudioResource } from '@discordjs/voice';
-import { globals } from 'bot-config';
+import { Queue } from 'bot-classes';
 import { destroyConnectionOnIdle, safeJoinVoiceChannel } from 'bot-functions';
 import { GuildMember } from 'discord.js';
 import ytdl from 'ytdl-core-discord';
@@ -9,7 +9,7 @@ const play: CommandHandler = async interaction => {
 	try {
 		// The user who sent the command
 		const guildMember = interaction.member;
-		if (!interaction.guildId || !(guildMember instanceof GuildMember)) {
+		if (!interaction?.guild?.id || !(guildMember instanceof GuildMember)) {
 			return;
 		}
 
@@ -31,10 +31,13 @@ const play: CommandHandler = async interaction => {
 		}
 		await interaction.reply('Downloading YouTube video...');
 
+		const queue = Queue.getQueue(interaction.guild);
 		const details = await ytdl.getBasicInfo(youtubeUrl);
 		const audioBitstream = await ytdl(youtubeUrl, { filter: 'audioonly' });
-		const player = globals.audioPlayer;
-		const connection = safeJoinVoiceChannel(interaction);
+		const player = queue.getPlayer();
+		queue.setConnection(safeJoinVoiceChannel(interaction));
+		const connection = queue.getConnection();
+
 		if (!connection) {
 			interaction.reply('I was unable to establish a connection to the voice channel!');
 			return;
