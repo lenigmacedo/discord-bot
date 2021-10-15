@@ -1,1 +1,1 @@
-export { default as Queue } from './classes/Queue';
+export { default as Queue } from './modules/Queue';
