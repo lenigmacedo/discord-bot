@@ -1,5 +1,6 @@
-import { AudioPlayerState, createAudioResource, DiscordGatewayAdapterCreator, getVoiceConnection, joinVoiceChannel } from '@discordjs/voice';
+import { AudioPlayerState, createAudioResource } from '@discordjs/voice';
 import { globals } from 'bot-config';
+import { safeJoinVoiceChannel } from 'bot-functions';
 import { GuildMember } from 'discord.js';
 import ytdl from 'ytdl-core-discord';
 import { CommandHandler } from '../CommandHandler.types';
@@ -18,18 +19,6 @@ const play: CommandHandler = async interaction => {
 			return;
 		}
 
-		const adapterCreator = interaction.guild?.voiceAdapterCreator;
-		if (!adapterCreator) {
-			interaction.reply('Unable to create or retrieve the voice adapter. I cannot play the video.');
-			return;
-		}
-
-		const connectionOptions = {
-			guildId: interaction.guildId,
-			channelId: voiceChannel.id,
-			adapterCreator: interaction.guild?.voiceAdapterCreator as DiscordGatewayAdapterCreator
-		};
-
 		const youtubeUrl = interaction.options.get('url', true).value;
 		if (typeof youtubeUrl !== 'string') {
 			interaction.reply('Invalid argument provided. This issue must be reported to the bot developer, as it is a configuration issue on our end.');
@@ -41,12 +30,17 @@ const play: CommandHandler = async interaction => {
 			return;
 		}
 		await interaction.reply('Downloading YouTube video...');
+
 		const details = await ytdl.getBasicInfo(youtubeUrl);
 		const audioBitstream = await ytdl(youtubeUrl, { filter: 'audioonly' });
 		const player = globals.audioPlayer;
-		const connection = getVoiceConnection(interaction.guildId) || joinVoiceChannel(connectionOptions);
-		await interaction.editReply(`Downloaded! Now I am preparing to stream...`);
+		const connection = safeJoinVoiceChannel(interaction);
+		if (!connection) {
+			interaction.reply('I was unable to establish a connection to the voice channel!');
+			return;
+		}
 
+		await interaction.editReply(`Downloaded! Now I am preparing to stream...`);
 		const audioResource = createAudioResource(audioBitstream);
 		connection.subscribe(player);
 
