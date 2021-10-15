@@ -1,4 +1,4 @@
-import { createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel } from '@discordjs/voice';
+import { AudioPlayerState, createAudioResource, DiscordGatewayAdapterCreator, getVoiceConnection, joinVoiceChannel } from '@discordjs/voice';
 import { globals } from 'bot-config';
 import { GuildMember } from 'discord.js';
 import ytdl from 'ytdl-core-discord';
@@ -41,17 +41,28 @@ const play: CommandHandler = async interaction => {
 			return;
 		}
 		await interaction.reply('Downloading YouTube video...');
-
+		const details = await ytdl.getBasicInfo(youtubeUrl);
 		const audioBitstream = await ytdl(youtubeUrl, { filter: 'audioonly' });
 		const player = globals.audioPlayer;
-		const connection = joinVoiceChannel(connectionOptions);
-		await interaction.editReply('Downloaded! Now I am preparing to stream...');
+		const connection = getVoiceConnection(interaction.guildId) || joinVoiceChannel(connectionOptions);
+		await interaction.editReply(`Downloaded! Now I am preparing to stream...`);
 
 		const audioResource = createAudioResource(audioBitstream);
 		connection.subscribe(player);
 
-		await interaction.editReply('All ready to go. Playing video.');
+		await interaction.editReply(`Now playing \`${details.videoDetails.title}\` by \`${details.videoDetails.author.name}\``);
 		player.play(audioResource);
+
+		// When the criteria for this callback has been met, we must destroy it as an event listener otherwise
+		// it will try to run an "outdated" callback which runs destroy on an old connection instance which is bad.
+		// "player.once" could be used, but it will always destroy the event listener even if the critera was not met so it is not suitable.
+		const onIdleCallback = (oldState: AudioPlayerState, newState: AudioPlayerState) => {
+			if (oldState.status === 'playing' && newState.status === 'idle') {
+				player.removeListener('stateChange', onIdleCallback);
+				connection.destroy();
+			}
+		};
+		player.on('stateChange', onIdleCallback);
 	} catch (error) {
 		console.error(error);
 	}
