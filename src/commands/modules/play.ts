@@ -1,6 +1,6 @@
-import { AudioPlayerState, createAudioResource } from '@discordjs/voice';
+import { createAudioResource } from '@discordjs/voice';
 import { globals } from 'bot-config';
-import { safeJoinVoiceChannel } from 'bot-functions';
+import { destroyConnectionOnIdle, safeJoinVoiceChannel } from 'bot-functions';
 import { GuildMember } from 'discord.js';
 import ytdl from 'ytdl-core-discord';
 import { CommandHandler } from '../CommandHandler.types';
@@ -47,16 +47,7 @@ const play: CommandHandler = async interaction => {
 		await interaction.editReply(`Now playing \`${details.videoDetails.title}\` by \`${details.videoDetails.author.name}\``);
 		player.play(audioResource);
 
-		// When the criteria for this callback has been met, we must destroy it as an event listener otherwise
-		// it will try to run an "outdated" callback which runs destroy on an old connection instance which is bad.
-		// "player.once" could be used, but it will always destroy the event listener even if the critera was not met so it is not suitable.
-		const onIdleCallback = (oldState: AudioPlayerState, newState: AudioPlayerState) => {
-			if (oldState.status === 'playing' && newState.status === 'idle') {
-				player.removeListener('stateChange', onIdleCallback);
-				connection.destroy();
-			}
-		};
-		player.on('stateChange', onIdleCallback);
+		destroyConnectionOnIdle(player, connection);
 	} catch (error) {
 		console.error(error);
 	}
