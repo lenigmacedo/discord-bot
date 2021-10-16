@@ -10,9 +10,22 @@ const rest = new REST({ version: '9' }).setToken(discordToken as string);
 
 const registerCommands = () => {
 	console.log('Started refreshing application (/) commands.');
-	const guildCommandsRoute = Routes.applicationGuildCommands(devClientId as string, devGuildId as string);
+
+	let route = null;
+
+	switch (config.environment) {
+		case 'production':
+			route = Routes.applicationGuildCommands(devClientId as string, devGuildId as string);
+			break;
+		case 'development':
+			route = Routes.applicationCommands(devClientId as string);
+			break;
+		default:
+			throw TypeError('Environment not defined! Make sure NODE_ENV environment variable is set to "production" or "development".');
+	}
+
 	rest
-		.put(guildCommandsRoute, { body: commands })
+		.put(route, { body: commands })
 		.then(() => console.log('Successfully reloaded application (/) commands.'))
 		.catch(console.error);
 };

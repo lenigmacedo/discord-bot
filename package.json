@@ -3,7 +3,8 @@
 	"version": "1.0.0",
 	"description": "A Discord bot powered by Discord.js v13 and TypeScript for YouTube playback.",
 	"scripts": {
-		"dev": "nodemon src/index.ts"
+		"dev": "cross-env NODE_ENV=development nodemon src/index.ts",
+		"bot": "cross-env NODE_ENV=production ts-node src/index.ts"
 	},
 	"workspaces": [
 		"src/config",
@@ -29,6 +30,7 @@
 		"@discordjs/rest": "^0.1.0-canary.0",
 		"@discordjs/voice": "^0.6.0",
 		"@types/redis": "^2.8.32",
+		"cross-env": "^7.0.3",
 		"discord.js": "^13.2.0",
 		"dotenv": "^10.0.0",
 		"ffmpeg-static": "^4.4.0",
