@@ -10,7 +10,8 @@ const queue: CommandHandler = async interaction => {
 	const queue = await audioInterface.queueGetAll();
 
 	if (!queue.length) {
-		interaction.reply('The queue is empty.');
+		await interaction.reply('The queue is empty.');
+		return;
 	}
 
 	const runNow = interaction.options.getBoolean('run-now');

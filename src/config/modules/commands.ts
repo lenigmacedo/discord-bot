@@ -10,7 +10,9 @@ const commands = [
 	new SlashCommandBuilder()
 		.setName('queue')
 		.setDescription('Get a list of all the items in the queue.')
-		.addBooleanOption(option => option.setName('run-now').setDescription("If the bot isn't currently playing, start playing the queue now?")),
+		.addBooleanOption(option =>
+			option.setName('run-now').setDescription("If the bot isn't currently playing, start playing the queue now?").setRequired(false)
+		),
 	new SlashCommandBuilder()
 		.setName('enqueue')
 		.setDescription('Add a YouTube video to the end of the queue.')
