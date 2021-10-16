@@ -17,10 +17,10 @@ const registerCommands = () => {
 
 	switch (config.environment) {
 		case 'production':
-			route = Routes.applicationGuildCommands(clientId as string, devGuildId as string);
+			route = Routes.applicationCommands(clientId as string);
 			break;
 		case 'development':
-			route = Routes.applicationCommands(clientId as string);
+			route = Routes.applicationGuildCommands(clientId as string, devGuildId as string);
 			break;
 		default:
 			throw TypeError('Environment not defined! Make sure NODE_ENV environment variable is set to "production" or "development".');
