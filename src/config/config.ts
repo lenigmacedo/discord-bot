@@ -5,7 +5,7 @@ env();
 
 const config = {
 	discordToken: process.env.DISCORD_TOKEN,
-	devClientId: process.env.DEV_CLIENT_ID,
+	devClientId: process.env.CLIENT_ID,
 	devGuildId: process.env.DEV_GUILD_ID,
 	environment: process.env.NODE_ENV, // development or production
 	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES],
