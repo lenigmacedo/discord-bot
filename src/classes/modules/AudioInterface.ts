@@ -1,4 +1,13 @@
-import { AudioPlayer, AudioPlayerState, createAudioPlayer, VoiceConnection } from '@discordjs/voice';
+import {
+	AudioPlayer,
+	AudioPlayerIdleState,
+	AudioPlayerPlayingState,
+	AudioPlayerState,
+	AudioPlayerStatus,
+	AudioResource,
+	createAudioPlayer,
+	VoiceConnection
+} from '@discordjs/voice';
 import config, { globals } from 'bot-config';
 import { downloadYouTubeVideo } from 'bot-functions';
 import { Guild } from 'discord.js';
@@ -21,6 +30,7 @@ export default class AudioInterface {
 	player: AudioPlayer;
 	connection?: VoiceConnection;
 	redisQueueNamespace: string;
+	currentResouce?: AudioResource | null;
 
 	constructor(guild: Guild) {
 		this.guild = guild;
@@ -97,7 +107,9 @@ export default class AudioInterface {
 					return;
 				}
 
-				this.getPlayer().play(audioResource);
+				this.currentResouce = audioResource;
+
+				this.getPlayer().play(this.currentResouce);
 				await this.queueDeleteOldest();
 
 				const onIdleCallback = async (oldState: AudioPlayerState, newState: AudioPlayerState) => {
@@ -132,6 +144,8 @@ export default class AudioInterface {
 			return true;
 		}
 
+		this.currentResouce = null;
+
 		return null;
 	}
 
@@ -140,6 +154,13 @@ export default class AudioInterface {
 	 */
 	getConnection() {
 		return this.connection || null;
+	}
+
+	/**
+	 * Get the current audio resource
+	 */
+	getCurrentAudioResource() {
+		return this.currentResouce || null;
 	}
 
 	/**
@@ -219,5 +240,31 @@ export default class AudioInterface {
 		else if (queueLength > 1) await LTRIM(this.redisQueueNamespace, -1, 0);
 		// LTRIM does not work if there is more than one value
 		else return null;
+	}
+
+	/**
+	 * Emit the exact event that will happen when the bot gets to the end of its current audio track. Useful for skipping.
+	 */
+	emitAudioFinish() {
+		const currentAudioResource = this.getCurrentAudioResource();
+		const player = this.getPlayer();
+
+		if (!(currentAudioResource instanceof AudioResource)) return null;
+
+		const oldState: AudioPlayerPlayingState = {
+			status: AudioPlayerStatus.Playing,
+			playbackDuration: currentAudioResource.playbackDuration,
+			missedFrames: 0,
+			resource: currentAudioResource,
+			onStreamError: () => {}
+		};
+
+		const newState: AudioPlayerIdleState = {
+			status: AudioPlayerStatus.Idle
+		};
+
+		player.emit('stateChange', oldState, newState);
+
+		return true;
 	}
 }

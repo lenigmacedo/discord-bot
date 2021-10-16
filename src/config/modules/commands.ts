@@ -13,7 +13,8 @@ const commands = [
 		.setName('enqueue')
 		.setDescription('Add a YouTube video to the end of the queue.')
 		.addStringOption(option => option.setName('youtube-url').setDescription('The YouTube video URL.').setRequired(true)),
-	new SlashCommandBuilder().setName('stop').setDescription('Stop the bot from playing?')
+	new SlashCommandBuilder().setName('stop').setDescription('Stop the bot from playing?'),
+	new SlashCommandBuilder().setName('skip').setDescription('Skip the current playing audio.')
 ];
 
 export default commands.map(builder => builder.toJSON());
