@@ -47,6 +47,9 @@ This means that many audio problems with the original bot have been fixed and th
 5. In the .env file you created, fill in the following:
 
    1. `DISCORD_TOKEN` - Which you can find/create at https://discord.com/developers.
+      1. Make sure the bot has the following permissions:
+         1. bot
+         2. applications.commands
    2. `GOOGLE_API_TOKEN` - Which you can create in the Google Cloud platform https://console.cloud.google.com/apis/credentials.
       1. You also need to enable **YouTube Data API v3** in the Google Cloud platform.
 
