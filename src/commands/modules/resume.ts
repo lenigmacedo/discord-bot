@@ -1,12 +1,12 @@
-import { Queue } from 'bot-classes';
+import { AudioInterface } from 'bot-classes';
 import { CommandHandler } from '../CommandHandler.types';
 
 const resume: CommandHandler = async interaction => {
 	if (!interaction.guild) return;
 
-	const queue = Queue.getQueue(interaction.guild);
+	const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
 
-	queue.getPlayer().unpause();
+	audioInterface.getPlayer().unpause();
 
 	interaction.reply('The audio has been resumed.');
 };

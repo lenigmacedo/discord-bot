@@ -1,8 +1,6 @@
-import { createAudioResource } from '@discordjs/voice';
-import { Queue } from 'bot-classes';
-import { destroyConnectionOnIdle, safeJoinVoiceChannel } from 'bot-functions';
+import { AudioInterface } from 'bot-classes';
+import { safeJoinVoiceChannel } from 'bot-functions';
 import { GuildMember } from 'discord.js';
-import ytdl from 'ytdl-core-discord';
 import { CommandHandler } from '../CommandHandler.types';
 
 const play: CommandHandler = async interaction => {
@@ -25,32 +23,21 @@ const play: CommandHandler = async interaction => {
 			return;
 		}
 
-		if (!ytdl.validateURL(youtubeUrl)) {
-			interaction.reply('Invalid URL. I cannot play that video.');
-			return;
-		}
-		await interaction.reply('Downloading YouTube video...');
+		const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
 
-		const queue = Queue.getQueue(interaction.guild);
-		const details = await ytdl.getBasicInfo(youtubeUrl);
-		const audioBitstream = await ytdl(youtubeUrl, { filter: 'audioonly' });
-		const player = queue.getPlayer();
-		queue.setConnection(safeJoinVoiceChannel(interaction));
-		const connection = queue.getConnection();
-
-		if (!connection) {
-			interaction.reply('I was unable to establish a connection to the voice channel!');
+		if (audioInterface.isBusy()) {
+			interaction.reply('I am busy!');
 			return;
 		}
 
-		await interaction.editReply(`Downloaded! Now I am preparing to stream...`);
-		const audioResource = createAudioResource(audioBitstream);
-		connection.subscribe(player);
+		await interaction.reply('Preparing to play...');
+		audioInterface.setConnection(safeJoinVoiceChannel(interaction));
+		await audioInterface.queueAppend(youtubeUrl);
+		await interaction.editReply('I am now playing audio.');
 
-		await interaction.editReply(`Now playing \`${details.videoDetails.title}\` by \`${details.videoDetails.author.name}\``);
-		player.play(audioResource);
+		while (await audioInterface.queueRunner());
 
-		destroyConnectionOnIdle(player, connection);
+		audioInterface.deleteConnection();
 	} catch (error) {
 		console.error(error);
 	}

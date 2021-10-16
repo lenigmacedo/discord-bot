@@ -1,1 +1,1 @@
-export { default as Queue } from './modules/Queue';
+export { default as AudioInterface } from './modules/AudioInterface';
