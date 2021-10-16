@@ -43,7 +43,7 @@ This means that many audio problems with the original bot have been fixed and th
       2. For Linux Debian (CLI): `sudo apt update -y && sudo apt upgrade -y && sudo apt install git -y`
 2. `cd` into a directory you want to place the project in.
 3. Clone this repository using Git: `git clone https://github.com/jack3898/discord-youtube-bot-2`
-4. Rename `.env-example` and call the new copy `.env`.
+4. Rename `.env-example` and call it `.env`.
 5. In the .env file you created, fill in the following:
 
    1. `DISCORD_TOKEN` - Which you can find/create at https://discord.com/developers.
