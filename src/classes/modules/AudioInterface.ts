@@ -6,6 +6,7 @@ import { promisify } from 'util';
 import ytdl from 'ytdl-core-discord';
 
 const RPUSH = promisify<string, string>(globals.redisClient.RPUSH).bind(globals.redisClient);
+const LPUSH = promisify<string, string>(globals.redisClient.LPUSH).bind(globals.redisClient);
 const LRANGE = promisify(globals.redisClient.LRANGE).bind(globals.redisClient);
 const LLEN = promisify(globals.redisClient.LLEN).bind(globals.redisClient);
 const LPOP = promisify(globals.redisClient.LPOP).bind(globals.redisClient);
@@ -152,7 +153,17 @@ export default class AudioInterface {
 	}
 
 	/**
-	 * Get ALL items in the guild's queue.
+	 * Add a URL to the end of the guild's queue.
+	 */
+	async queuePrepend(url: string) {
+		if (!ytdl.validateURL(url)) return null;
+
+		await LPUSH(this.redisQueueNamespace, url);
+		return true;
+	}
+
+	/**
+	 * Get many items in the guild's queue. Default limit is 9, which means 10 items are returned.
 	 */
 	async queueGetMultiple(limit: number = 9) {
 		const results = await LRANGE(this.redisQueueNamespace, 0, limit);

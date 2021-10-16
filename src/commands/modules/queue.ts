@@ -1,5 +1,4 @@
 import { AudioInterface } from 'bot-classes';
-import { safeJoinVoiceChannel } from 'bot-functions';
 import { CommandHandler } from '../CommandHandler.types';
 
 const queue: CommandHandler = async interaction => {
@@ -14,30 +13,9 @@ const queue: CommandHandler = async interaction => {
 		return;
 	}
 
-	const runNow = interaction.options.getBoolean('run-now');
+	const reply = `**Displaying the first ${queue.length} items in the queue:**\n${queue.map((item, index) => `${index + 1}) \`${item}\``).join('\n')}`;
 
-	if (!runNow) {
-		const reply = `**Displaying the first ${queue.length} items in the queue:**\n${queue
-			.map((item, index) => `${index + 1}) \`${item}\``)
-			.join('\n')}`;
-		interaction.reply(reply);
-		return;
-	}
-
-	if (audioInterface.isBusy()) {
-		interaction.reply('I am busy!');
-		return;
-	}
-
-	await interaction.reply('Preparing to play...');
-
-	audioInterface.setConnection(safeJoinVoiceChannel(interaction));
-
-	await interaction.editReply('I am now playing the queue.');
-
-	while (await audioInterface.queueRunner());
-
-	audioInterface.deleteConnection();
+	interaction.reply(reply);
 };
 
 export default queue;

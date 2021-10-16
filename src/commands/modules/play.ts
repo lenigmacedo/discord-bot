@@ -34,7 +34,7 @@ const play: CommandHandler = async interaction => {
 
 		audioInterface.setConnection(safeJoinVoiceChannel(interaction));
 
-		await audioInterface.queueAppend(youtubeUrl);
+		await audioInterface.queuePrepend(youtubeUrl);
 
 		await interaction.editReply('I am now playing audio.');
 
