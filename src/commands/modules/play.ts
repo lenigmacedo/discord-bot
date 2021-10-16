@@ -17,7 +17,7 @@ const play: CommandHandler = async interaction => {
 			return;
 		}
 
-		const youtubeUrl = interaction.options.get('url', true).value;
+		const youtubeUrl = interaction.options.get('youtube-url', true).value;
 		if (typeof youtubeUrl !== 'string') {
 			interaction.reply('Invalid argument provided. This issue must be reported to the bot developer, as it is a configuration issue on our end.');
 			return;
@@ -31,8 +31,11 @@ const play: CommandHandler = async interaction => {
 		}
 
 		await interaction.reply('Preparing to play...');
+
 		audioInterface.setConnection(safeJoinVoiceChannel(interaction));
+
 		await audioInterface.queueAppend(youtubeUrl);
+
 		await interaction.editReply('I am now playing audio.');
 
 		while (await audioInterface.queueRunner());
