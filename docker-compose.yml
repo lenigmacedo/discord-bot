@@ -5,8 +5,10 @@ services:
     container_name: redis
     image: redis
     command: redis-server
+    restart: always
   bot:
     container_name: bot
     depends_on:
       - redis
     build: .
+    restart: always
