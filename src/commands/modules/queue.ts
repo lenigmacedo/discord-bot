@@ -7,7 +7,7 @@ const queue: CommandHandler = async interaction => {
 
 	const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
 
-	const queue = await audioInterface.queueGetAll();
+	const queue = await audioInterface.queueGetMultiple();
 
 	if (!queue.length) {
 		await interaction.reply('The queue is empty.');
@@ -17,7 +17,9 @@ const queue: CommandHandler = async interaction => {
 	const runNow = interaction.options.getBoolean('run-now');
 
 	if (!runNow) {
-		const reply = `**You have ${queue.length} items in the queue:**\n${queue.map((item, index) => `${index + 1}) \`${item}\``).join('\n')}`;
+		const reply = `**Displaying the first ${queue.length} items in the queue:**\n${queue
+			.map((item, index) => `${index + 1}) \`${item}\``)
+			.join('\n')}`;
 		interaction.reply(reply);
 		return;
 	}

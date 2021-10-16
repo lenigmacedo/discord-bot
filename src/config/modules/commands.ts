@@ -16,7 +16,11 @@ const commands = [
 	new SlashCommandBuilder()
 		.setName('enqueue')
 		.setDescription('Add a YouTube video to the end of the queue.')
-		.addStringOption(option => option.setName('youtube-url').setDescription('The YouTube video URL.').setRequired(true))
+		.addStringOption(option => option.setName('youtube-url').setDescription('The YouTube video URL.').setRequired(true)),
+	new SlashCommandBuilder()
+		.setName('stop')
+		.setDescription('Stop the bot from playing?')
+		.addBooleanOption(option => option.setName('purge-queue').setDescription('Also wipe the queue clean?'))
 ];
 
 export default commands.map(builder => builder.toJSON());

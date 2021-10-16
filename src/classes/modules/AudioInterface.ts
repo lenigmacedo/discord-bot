@@ -9,6 +9,8 @@ const RPUSH = promisify<string, string>(globals.redisClient.RPUSH).bind(globals.
 const LRANGE = promisify(globals.redisClient.LRANGE).bind(globals.redisClient);
 const LLEN = promisify(globals.redisClient.LLEN).bind(globals.redisClient);
 const LPOP = promisify(globals.redisClient.LPOP).bind(globals.redisClient);
+const LTRIM = promisify(globals.redisClient.LTRIM).bind(globals.redisClient);
+const DEL = promisify<string>(globals.redisClient.DEL).bind(globals.redisClient);
 
 /**
  * An easy toolbox for managing audio for this bot.
@@ -152,8 +154,8 @@ export default class AudioInterface {
 	/**
 	 * Get ALL items in the guild's queue.
 	 */
-	async queueGetAll() {
-		const results = await LRANGE(this.redisQueueNamespace, 0, -1);
+	async queueGetMultiple(limit: number = 9) {
+		const results = await LRANGE(this.redisQueueNamespace, 0, limit);
 		return results;
 	}
 
@@ -195,5 +197,16 @@ export default class AudioInterface {
 	async queueIsEmpty() {
 		const queueLength = await this.queueGetLength();
 		return queueLength < 1;
+	}
+
+	/**
+	 * Delete all items in the queue for the guild
+	 */
+	async queueDelete() {
+		const queueLength = await this.queueGetLength();
+		if (queueLength === 1) await DEL(this.redisQueueNamespace);
+		else if (queueLength > 1) await LTRIM(this.redisQueueNamespace, -1, 0);
+		// LTRIM does not work if there is more than one value
+		else return null;
 	}
 }
