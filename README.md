@@ -6,16 +6,17 @@ A lot of music bots are private and proprietary (and lock features behind a payw
 
 ## Features
 
-| Command     | What it does                                                           |
-| ----------- | ---------------------------------------------------------------------- |
-| /play <URL> | Play a YouTube video with a URL                                        |
-| /pause      | Pause the current playing audio.                                       |
-| /resume     | Unpause the bot.                                                       |
-| /enqueue    | Add a YouTube video to the queue                                       |
-| /queue      | Get a list of items in the queue.                                      |
-| /start      | Start playing the queue whilst the bot is inactive.                    |
-| /stop       | Stop the playing of audio and disconnect the bot.                      |
-| /skip       | Skip the current item in the queue. Disconnects if the queue is empty. |
+| Command  | What it does                                                           |
+| -------- | ---------------------------------------------------------------------- |
+| /play    | Play a YouTube video with a URL                                        |
+| /pause   | Pause the current playing audio.                                       |
+| /resume  | Unpause the bot.                                                       |
+| /enqueue | Add a YouTube video to the queue                                       |
+| /queue   | Get a list of items in the queue.                                      |
+| /start   | Start playing the queue whilst the bot is inactive.                    |
+| /stop    | Stop the playing of audio and disconnect the bot.                      |
+| /skip    | Skip the current item in the queue. Disconnects if the queue is empty. |
+| /search  | Search YouTube and pick a video to add to the queue using reactions.   |
 
 TIP: Typing "/" in the Discord text channel will give you automatic suggestions of commands and will auto-complete options as you type the command!
 
@@ -59,6 +60,7 @@ This means that many audio problems with the original bot have been fixed and th
 9. Congratulations! It's deployed!
 
 ## How to update the bot
+
 1. Pull the latest code from this repository with `git pull`. This will not override your .env file, but it should be a good idea to check that the .env-example file has not changed.
 2. Rebuild the Docker containers with `docker-compose up --build --detach`.
 3. Done!
