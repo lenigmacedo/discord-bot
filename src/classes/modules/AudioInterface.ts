@@ -30,7 +30,7 @@ export default class AudioInterface {
 	player: AudioPlayer;
 	connection?: VoiceConnection;
 	redisQueueNamespace: string;
-	currentResouce?: AudioResource | null;
+	currentResource?: AudioResource | null;
 
 	constructor(guild: Guild) {
 		this.guild = guild;
@@ -107,9 +107,9 @@ export default class AudioInterface {
 					return;
 				}
 
-				this.currentResouce = audioResource;
+				this.currentResource = audioResource;
 
-				this.getPlayer().play(this.currentResouce);
+				this.getPlayer().play(this.currentResource);
 				await this.queueDeleteOldest();
 
 				const onIdleCallback = async (oldState: AudioPlayerState, newState: AudioPlayerState) => {
@@ -138,13 +138,13 @@ export default class AudioInterface {
 	 * Destroy the connection instance associated with this guild
 	 */
 	deleteConnection() {
+		this.currentResource = null;
+
 		if (this.connection instanceof VoiceConnection) {
 			this.connection.disconnect();
 			this.connection.destroy();
 			return true;
 		}
-
-		this.currentResouce = null;
 
 		return null;
 	}
@@ -160,7 +160,7 @@ export default class AudioInterface {
 	 * Get the current audio resource
 	 */
 	getCurrentAudioResource() {
-		return this.currentResouce || null;
+		return this.currentResource || null;
 	}
 
 	/**

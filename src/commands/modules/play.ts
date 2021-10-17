@@ -5,19 +5,21 @@ import { CommandHandler } from '../CommandHandler.types';
 
 const play: CommandHandler = async interaction => {
 	try {
-		// The user who sent the command
 		const guildMember = interaction.member;
+
 		if (!interaction?.guild?.id || !(guildMember instanceof GuildMember)) {
 			return;
 		}
 
 		const voiceChannel = guildMember.voice.channel;
+
 		if (!voiceChannel) {
 			await interaction.reply('You must be connected to a voice channel for me to know where to join!');
 			return;
 		}
 
 		const youtubeUrl = interaction.options.get('youtube-url', true).value;
+
 		if (typeof youtubeUrl !== 'string') {
 			interaction.reply('Invalid argument provided. This issue must be reported to the bot developer, as it is a configuration issue on our end.');
 			return;

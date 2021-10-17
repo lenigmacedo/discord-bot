@@ -5,11 +5,13 @@ import { CommandHandler } from '../CommandHandler.types';
 
 const start: CommandHandler = async interaction => {
 	const guildMember = interaction.member;
+
 	if (!interaction?.guild?.id || !(guildMember instanceof GuildMember)) {
 		return;
 	}
 
 	const voiceChannel = guildMember.voice.channel;
+
 	if (!voiceChannel) {
 		await interaction.reply('You must be connected to a voice channel for me to know where to join!');
 		return;
