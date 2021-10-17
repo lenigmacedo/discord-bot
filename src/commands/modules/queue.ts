@@ -1,4 +1,5 @@
 import { AudioInterface } from 'bot-classes';
+import { getVideoDetails, YtdlVideoInfoResolved } from 'bot-functions';
 import { CommandHandler } from '../CommandHandler.types';
 
 const queue: CommandHandler = async interaction => {
@@ -13,7 +14,17 @@ const queue: CommandHandler = async interaction => {
 		return;
 	}
 
-	const reply = `**Displaying the first ${queue.length} items in the queue:**\n${queue.map((item, index) => `${index + 1}) \`${item}\``).join('\n')}`;
+	const videoDetails = (await Promise.all(queue.map(url => getVideoDetails(url)))).filter(Boolean) as YtdlVideoInfoResolved[];
+
+	const reply = `**Displaying the first ${queue.length} items in the queue:**\n${videoDetails
+		.map(({ videoDetails }, index) => {
+			const { title = 'Problem getting video details', viewCount } = videoDetails;
+
+			if (!title || !parseInt(viewCount)) return 'Error getting video.';
+
+			return `${index + 1}) \`${title}\`, \`${parseInt(viewCount).toLocaleString()}\` views`;
+		})
+		.join('\n')}`;
 
 	interaction.reply(reply);
 };
