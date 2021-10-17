@@ -13,7 +13,13 @@ const play: CommandHandler = async interaction => {
 
 		const voiceChannel = guildMember.voice.channel;
 		if (!voiceChannel) {
-			await interaction.reply('You must be connected for a voice channel for me to know where to join!');
+			await interaction.reply('You must be connected to a voice channel for me to know where to join!');
+			return;
+		}
+
+		const youtubeUrl = interaction.options.get('youtube-url', true).value;
+		if (typeof youtubeUrl !== 'string') {
+			interaction.reply('Invalid argument provided. This issue must be reported to the bot developer, as it is a configuration issue on our end.');
 			return;
 		}
 

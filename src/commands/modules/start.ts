@@ -11,7 +11,7 @@ const start: CommandHandler = async interaction => {
 
 	const voiceChannel = guildMember.voice.channel;
 	if (!voiceChannel) {
-		await interaction.reply('You must be connected for a voice channel for me to know where to join!');
+		await interaction.reply('You must be connected to a voice channel for me to know where to join!');
 		return;
 	}
 
