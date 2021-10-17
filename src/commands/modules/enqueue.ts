@@ -6,16 +6,12 @@ const enqueue: CommandHandler = async interaction => {
 
 	const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
 
-	const youtubeUrl = interaction.options.get('youtube-url', true).value;
+	const youtubeUrl = interaction.options.getString('youtube-url', true);
 
-	if (typeof youtubeUrl !== 'string') {
-		interaction.reply('Invalid argument provided. This issue must be reported to the bot developer, as it is a configuration issue on our end.');
-		return;
-	}
+	const appended = await audioInterface.queueAppend(youtubeUrl);
 
-	audioInterface.queueAppend(youtubeUrl);
-
-	interaction.reply('Item appended to the queue!');
+	if (appended) interaction.reply('Item appended to the queue!');
+	else interaction.reply('I could not add that item to the queue. Is it a valid URL?');
 };
 
 export default enqueue;

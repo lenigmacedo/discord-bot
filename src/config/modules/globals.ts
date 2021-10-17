@@ -1,3 +1,4 @@
+import { youtube } from '@googleapis/youtube';
 import { AudioInterface } from 'bot-classes';
 import config from 'bot-config';
 import { Guild } from 'discord.js';
@@ -8,6 +9,10 @@ const globals = {
 	redisClient: redis.createClient({
 		host: config.redisHost,
 		port: config.redisPort
+	}),
+	youtubeApi: youtube({
+		version: 'v3',
+		auth: config.googleApiToken
 	})
 };
 

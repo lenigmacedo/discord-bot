@@ -5,11 +5,14 @@ env();
 
 const config = {
 	discordToken: process.env.DISCORD_TOKEN,
+	googleApiToken: process.env.GOOGLE_API_TOKEN,
 	clientId: process.env.CLIENT_ID,
 	devGuildId: process.env.DEV_GUILD_ID,
 	environment: process.env.NODE_ENV, // development or production
-	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES],
+	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
 	redisNamespace: 'discord-youtube-bot',
+	paginateMaxLength: 5,
+	searchExpiryMilliseconds: 60 * 1000,
 	redisHost: (() => {
 		switch (process.env.NODE_ENV) {
 			case 'production':
@@ -20,7 +23,8 @@ const config = {
 				return 'localhost';
 		}
 	})(),
-	redisPort: 6379
+	redisPort: 6379,
+	searchReactionOptions: ['\u0031\u20E3', '\u0032\u20E3', '\u0033\u20E3', '\u0034\u20E3', '\u0035\u20E3']
 };
 
 export default config;
