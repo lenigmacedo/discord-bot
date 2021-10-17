@@ -21,7 +21,7 @@ const search: CommandHandler = async interaction => {
 
 		const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
 
-		interaction.reply('Searching YouTube...');
+		await interaction.reply('Searching YouTube...');
 
 		const searchQuery = interaction.options.getString('search-query', true);
 
