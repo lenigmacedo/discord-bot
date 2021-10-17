@@ -58,6 +58,11 @@ This means that many audio problems with the original bot have been fixed and th
 8. If the bot runs well, press `CTRL`+`C` to cancel the running docker instances and re-run step 6 with an additional `--detach` flag. This will run the containers as a service, allowing you to close any shell sessions you have open.
 9. Congratulations! It's deployed!
 
+## How to update the bot
+1. Pull the latest code from this repository with `git pull`. This will not override your .env file, but it should be a good idea to check that the .env-example file has not changed.
+2. Rebuild the Docker containers with `docker-compose up --build --detach`.
+3. Done!
+
 ## Plans
 
 This bot is in continuous development, and is only in its beginning phase. It currently does not have any additional features over the previous bot so my first plan is to make that so.
