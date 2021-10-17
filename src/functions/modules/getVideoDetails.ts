@@ -17,11 +17,7 @@ export type YtdlVideoInfoResolved = Awaited<ReturnType<typeof ytdl.getBasicInfo>
  */
 export default async function getVideoDetails(url: string): Promise<YtdlVideoInfoResolved | null> {
 	try {
-		const urlObject = new URL(url);
-
-		const searchParams = urlObject.searchParams;
-
-		const videoId = searchParams.get('v');
+		const videoId = ytdl.getVideoID(url);
 
 		const namespace = `${redisNamespace}:${videoId}`;
 
