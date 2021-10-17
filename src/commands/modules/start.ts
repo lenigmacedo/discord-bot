@@ -1,9 +1,19 @@
 import { AudioInterface } from 'bot-classes';
 import { safeJoinVoiceChannel } from 'bot-functions';
+import { GuildMember } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
 
 const start: CommandHandler = async interaction => {
-	if (!interaction.guild) return;
+	const guildMember = interaction.member;
+	if (!interaction?.guild?.id || !(guildMember instanceof GuildMember)) {
+		return;
+	}
+
+	const voiceChannel = guildMember.voice.channel;
+	if (!voiceChannel) {
+		await interaction.reply('You must be connected for a voice channel for me to know where to join!');
+		return;
+	}
 
 	const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
 
