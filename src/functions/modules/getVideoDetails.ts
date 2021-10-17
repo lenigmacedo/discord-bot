@@ -19,9 +19,9 @@ export default async function getVideoDetails(url: string): Promise<YtdlVideoInf
 	try {
 		const videoId = ytdl.getVideoID(url);
 
-		const namespace = `${redisNamespace}:${videoId}`;
-
 		if (!videoId) return null;
+
+		const namespace = `${redisNamespace}:${videoId}`;
 
 		const searchCache = await GET(namespace);
 
