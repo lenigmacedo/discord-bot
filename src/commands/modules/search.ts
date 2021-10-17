@@ -1,8 +1,7 @@
 import { AudioInterface } from 'bot-classes';
 import config from 'bot-config';
-import { findYouTubeUrls } from 'bot-functions';
+import { findYouTubeUrls, getVideoDetails, YtdlVideoInfoResolved } from 'bot-functions';
 import { GuildMember, Message, MessageReaction, PartialMessageReaction, PartialUser, User } from 'discord.js';
-import ytdl from 'ytdl-core-discord';
 import { CommandHandler } from '../CommandHandler.types';
 
 const search: CommandHandler = async interaction => {
@@ -33,7 +32,7 @@ const search: CommandHandler = async interaction => {
 			return;
 		}
 
-		const videoDetails = await Promise.all(searchResult.map(url => ytdl.getBasicInfo(url)));
+		const videoDetails = (await Promise.all(searchResult.map(url => getVideoDetails(url)))).filter(Boolean) as YtdlVideoInfoResolved[];
 
 		const reply = `**Found ${searchResult.length} result(s):**\n${videoDetails
 			.map(({ videoDetails }, index) => {

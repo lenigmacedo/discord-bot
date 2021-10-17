@@ -9,7 +9,7 @@ import {
 	VoiceConnection
 } from '@discordjs/voice';
 import config, { globals } from 'bot-config';
-import { downloadYouTubeVideo } from 'bot-functions';
+import { downloadYouTubeVideo, getVideoDetails } from 'bot-functions';
 import { Guild } from 'discord.js';
 import { promisify } from 'util';
 import ytdl from 'ytdl-core-discord';
@@ -65,7 +65,7 @@ export default class AudioInterface {
 	async queueGetQueueItemInfo(queueItemIndex: number = 0) {
 		const queueItem = await this.queueGetFromIndex(queueItemIndex);
 		if (!queueItem) return null;
-		const info = ytdl.getBasicInfo(queueItem);
+		const info = await getVideoDetails(queueItem);
 		return info;
 	}
 

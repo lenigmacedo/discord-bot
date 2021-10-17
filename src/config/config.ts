@@ -3,6 +3,10 @@ import { config as env } from 'dotenv';
 
 env();
 
+/**
+ * CONFIG
+ * Set values that are meant to be user-changeable here!
+ */
 const config = {
 	discordToken: process.env.DISCORD_TOKEN,
 	googleApiToken: process.env.GOOGLE_API_TOKEN,
@@ -13,6 +17,7 @@ const config = {
 	redisNamespace: 'discord-youtube-bot',
 	paginateMaxLength: 5,
 	searchExpiryMilliseconds: 60 * 1000,
+	cacheExpiryHours: 24,
 	redisHost: (() => {
 		switch (process.env.NODE_ENV) {
 			case 'production':

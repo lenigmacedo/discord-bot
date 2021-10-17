@@ -4,6 +4,10 @@ import config from 'bot-config';
 import { Guild } from 'discord.js';
 import redis from 'redis';
 
+/**
+ * GLOBALS
+ * Set values that should NOT be user changeable yet used throughout many parts of the code as reference.
+ */
 const globals = {
 	players: new Map<Guild['id'], AudioInterface>(),
 	redisClient: redis.createClient({
