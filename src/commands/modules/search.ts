@@ -2,6 +2,7 @@ import { AudioInterface } from 'bot-classes';
 import config from 'bot-config';
 import { findYouTubeUrls } from 'bot-functions';
 import { GuildMember, Message, MessageReaction, PartialMessageReaction, PartialUser, User } from 'discord.js';
+import ytdl from 'ytdl-core-discord';
 import { CommandHandler } from '../CommandHandler.types';
 
 const search: CommandHandler = async interaction => {
@@ -32,8 +33,16 @@ const search: CommandHandler = async interaction => {
 			return;
 		}
 
-		const reply = `**Found ${searchResult.length} result(s):**\n${searchResult
-			.map((url, index) => `${index + 1}) \`${url}\``)
+		const videoDetails = await Promise.all(searchResult.map(url => ytdl.getBasicInfo(url)));
+
+		const reply = `**Found ${searchResult.length} result(s):**\n${videoDetails
+			.map(({ videoDetails }, index) => {
+				const { title = 'Problem getting video details', viewCount } = videoDetails;
+
+				if (!title || !parseInt(viewCount)) return 'Error getting video.';
+
+				return `${index + 1}) \`${title}\`, \`${parseInt(viewCount).toLocaleString()}\` views`;
+			})
 			.join('\n')}\n*You have ${config.searchExpiryMilliseconds / 1000} seconds to make your pick!*`;
 
 		const botReply = await interaction.editReply(reply);
