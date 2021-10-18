@@ -3,9 +3,11 @@ import { CommandHandler } from '../CommandHandler.types';
 
 const resume: CommandHandler = async interaction => {
 	if (!interaction.guild) return;
+	await interaction.reply('Trying to resume...');
 	const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
-	audioInterface.getPlayer().unpause();
-	interaction.reply('The audio has been resumed.');
+	const unpaused = audioInterface.getPlayer().unpause();
+	if (unpaused) await interaction.editReply('The audio has been resumed.');
+	else await interaction.editReply('I could not unpause the audio.');
 };
 
 export default resume;

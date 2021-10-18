@@ -4,6 +4,7 @@ import { CommandHandler } from '../CommandHandler.types';
 
 const skip: CommandHandler = async interaction => {
 	const guildMember = interaction.member;
+	await interaction.reply('Skipping...');
 
 	if (!interaction?.guild?.id || !(guildMember instanceof GuildMember)) {
 		return;
@@ -13,14 +14,14 @@ const skip: CommandHandler = async interaction => {
 	const voiceChannel = guildMember.voice.channel;
 
 	if (!voiceChannel) {
-		await interaction.reply('You must be connected to a voice channel for me to skip the audio!');
+		await interaction.editReply('You must be connected to a voice channel for me to skip the audio!');
 		return;
 	}
 
 	const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
 	const skipped = audioInterface.emitAudioFinish();
-	if (skipped) interaction.reply('The audio has been skipped.');
-	else interaction.reply('I cannot skip as I am not playing anything!');
+	if (skipped) await interaction.editReply('The audio has been skipped.');
+	else await interaction.editReply('I cannot skip as I am not playing anything!');
 };
 
 export default skip;

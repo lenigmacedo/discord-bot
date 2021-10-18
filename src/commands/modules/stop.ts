@@ -3,15 +3,16 @@ import { CommandHandler } from '../CommandHandler.types';
 
 const stop: CommandHandler = async interaction => {
 	if (!interaction.guild) return;
+	await interaction.reply('Stopping...');
 	const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
 
 	if (!audioInterface.isBusy()) {
-		interaction.reply('I am not doing anything that needs stopping.');
+		await interaction.editReply('I am not doing anything that needs stopping.');
 		return;
 	}
 
 	audioInterface.deleteConnection();
-	interaction.reply('The bot has been stopped.');
+	await interaction.editReply('The bot has been stopped.');
 };
 
 export default stop;

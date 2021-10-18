@@ -3,9 +3,11 @@ import { CommandHandler } from '../CommandHandler.types';
 
 const pause: CommandHandler = async interaction => {
 	if (!interaction.guild) return;
+	await interaction.reply('Trying to pause...');
 	const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
-	audioInterface.getPlayer().pause();
-	interaction.reply('The audio has been paused.');
+	const paused = audioInterface.getPlayer().pause(true);
+	if (paused) await interaction.editReply('The audio has been paused.');
+	else await interaction.editReply('I could not pause the audio.');
 };
 
 export default pause;

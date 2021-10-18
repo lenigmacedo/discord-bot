@@ -4,12 +4,12 @@ import { CommandHandler } from '../CommandHandler.types';
 
 const queue: CommandHandler = async interaction => {
 	if (!interaction.guild) return;
-
+	await interaction.reply('Fetching queue...');
 	const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
 	const queue = await audioInterface.queueGetMultiple();
 
 	if (!queue.length) {
-		await interaction.reply('The queue is empty.');
+		await interaction.editReply('The queue is empty.');
 		return;
 	}
 
@@ -23,7 +23,7 @@ const queue: CommandHandler = async interaction => {
 		})
 		.join('\n')}`;
 
-	interaction.reply(reply);
+	await interaction.editReply(reply);
 };
 
 export default queue;
