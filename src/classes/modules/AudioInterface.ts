@@ -119,6 +119,7 @@ export default class AudioInterface {
 
 				player.on('stateChange', onIdleCallback);
 			} catch (error) {
+				console.error(error);
 				resolve(true);
 			}
 		});
