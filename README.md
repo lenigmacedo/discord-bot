@@ -47,16 +47,16 @@ This means that many audio problems with the original bot have been fixed and th
 4. Rename `.env-example` and call it `.env`.
 5. In the .env file you created, fill in the following:
 
-   1. `DISCORD_TOKEN` - Which you can find/create at https://discord.com/developers.
+   1. `DISCORD_TOKEN` & `CLIENT_ID` - Which you can create at https://discord.com/developers.
       1. Make sure the bot has the following permissions:
          1. bot
          2. applications.commands
    2. `GOOGLE_API_TOKEN` - Which you can create in the Google Cloud platform https://console.cloud.google.com/apis/credentials.
       1. You also need to enable **YouTube Data API v3** in the Google Cloud platform.
 
-6. Run `docker-compose up --build`. This will build the bot.
+6. Run `docker-compose up --build`. This will build the bot, and run it.
 7. Verify that the bot runs with no errors.
-8. If the bot runs well, press `CTRL`+`C` to cancel the running docker instances and re-run step 6 with an additional `--detach` flag. This will run the containers as a service, allowing you to close any shell sessions you have open.
+8. If the bot runs well, press `CTRL`+`C` to cancel the running docker instances and re-run step 6 with the `--detach` flag included. This will run the containers as a service, allowing you to close any shell sessions you have open. If any of the containers crash, they we also be automatically restarted.
 9. Congratulations! It's deployed!
 
 ## How to update the bot
