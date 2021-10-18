@@ -56,7 +56,7 @@ This means that many audio problems with the original bot have been fixed and th
 
 6. Run `docker-compose up --build`. This will build the bot, and run it.
 7. Verify that the bot runs with no errors.
-8. If the bot runs well, press `CTRL`+`C` to cancel the running docker instances and re-run step 6 with the `--detach` flag included. This will run the containers as a service, allowing you to close any shell sessions you have open. If any of the containers crash, they we also be automatically restarted.
+8. If the bot runs well, press `CTRL`+`C` to cancel the running docker instances and re-run step 6 with the `--detach` flag included. This will run the containers as a service, allowing you to close any shell sessions you have open. If any of the containers crash, they will be automatically restarted.
 9. Congratulations! It's deployed!
 
 ## How to update the bot
