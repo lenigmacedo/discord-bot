@@ -90,7 +90,7 @@ export default class AudioInterface {
 	 * Start the execution of the queue by joining the bot and playing audio.
 	 */
 	queueRunner(): Promise<true | null> {
-		return new Promise(async (resolve, reject) => {
+		return new Promise(async resolve => {
 			try {
 				const player = this.getPlayer();
 
@@ -119,7 +119,7 @@ export default class AudioInterface {
 
 				player.on('stateChange', onIdleCallback);
 			} catch (error) {
-				reject(error);
+				resolve(true);
 			}
 		});
 	}
