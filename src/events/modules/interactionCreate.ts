@@ -5,7 +5,6 @@ const interactionCreate = async (interaction: Interaction) => {
 		if (interaction.isCommand()) {
 			const commandModule = await import(`bot-commands/modules/${interaction.commandName}`);
 			const handler = commandModule.default;
-
 			handler(interaction);
 		}
 	} catch (error) {

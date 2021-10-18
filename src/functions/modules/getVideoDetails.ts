@@ -18,31 +18,21 @@ export type YtdlVideoInfoResolved = Awaited<ReturnType<typeof ytdl.getBasicInfo>
 export default async function getVideoDetails(url: string): Promise<YtdlVideoInfoResolved | null> {
 	try {
 		const videoId = ytdl.getVideoID(url);
-
 		if (!videoId) return null;
-
 		const namespace = `${redisNamespace}:${videoId}`;
-
 		const searchCache = await GET(namespace);
 
 		if (searchCache) {
 			console.log(`Video id ${videoId} found in cache! Using cache.`);
-
 			return JSON.parse(searchCache);
 		} else {
 			if (!ytdl.validateURL(url)) return null;
-
 			console.log(`Video id ${videoId} not found in cache! Getting video details.`);
-
 			const results = await ytdl.getBasicInfo(url);
-
 			const json = JSON.stringify(results);
-
 			await SET(namespace, json);
-
 			// Set an expiry on the cache, so that it will be forced to re-fetch in the future to keep the data up to date
 			await EXPIRE(namespace, config.cacheExpiryHours * 3600); // 3600 seconds in an hour
-
 			return results;
 		}
 	} catch (error) {

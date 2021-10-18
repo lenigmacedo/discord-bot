@@ -18,9 +18,7 @@ const skip: CommandHandler = async interaction => {
 	}
 
 	const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
-
 	const skipped = audioInterface.emitAudioFinish();
-
 	if (skipped) interaction.reply('The audio has been skipped.');
 	else interaction.reply('I cannot skip as I am not playing anything!');
 };

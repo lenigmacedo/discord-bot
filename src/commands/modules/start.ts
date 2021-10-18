@@ -18,7 +18,6 @@ const start: CommandHandler = async interaction => {
 	}
 
 	const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
-
 	const queue = await audioInterface.queueGetMultiple();
 
 	if (!queue.length) {
@@ -32,13 +31,9 @@ const start: CommandHandler = async interaction => {
 	}
 
 	await interaction.reply('Preparing to play...');
-
 	audioInterface.setConnection(safeJoinVoiceChannel(interaction));
-
 	await interaction.editReply('I am now playing the queue.');
-
 	while (await audioInterface.queueRunner());
-
 	audioInterface.deleteConnection();
 };
 

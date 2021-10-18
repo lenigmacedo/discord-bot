@@ -81,7 +81,6 @@ export default class AudioInterface {
 	 */
 	isBusy() {
 		const connection = this.getConnection();
-
 		if (!connection?.state.status) return false;
 		if (connection?.state.status !== 'destroyed') return true;
 		return false;
@@ -108,7 +107,6 @@ export default class AudioInterface {
 				}
 
 				this.currentResource = audioResource;
-
 				this.getPlayer().play(this.currentResource);
 				await this.queueDeleteOldest();
 
@@ -168,7 +166,6 @@ export default class AudioInterface {
 	 */
 	async queueAppend(url: string) {
 		if (!ytdl.validateURL(url)) return null;
-
 		await RPUSH(this.redisQueueNamespace, url);
 		return true;
 	}
@@ -178,7 +175,6 @@ export default class AudioInterface {
 	 */
 	async queuePrepend(url: string) {
 		if (!ytdl.validateURL(url)) return null;
-
 		await LPUSH(this.redisQueueNamespace, url);
 		return true;
 	}
@@ -248,7 +244,6 @@ export default class AudioInterface {
 	emitAudioFinish() {
 		const currentAudioResource = this.getCurrentAudioResource();
 		const player = this.getPlayer();
-
 		if (!(currentAudioResource instanceof AudioResource)) return null;
 
 		const oldState: AudioPlayerPlayingState = {
@@ -264,7 +259,6 @@ export default class AudioInterface {
 		};
 
 		player.emit('stateChange', oldState, newState);
-
 		return true;
 	}
 }

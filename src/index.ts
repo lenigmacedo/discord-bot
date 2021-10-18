@@ -10,9 +10,7 @@ const rest = new REST({ version: '9' }).setToken(discordToken as string);
 
 const registerCommands = () => {
 	console.log('Started refreshing application (/) commands.');
-
 	if (!clientId) throw TypeError('No client ID defined in .env. This is required.');
-
 	let route = null;
 
 	switch (config.environment) {

@@ -19,7 +19,6 @@ const play: CommandHandler = async interaction => {
 		}
 
 		const youtubeUrl = interaction.options.getString('youtube-url', true);
-
 		const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
 
 		if (audioInterface.isBusy()) {
@@ -28,15 +27,10 @@ const play: CommandHandler = async interaction => {
 		}
 
 		await interaction.reply('Preparing to play...');
-
 		audioInterface.setConnection(safeJoinVoiceChannel(interaction));
-
 		await audioInterface.queuePrepend(youtubeUrl);
-
 		await interaction.editReply('I am now playing audio.');
-
 		while (await audioInterface.queueRunner());
-
 		audioInterface.deleteConnection();
 	} catch (error) {
 		console.error(error);

@@ -21,9 +21,7 @@ export default function findYouTubeUrls(query: string) {
 				const urls = data?.data.items
 					?.map(video => {
 						const id = video?.id?.videoId;
-
 						if (!id) return null;
-
 						return `https://www.youtube.com/watch?v=${id}`;
 					})
 					.filter(Boolean) as string[] | undefined;

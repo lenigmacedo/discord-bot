@@ -16,8 +16,8 @@ export default function resolveConnection(interaction: Interaction) {
 
 	const potentialVoiceConnection = getVoiceConnection(interaction.guild.id);
 	if (potentialVoiceConnection) return potentialVoiceConnection;
-
 	const adapterCreator = interaction.guild.voiceAdapterCreator;
+
 	if (!adapterCreator) {
 		throw TypeError('Unable to retrieve an instance of DiscordGatewayAdapterCreator to create a connection to a voice channel.');
 	}

@@ -3,7 +3,6 @@ import { CommandHandler } from '../CommandHandler.types';
 
 const stop: CommandHandler = async interaction => {
 	if (!interaction.guild) return;
-
 	const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
 
 	if (!audioInterface.isBusy()) {
@@ -12,7 +11,6 @@ const stop: CommandHandler = async interaction => {
 	}
 
 	audioInterface.deleteConnection();
-
 	interaction.reply('The bot has been stopped.');
 };
 

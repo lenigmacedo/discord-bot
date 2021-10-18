@@ -6,7 +6,6 @@ const queue: CommandHandler = async interaction => {
 	if (!interaction.guild) return;
 
 	const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
-
 	const queue = await audioInterface.queueGetMultiple();
 
 	if (!queue.length) {
@@ -19,9 +18,7 @@ const queue: CommandHandler = async interaction => {
 	const reply = `**Displaying the first ${queue.length} items in the queue:**\n${videoDetails
 		.map(({ videoDetails }, index) => {
 			const { title = 'Problem getting video details', viewCount } = videoDetails;
-
 			if (!title || !parseInt(viewCount)) return 'Error getting video.';
-
 			return `${index + 1}) \`${title}\`, \`${parseInt(viewCount).toLocaleString()}\` views`;
 		})
 		.join('\n')}`;
