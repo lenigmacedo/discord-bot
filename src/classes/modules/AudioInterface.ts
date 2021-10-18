@@ -236,6 +236,7 @@ export default class AudioInterface {
 		else if (queueLength > 1) await LTRIM(this.redisQueueNamespace, -1, 0);
 		// LTRIM does not work if there is more than one value
 		else return null;
+		return true;
 	}
 
 	/**

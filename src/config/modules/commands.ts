@@ -18,7 +18,8 @@ const commands = [
 	new SlashCommandBuilder()
 		.setName('search')
 		.setDescription('Search YouTube for videos and use reactions to select a result.')
-		.addStringOption(option => option.setName('search-query').setDescription('The video you would like to search for.').setRequired(true))
+		.addStringOption(option => option.setName('search-query').setDescription('The video you would like to search for.').setRequired(true)),
+	new SlashCommandBuilder().setName('clear').setDescription('Clear the entire queue.')
 ];
 
 export default commands.map(builder => builder.toJSON());

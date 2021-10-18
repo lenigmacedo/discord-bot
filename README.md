@@ -17,6 +17,7 @@ A lot of music bots are private and proprietary (and lock features behind a payw
 | /stop    | Stop the playing of audio and disconnect the bot.                      |
 | /skip    | Skip the current item in the queue. Disconnects if the queue is empty. |
 | /search  | Search YouTube and pick a video to add to the queue using reactions.   |
+| /clear   | Purge the queue of all of its contents.                                |
 
 TIP: Typing "/" in the Discord text channel will give you automatic suggestions of commands and will auto-complete options as you type the command!
 

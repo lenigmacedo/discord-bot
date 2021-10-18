@@ -29,7 +29,8 @@ const config = {
 		}
 	})(),
 	redisPort: 6379,
-	searchReactionOptions: ['\u0031\u20E3', '\u0032\u20E3', '\u0033\u20E3', '\u0034\u20E3', '\u0035\u20E3']
+	searchReactionOptions: ['\u0031\u20E3', '\u0032\u20E3', '\u0033\u20E3', '\u0034\u20E3', '\u0035\u20E3'], // Go to keyboard.cool/db for a great list!
+	confirmOptions: ['\u2705', '\u274E']
 };
 
 export default config;

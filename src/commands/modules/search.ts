@@ -1,7 +1,7 @@
 import { AudioInterface } from 'bot-classes';
 import config from 'bot-config';
 import { findYouTubeUrls, getVideoDetails, YtdlVideoInfoResolved } from 'bot-functions';
-import { GuildMember, Message, MessageReaction, PartialMessageReaction, PartialUser, User } from 'discord.js';
+import { GuildMember, Message, MessageReaction, PartialMessageReaction } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
 
 const search: CommandHandler = async interaction => {
@@ -42,16 +42,14 @@ const search: CommandHandler = async interaction => {
 		const botReply = await interaction.editReply(reply);
 		if (!(botReply instanceof Message)) return;
 
-		await Promise.all(
-			config.searchReactionOptions.map((react, index) => {
-				// If only 1 result was found, why give the user the option to select the second option when it does not exist?
-				if (index < searchResult.length) botReply.react(react);
-			})
-		);
+		config.searchReactionOptions.forEach((react, index) => {
+			// If only 1 result was found, why give the user the option to select the second option when it does not exist?
+			if (index < searchResult.length) botReply.react(react);
+		});
 
 		const botClient = botReply.author.client;
 
-		const listener = (reaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) => {
+		const listener = (reaction: MessageReaction | PartialMessageReaction) => {
 			if (!(guildMember instanceof GuildMember)) return;
 			// Check that the user that actually asked the question to the bot is the one reacting
 			if (!reaction.users.cache.has(guildMember.user.id)) return;
