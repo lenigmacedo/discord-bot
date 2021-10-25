@@ -4,7 +4,8 @@
 	"description": "A Discord bot powered by Discord.js v13 and TypeScript for YouTube playback.",
 	"scripts": {
 		"dev": "cross-env NODE_ENV=development nodemon src/index.ts",
-		"bot": "cross-env NODE_ENV=production ts-node src/index.ts"
+		"bot": "cross-env NODE_ENV=production ts-node src/index.ts -p tsconfig.build.json",
+		"test": "jest --forceExit --coverage"
 	},
 	"workspaces": [
 		"src/config",
@@ -44,5 +45,10 @@
 		"tweetnacl": "^1.0.3",
 		"typescript": "^4.4.3",
 		"ytdl-core-discord": "^1.3.1"
+	},
+	"devDependencies": {
+		"@types/jest": "^27.0.2",
+		"jest": "^27.3.1",
+		"ts-jest": "^27.0.7"
 	}
 }

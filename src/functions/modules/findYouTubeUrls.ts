@@ -1,6 +1,9 @@
 import { youtube_v3 } from '@googleapis/youtube';
 import config, { globals } from 'bot-config';
 
+/**
+ * With a string, search for an array of video URLs
+ */
 export default function findYouTubeUrls(query: string) {
 	return new Promise<string[] | []>(async resolve => {
 		try {
@@ -26,7 +29,7 @@ export default function findYouTubeUrls(query: string) {
 					})
 					.filter(Boolean) as string[] | undefined;
 
-				if (!urls) {
+				if (!urls?.length) {
 					resolve([]);
 					return;
 				}

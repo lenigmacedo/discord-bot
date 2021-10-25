@@ -102,17 +102,18 @@ export default class AudioInterface {
 				const audioResource = await this.downloadFromQueue();
 
 				if (!audioResource) {
-					resolve(null);
+					await this.queueDeleteOldest();
+					resolve(true);
 					return;
 				}
 
 				this.currentResource = audioResource;
 				this.getPlayer().play(this.currentResource);
-				await this.queueDeleteOldest();
 
 				const onIdleCallback = async (oldState: AudioPlayerState, newState: AudioPlayerState) => {
 					if (oldState.status === 'playing' && newState.status === 'idle') {
 						player.removeListener('stateChange', onIdleCallback);
+						await this.queueDeleteOldest();
 						resolve(true);
 					}
 				};
@@ -120,6 +121,7 @@ export default class AudioInterface {
 				player.on('stateChange', onIdleCallback);
 			} catch (error) {
 				console.error(error);
+				await this.queueDeleteOldest();
 				resolve(true);
 			}
 		});

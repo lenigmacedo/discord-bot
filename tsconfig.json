@@ -1,9 +1,11 @@
 {
 	"compilerOptions": {
+		"types": ["node", "jest"],
 		"strict": true,
 		"esModuleInterop": true,
 		"target": "ESNext",
 		"moduleResolution": "node",
-		"module": "CommonJS"
+		"module": "CommonJS",
+		"forceConsistentCasingInFileNames": true
 	}
 }
