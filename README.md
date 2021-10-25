@@ -35,36 +35,25 @@ This means that many audio problems with the original bot have been fixed and th
 
 ## Setup for production
 
-1. Install Docker, Docker Compose and Git.
-   1. Docker & Docker Compose
-      1. For Windows and Mac this can be achieved with Docker Desktop: https://www.docker.com/products/docker-desktop.
-      2. For Linux Debian run: `sudo apt update -y && sudo apt upgrade -y && sudo apt install docker.io`.
-      3. As I can't give a guide for every distro, you may need to research the installation of Docker for yourself.
-   2. Git
-      1. For Windows, Max and Linux: https://git-scm.com/downloads
-      2. For Linux Debian (CLI): `sudo apt update -y && sudo apt upgrade -y && sudo apt install git -y`
-2. `cd` into a directory you want to place the project in.
+1. Install Docker, Docker Compose and Git for your own OS.
+2. `cd` into a directory you want to place the project directory in.
 3. Clone this repository using Git: `git clone https://github.com/jack3898/discord-youtube-bot-2`
-4. Rename `.env-example` and call it `.env`.
-5. In the .env file you created, fill in the following:
+4. Rename `.env-example` to `.env`.
+5. In the empty .env, fill in the keys.
 
-   1. `DISCORD_TOKEN` & `CLIENT_ID` - Which you can create at https://discord.com/developers.
-      1. Make sure the bot has the following permissions:
-         1. bot
-         2. applications.commands
-   2. `GOOGLE_API_TOKEN` - Which you can create in the Google Cloud platform https://console.cloud.google.com/apis/credentials.
+   1. `DISCORD_TOKEN` & `CLIENT_ID` - Which you can create/find https://discord.com/developers. This bot also requires the `applications.commands` permission otherwise you will not be able to use slash commands.
+   2. `DEV_GUILD_ID` - For developers only. You do not need to fill this in if you are not a developer.
+   3. `GOOGLE_API_TOKEN` - Which you can create in the Google Cloud platform https://console.cloud.google.com/apis/credentials.
       1. You also need to enable **YouTube Data API v3** in the Google Cloud platform.
 
-6. Run `docker-compose up --build`. This will build the bot, and run it.
-7. Verify that the bot runs with no errors.
-8. If the bot runs well, press `CTRL`+`C` to cancel the running docker instances and re-run step 6 with the `--detach` flag included. This will run the containers as a service, allowing you to close any shell sessions you have open. If any of the containers crash, they will be automatically restarted.
-9. Congratulations! It's deployed!
+6. Run `docker-compose up --build --detach`. This will build the bot, and run it. If there's any errors, exclude `--detach` to see what it is.
+7. Congratulations! It's deployed!
 
 ## How to update the bot
 
 1. Pull the latest code from this repository with `git pull`. This will not override your .env file, but it should be a good idea to check that the .env-example file has not changed.
 2. Rebuild the Docker containers with `docker-compose up --build --detach`.
-3. Done!
+3. Done! Also, as this bot uses Redis all queues will be retained.
 
 ## Plans
 
