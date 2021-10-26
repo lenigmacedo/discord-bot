@@ -1,6 +1,6 @@
 import { AudioInterface } from 'bot-classes';
-import config from 'bot-config';
-import { GuildMember, Message, MessageReaction, PartialMessageReaction } from 'discord.js';
+import { handleButtonEvent } from 'bot-functions';
+import { CollectorFilter, GuildMember, Message, MessageActionRow, MessageButton, MessageComponentInteraction } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
 
 const clear: CommandHandler = async interaction => {
@@ -18,44 +18,38 @@ const clear: CommandHandler = async interaction => {
 	}
 
 	const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
-	await interaction.reply('Preparing...');
-	const botReply = await interaction.editReply('Are you sure you want to delete the ENTIRE queue?');
-	if (!(botReply instanceof Message)) return;
 
-	config.confirmOptions.forEach(react => {
-		botReply.react(react);
-	});
+	if ((await audioInterface.queueGetLength()) > 0) {
+		const actionRow = new MessageActionRow().addComponents(
+			new MessageButton().setCustomId('queue-clear-accept').setLabel('Delete!').setStyle('DANGER'),
+			new MessageButton().setCustomId('queue-clear-decline').setLabel('Leave it!').setStyle('SUCCESS')
+		);
 
-	const botClient = botReply.author.client;
+		// Unfortunately, this is used as an initial reply. Only "editReply" returns Promise<Message>. "reply" return Promise<void>
+		await interaction.reply({ content: 'Loading...', ephemeral: true });
+		const queueLength = await audioInterface.queueGetLength();
 
-	const listener = (reaction: MessageReaction | PartialMessageReaction) => {
-		if (!(guildMember instanceof GuildMember)) return;
-		// Check that the user that actually asked the question to the bot is the one reacting
-		if (!reaction.users.cache.has(guildMember.user.id)) return;
-		// Now check that the reaction is in relation to the question asked
-		if (reaction.message.id !== botReply.id) return;
-		const userReaction = reaction.emoji.toString();
-
-		config.confirmOptions.forEach(async (configReaction, index) => {
-			// Check the reaction is eligible for the question response
-			if (userReaction !== configReaction) return;
-			if (index === 0) {
-				const deleted = await audioInterface.queueDelete();
-				if (deleted) await interaction.editReply(`${userReaction} Queue has been purged.`);
-				else await interaction.editReply('I could not delete the queue!');
-			} else if (index === 1) {
-				await interaction.editReply(`${userReaction} Queue deletion aborted.`);
-			}
-
-			botClient.removeListener('messageReactionAdd', listener);
+		const botMessage = await interaction.editReply({
+			content: `Are you sure you want to delete the ENTIRE queue? ${queueLength} item(s) will be removed if you do!`,
+			components: [actionRow]
 		});
-	};
 
-	botClient.on('messageReactionAdd', listener);
+		if (!(botMessage instanceof Message)) return;
 
-	setTimeout(() => {
-		botClient.removeListener('messageReactionAdd', listener), config.searchExpiryMilliseconds;
-	}, config.searchExpiryMilliseconds);
+		const filter: CollectorFilter<[MessageComponentInteraction]> = messageComponentInteraction => {
+			if (messageComponentInteraction.user.id === interaction.member?.user.id) return true;
+			return false;
+		};
+
+		const collector = botMessage.createMessageComponentCollector({
+			max: 1,
+			filter
+		});
+
+		collector.on('end', handleButtonEvent);
+	} else {
+		await interaction.reply({ content: 'The queue seems to be empty.', ephemeral: true });
+	}
 };
 
 export default clear;

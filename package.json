@@ -12,7 +12,8 @@
 		"src/commands",
 		"src/events",
 		"src/functions",
-		"src/classes"
+		"src/classes",
+		"src/buttons"
 	],
 	"repository": {
 		"type": "git",
@@ -41,7 +42,7 @@
 		"nodemon": "^2.0.13",
 		"redis": "^3.1.2",
 		"redis-rejson": "^1.0.0",
-		"ts-node": "^10.3.0",
+		"ts-node": "^10.4.0",
 		"tweetnacl": "^1.0.3",
 		"typescript": "^4.4.3",
 		"ytdl-core-discord": "^1.3.1"
