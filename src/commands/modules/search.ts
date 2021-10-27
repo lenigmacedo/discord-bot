@@ -1,14 +1,6 @@
 import { findYouTubeUrls, getVideoDetails, YtdlVideoInfoResolved } from 'bot-functions';
-import handleMessageComponentEvent from 'bot-functions/modules/handleMessageComponentEvent';
-import {
-	CollectorFilter,
-	GuildMember,
-	Message,
-	MessageActionRow,
-	MessageComponentInteraction,
-	MessageSelectMenu,
-	MessageSelectOptionData
-} from 'discord.js';
+import initOneTimeUseComponentInteraction from 'bot-functions/modules/initOneTimeUseComponentInteraction';
+import { GuildMember, Message, MessageActionRow, MessageSelectMenu, MessageSelectOptionData } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
 
 const search: CommandHandler = async interaction => {
@@ -54,17 +46,7 @@ const search: CommandHandler = async interaction => {
 
 		if (!(botMessage instanceof Message)) return;
 
-		const filter: CollectorFilter<[MessageComponentInteraction]> = messageComponentInteraction => {
-			if (messageComponentInteraction.user.id === interaction.member?.user.id) return true;
-			return false;
-		};
-
-		const collector = botMessage.createMessageComponentCollector({
-			max: 1,
-			filter
-		});
-
-		collector.on('end', handleMessageComponentEvent);
+		initOneTimeUseComponentInteraction(botMessage, interaction);
 	} catch (error) {
 		console.error(error);
 	}

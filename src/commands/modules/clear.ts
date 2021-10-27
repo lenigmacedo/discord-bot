@@ -1,6 +1,6 @@
 import { AudioInterface } from 'bot-classes';
-import { handleMessageComponentEvent } from 'bot-functions';
-import { CollectorFilter, GuildMember, Message, MessageActionRow, MessageButton, MessageComponentInteraction } from 'discord.js';
+import initOneTimeUseComponentInteraction from 'bot-functions/modules/initOneTimeUseComponentInteraction';
+import { GuildMember, Message, MessageActionRow, MessageButton } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
 
 const clear: CommandHandler = async interaction => {
@@ -26,8 +26,7 @@ const clear: CommandHandler = async interaction => {
 				new MessageButton().setCustomId('queue-clear-decline').setLabel('Leave it!').setStyle('SUCCESS')
 			);
 
-			// Unfortunately, this is used as an initial reply. Only "editReply" returns Promise<Message>. "reply" return Promise<void>
-			await interaction.reply({ content: 'Loading...', ephemeral: true });
+			await interaction.deferReply({ ephemeral: true });
 			const queueLength = await audioInterface.queueGetLength();
 
 			const botMessage = await interaction.editReply({
@@ -35,19 +34,11 @@ const clear: CommandHandler = async interaction => {
 				components: [actionRow]
 			});
 
-			if (!(botMessage instanceof Message)) return;
+			if (!(botMessage instanceof Message)) {
+				return;
+			}
 
-			const filter: CollectorFilter<[MessageComponentInteraction]> = messageComponentInteraction => {
-				if (messageComponentInteraction.user.id === interaction.member?.user.id) return true;
-				return false;
-			};
-
-			const collector = botMessage.createMessageComponentCollector({
-				max: 1,
-				filter
-			});
-
-			collector.on('end', handleMessageComponentEvent);
+			initOneTimeUseComponentInteraction(botMessage, interaction);
 		} else {
 			await interaction.reply({ content: 'The queue seems to be empty.', ephemeral: true });
 		}
