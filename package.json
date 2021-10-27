@@ -13,7 +13,7 @@
 		"src/events",
 		"src/functions",
 		"src/classes",
-		"src/buttons"
+		"src/botMessageComponentHandlers"
 	],
 	"repository": {
 		"type": "git",

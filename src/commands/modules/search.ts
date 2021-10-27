@@ -1,7 +1,14 @@
-import { AudioInterface } from 'bot-classes';
-import config from 'bot-config';
 import { findYouTubeUrls, getVideoDetails, YtdlVideoInfoResolved } from 'bot-functions';
-import { GuildMember, Message, MessageReaction, PartialMessageReaction } from 'discord.js';
+import handleMessageComponentEvent from 'bot-functions/modules/handleMessageComponentEvent';
+import {
+	CollectorFilter,
+	GuildMember,
+	Message,
+	MessageActionRow,
+	MessageComponentInteraction,
+	MessageSelectMenu,
+	MessageSelectOptionData
+} from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
 
 const search: CommandHandler = async interaction => {
@@ -19,8 +26,7 @@ const search: CommandHandler = async interaction => {
 			return;
 		}
 
-		const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
-		await interaction.reply('Searching YouTube...');
+		await interaction.reply({ content: 'Searching YouTube...', ephemeral: true });
 		const searchQuery = interaction.options.getString('search-query', true);
 		const searchResult = await findYouTubeUrls(searchQuery);
 
@@ -31,49 +37,34 @@ const search: CommandHandler = async interaction => {
 
 		const videoDetails = (await Promise.all(searchResult.map(url => getVideoDetails(url)))).filter(Boolean) as YtdlVideoInfoResolved[];
 
-		const reply = `**Found ${searchResult.length} result(s):**\n${videoDetails
-			.map(({ videoDetails }, index) => {
-				const { title = 'Problem getting video details', viewCount } = videoDetails;
-				if (!title || !parseInt(viewCount)) return 'Error getting video.';
-				return `${index + 1}) \`${title}\`, \`${parseInt(viewCount).toLocaleString()}\` views`;
-			})
-			.join('\n')}\n*You have ${config.searchExpiryMilliseconds / 1000} seconds to make your pick!*`;
-
-		const botReply = await interaction.editReply(reply);
-		if (!(botReply instanceof Message)) return;
-
-		config.searchReactionOptions.forEach((react, index) => {
-			// If only 1 result was found, why give the user the option to select the second option when it does not exist?
-			if (index < searchResult.length) botReply.react(react);
+		const selectOptions = videoDetails.map((details, index) => {
+			const option: MessageSelectOptionData = {
+				label: `${index + 1}) ${details.videoDetails.title}`.substring(0, 100),
+				description: details.videoDetails.description?.substring(0, 100) || '',
+				value: details.videoDetails.video_url
+			};
+			return option;
 		});
 
-		const botClient = botReply.author.client;
+		const actionRow = new MessageActionRow().addComponents(
+			new MessageSelectMenu().setCustomId('search-video-selection').setPlaceholder('Select a video').addOptions(selectOptions)
+		);
 
-		const listener = (reaction: MessageReaction | PartialMessageReaction) => {
-			if (!(guildMember instanceof GuildMember)) return;
-			// Check that the user that actually asked the question to the bot is the one reacting
-			if (!reaction.users.cache.has(guildMember.user.id)) return;
-			// Now check that the reaction is in relation to the question asked
-			if (reaction.message.id !== botReply.id) return;
-			const userReaction = reaction.emoji.toString();
+		const botMessage = await interaction.editReply({ content: 'I found something!', components: [actionRow] });
 
-			config.searchReactionOptions.forEach(async (configReaction, index) => {
-				// Check the reaction is eligible for the question response
-				if (userReaction !== configReaction) return;
-				const chosenVideoUrl = searchResult[index];
-				const appended = await audioInterface.queueAppend(chosenVideoUrl);
-				if (appended) await interaction.editReply('Thanks for choosing! It has been added to the queue.');
-				else await interaction.editReply('I could not add the video to the queue! Try again?');
-				botClient.removeListener('messageReactionAdd', listener);
-			});
+		if (!(botMessage instanceof Message)) return;
+
+		const filter: CollectorFilter<[MessageComponentInteraction]> = messageComponentInteraction => {
+			if (messageComponentInteraction.user.id === interaction.member?.user.id) return true;
+			return false;
 		};
 
-		botClient.on('messageReactionAdd', listener);
-		// This will clean up any timeouts that never cleared
-		// This may be because the user never reacted or there was a problem
-		setTimeout(() => {
-			botClient.removeListener('messageReactionAdd', listener), config.searchExpiryMilliseconds;
-		}, config.searchExpiryMilliseconds);
+		const collector = botMessage.createMessageComponentCollector({
+			max: 1,
+			filter
+		});
+
+		collector.on('end', handleMessageComponentEvent);
 	} catch (error) {
 		console.error(error);
 	}

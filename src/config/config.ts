@@ -13,7 +13,7 @@ const config = {
 	clientId: process.env.CLIENT_ID,
 	devGuildId: process.env.DEV_GUILD_ID,
 	environment: process.env.NODE_ENV, // development or production
-	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
+	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MESSAGE_TYPING],
 	redisNamespace: 'discord-youtube-bot',
 	paginateMaxLength: 5,
 	searchExpiryMilliseconds: 60 * 1000,
@@ -28,9 +28,7 @@ const config = {
 				return 'localhost';
 		}
 	})(),
-	redisPort: 6379,
-	searchReactionOptions: ['\u0031\u20E3', '\u0032\u20E3', '\u0033\u20E3', '\u0034\u20E3', '\u0035\u20E3'], // Go to keyboard.cool/db for a great list!
-	confirmOptions: ['\u2705', '\u274E']
+	redisPort: 6379
 };
 
 export default config;

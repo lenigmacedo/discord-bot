@@ -1,5 +1,5 @@
 export { default as downloadYouTubeVideo } from './modules/downloadYouTubeVideo';
 export { default as findYouTubeUrls } from './modules/findYouTubeUrls';
 export { default as getVideoDetails, YtdlVideoInfoResolved } from './modules/getVideoDetails';
-export { default as handleButtonEvent } from './modules/handleButtonEvent';
+export { default as handleMessageComponentEvent } from './modules/handleMessageComponentEvent';
 export { default as safeJoinVoiceChannel } from './modules/safeJoinVoiceChannel';

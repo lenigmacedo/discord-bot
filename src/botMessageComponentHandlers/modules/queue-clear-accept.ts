@@ -1,8 +1,8 @@
 import { AudioInterface } from 'bot-classes';
 import { Guild } from 'discord.js';
-import { ButtonHandler } from '../ButtonHandler.types';
+import { MessageComponentHandler } from '../MessageComponentHandler.types';
 
-const queueClearAccept: ButtonHandler = async interaction => {
+const queueClearAccept: MessageComponentHandler = async interaction => {
 	try {
 		if (!(interaction.guild instanceof Guild)) {
 			return;
