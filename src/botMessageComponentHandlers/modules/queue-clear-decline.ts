@@ -1,7 +1,7 @@
 import { Guild } from 'discord.js';
 import { MessageComponentHandler } from '../MessageComponentHandler.types';
 
-const queueClearAccept: MessageComponentHandler = async interaction => {
+const queueClearDecline: MessageComponentHandler = async interaction => {
 	try {
 		if (!(interaction.guild instanceof Guild)) {
 			return;
@@ -13,4 +13,4 @@ const queueClearAccept: MessageComponentHandler = async interaction => {
 	}
 };
 
-export default queueClearAccept;
+export default queueClearDecline;
