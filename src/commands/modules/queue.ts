@@ -21,6 +21,8 @@ const queue: CommandHandler = async interaction => {
 
 		const videoDetails = (await Promise.all(queue.map(url => getVideoDetails(url)))) as YtdlVideoInfoResolved[];
 
+		if (videoDetails.length > config.paginateMaxLength) videoDetails.length = config.paginateMaxLength;
+
 		const fields: EmbedFieldData[] = videoDetails.map((videoDetails, index) => {
 			const number = index + 1;
 			const videoDetailsObj = videoDetails?.videoDetails;
