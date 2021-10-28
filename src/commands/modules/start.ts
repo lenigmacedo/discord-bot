@@ -1,5 +1,5 @@
 import { AudioInterface } from 'bot-classes';
-import { safeJoinVoiceChannel } from 'bot-functions';
+import { getVideoDetails, safeJoinVoiceChannel } from 'bot-functions';
 import { GuildMember } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
 
@@ -34,7 +34,14 @@ const start: CommandHandler = async interaction => {
 
 		await interaction.editReply('🔃 Preparing to play...');
 		audioInterface.setConnection(safeJoinVoiceChannel(interaction));
-		await interaction.editReply('🔊 I am now playing the queue.');
+		const videoDetails = await getVideoDetails((await audioInterface.queueGetOldest()) as string);
+
+		if (videoDetails) {
+			await interaction.editReply(`🔊 I am now playing the queue. First up \`${videoDetails.videoDetails.title}\`!`);
+		} else {
+			await interaction.editReply('🔊 I am now playing the queue.'); // If the video is invalid, the queue should handle it and skip it.
+		}
+
 		while (await audioInterface.queueRunner());
 		audioInterface.deleteConnection();
 	} catch (error) {

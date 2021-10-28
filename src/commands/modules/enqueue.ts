@@ -21,7 +21,7 @@ const enqueue: CommandHandler = async interaction => {
 		const appended = await audioInterface.queueAppend(youtubeUrl);
 
 		if (appended) {
-			await interaction.editReply(`✅ \`${videoDetails.videoDetails.title}\` appended to the queue!`);
+			await interaction.editReply(`✅ Enqueued \`${videoDetails.videoDetails.title}\`.`);
 		} else {
 			await interaction.editReply('🚨 I could not add that item to the queue. Is it a valid URL?');
 		}

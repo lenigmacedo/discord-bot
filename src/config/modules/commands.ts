@@ -4,7 +4,12 @@ const commands = [
 	new SlashCommandBuilder()
 		.setName('play')
 		.setDescription('If the bot is not busy, you can play something. Then it will continue the queue.')
-		.addStringOption(option => option.setName('youtube-url').setDescription('The YouTube video URL.').setRequired(true)),
+		.addStringOption(option =>
+			option
+				.setName('url-or-query')
+				.setDescription('A search query or YouTube URL. First result from the search query will be used.')
+				.setRequired(true)
+		),
 	new SlashCommandBuilder().setName('pause').setDescription('Pause the bot from playing audio.'),
 	new SlashCommandBuilder().setName('resume').setDescription('Resume the bot if it is paused.'),
 	new SlashCommandBuilder().setName('queue').setDescription('Get a list of all the items in the queue.'),
