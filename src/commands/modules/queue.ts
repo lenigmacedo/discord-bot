@@ -19,38 +19,30 @@ const queue: CommandHandler = async interaction => {
 			return;
 		}
 
-		const page = interaction.options.getNumber('page') || 1;
-		const pageIndex = page - 1;
+		let page = interaction.options.getNumber('page') || 1;
 		const pageCount = Math.ceil(queueLength / config.paginateMaxLength);
 
-		if (page > pageCount) {
-			await interaction.editReply(`🚨 Page number specified is larger than the amount of actual pages. Did you intend for page ${pageCount}?`);
-			return;
-		} else if (page < 1) {
-			await interaction.editReply(`🚨 Page number must not be lower than 1.`);
-			return;
-		}
+		if (page > pageCount) page = pageCount;
+		else if (page < 1) page = 1;
 
-		const queue = await audioInterface.queueGetMultiple(config.paginateMaxLength, config.paginateMaxLength * pageIndex);
-		const videoDetails = (await Promise.all(queue.map(url => getVideoDetails(url)))) as YtdlVideoInfoResolved[];
-
-		if (videoDetails.length > config.paginateMaxLength) {
-			videoDetails.length = config.paginateMaxLength;
-		}
+		const queue = await audioInterface.queueGetMultiple(page);
+		const videoDetailPromiseArray = queue.map(url => getVideoDetails(url));
+		const videoDetails = (await Promise.all(videoDetailPromiseArray)) as YtdlVideoInfoResolved[];
 
 		const fields: EmbedFieldData[] = videoDetails.map((videoDetails, index) => {
-			const number = index + 1;
+			const itemNumberOffset = (page - 1) * config.paginateMaxLength;
+			const itemNumber = index + 1 + itemNumberOffset;
 			const videoDetailsObj = videoDetails?.videoDetails;
 
 			if (!videoDetailsObj?.title || !videoDetailsObj?.description) {
 				return {
-					name: `${number}) 🚨 FAILED`,
+					name: `${itemNumber}) 🚨 FAILED`,
 					value: `Video private or age restricted or something else.`
 				};
 			}
 
 			return {
-				name: `${number}) ${videoDetailsObj.title.substring(0, 100)}`,
+				name: `${itemNumber}) ${videoDetailsObj.title.substring(0, 100)}`,
 				value: videoDetailsObj.description.substring(0, 200) + '...'
 			};
 		});

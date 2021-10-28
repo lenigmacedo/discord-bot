@@ -185,8 +185,12 @@ export default class AudioInterface {
 	/**
 	 * Get many items in the guild's queue. Default limit is one less than defined in the config because it starts at index 0.
 	 */
-	async queueGetMultiple(limit: number = config.paginateMaxLength - 1, start: number = 0) {
-		const results = await LRANGE(this.redisQueueNamespace, start, limit);
+	async queueGetMultiple(page = 1, limit: number = config.paginateMaxLength) {
+		const pageIndex = page - 1; // Redis starts from index 0
+		const startIndex = pageIndex * limit;
+		const endIndex = pageIndex * limit + limit - 1;
+
+		const results = await LRANGE(this.redisQueueNamespace, startIndex, endIndex);
 		return results;
 	}
 
