@@ -28,7 +28,10 @@ const config = {
 				return 'localhost';
 		}
 	})(),
-	redisPort: 6379
+	redisPort: 6379,
+	embedSuccess: '#00ff00',
+	embedDanger: '#ff0000',
+	embedWarning: '#ffff00'
 };
 
 export default config;

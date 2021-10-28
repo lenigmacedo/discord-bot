@@ -12,10 +12,10 @@ const queueClearAccept: MessageComponentHandler = async interaction => {
 
 		if ((await audioInterface.queueGetLength()) > 0) {
 			await audioInterface.queueDelete();
-			await interaction.reply("The queue has been deleted. I hope that wasn't a mistake!");
+			await interaction.reply("🚮 The queue has been deleted. I hope that wasn't a mistake!");
 		} else {
 			await interaction.reply({
-				content: 'Uhhh, the queue is now empty. Maybe it was deleted whilst you was making your decision.',
+				content: 'ℹ️ Uhhh, the queue is now empty. Maybe it was deleted whilst you was making your decision.',
 				ephemeral: true
 			});
 		}

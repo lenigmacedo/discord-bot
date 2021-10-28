@@ -16,15 +16,15 @@ const searchVideoSelection: MessageComponentHandler = async interaction => {
 		const value = interaction?.values[0];
 
 		if (!value) {
-			interaction.reply('I could not find the video from the selection. Try again?');
+			interaction.reply('🚨 I could not find the video from the selection. Try again?');
 		}
 
 		const appended = await audioInterface.queueAppend(value);
 
 		if (appended) {
-			interaction.reply('I have added it to the queue!');
+			interaction.reply('✅ I have added it to the queue!');
 		} else {
-			interaction.reply('I was unable to add that video to the queue. Try again?');
+			interaction.reply('🚨 I was unable to add that video to the queue. Try again?');
 		}
 	} catch (error) {
 		console.error(error);

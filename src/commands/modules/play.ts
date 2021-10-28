@@ -15,7 +15,7 @@ const play: CommandHandler = async interaction => {
 		const voiceChannel = guildMember.voice.channel;
 
 		if (!voiceChannel) {
-			await interaction.editReply('You must be connected to a voice channel for me to know where to join!');
+			await interaction.editReply('🚨 You must be connected to a voice channel for me to know where to join!');
 			return;
 		}
 
@@ -23,14 +23,14 @@ const play: CommandHandler = async interaction => {
 		const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
 
 		if (audioInterface.isBusy()) {
-			await interaction.editReply('I am busy!');
+			await interaction.editReply('🚨 I am busy!');
 			return;
 		}
 
-		await interaction.editReply('Preparing to play...');
+		await interaction.editReply('🔃 Preparing to play...');
 		audioInterface.setConnection(safeJoinVoiceChannel(interaction));
 		await audioInterface.queuePrepend(youtubeUrl);
-		await interaction.editReply('I am now playing audio.');
+		await interaction.editReply('🔊 I am now playing audio.');
 		while (await audioInterface.queueRunner());
 		audioInterface.deleteConnection();
 	} catch (error) {

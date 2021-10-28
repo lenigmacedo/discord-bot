@@ -7,7 +7,7 @@ const queueClearDecline: MessageComponentHandler = async interaction => {
 			return;
 		}
 
-		await interaction.reply({ content: "Ok! Don't scare me like that again!", ephemeral: true });
+		await interaction.reply({ content: "😔 Ok! Don't scare me like that again!", ephemeral: true });
 	} catch (error) {
 		console.error(error);
 	}

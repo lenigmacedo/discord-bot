@@ -14,16 +14,16 @@ const search: CommandHandler = async interaction => {
 		const voiceChannel = guildMember.voice.channel;
 
 		if (!voiceChannel) {
-			await interaction.reply('You must be connected to a voice channel for me to search!');
+			await interaction.reply('🚨 You must be connected to a voice channel for me to search!');
 			return;
 		}
 
-		await interaction.reply({ content: 'Searching YouTube...', ephemeral: true });
+		await interaction.reply({ content: '🔃 Searching YouTube...', ephemeral: true });
 		const searchQuery = interaction.options.getString('search-query', true);
 		const searchResult = await findYouTubeUrls(searchQuery);
 
 		if (!searchResult.length) {
-			await interaction.editReply('I could not find any results for that search query. Try searching for something less specific?');
+			await interaction.editReply('ℹ️ I could not find any results for that search query. Try searching for something less specific?');
 			return;
 		}
 
@@ -42,7 +42,7 @@ const search: CommandHandler = async interaction => {
 			new MessageSelectMenu().setCustomId('search-video-selection').setPlaceholder('Select a video').addOptions(selectOptions)
 		);
 
-		const botMessage = await interaction.editReply({ content: 'I found something!', components: [actionRow] });
+		const botMessage = await interaction.editReply({ content: '✅ I found something!', components: [actionRow] });
 
 		if (!(botMessage instanceof Message)) return;
 

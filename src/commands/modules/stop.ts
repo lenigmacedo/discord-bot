@@ -7,16 +7,16 @@ const stop: CommandHandler = async interaction => {
 			return;
 		}
 
-		await interaction.reply('Stopping...');
+		await interaction.deferReply();
 		const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
 
 		if (!audioInterface.isBusy()) {
-			await interaction.editReply('I am not doing anything that needs stopping.');
+			await interaction.editReply('🚨 I am not doing anything that needs stopping.');
 			return;
 		}
 
 		audioInterface.deleteConnection();
-		await interaction.editReply('The bot has been stopped.');
+		await interaction.editReply('✅ The bot has been stopped.');
 	} catch (error) {
 		console.error(error);
 	}

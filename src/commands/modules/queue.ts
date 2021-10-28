@@ -1,5 +1,7 @@
 import { AudioInterface } from 'bot-classes';
+import config from 'bot-config';
 import { getVideoDetails, YtdlVideoInfoResolved } from 'bot-functions';
+import { ColorResolvable, EmbedFieldData, MessageEmbed } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
 
 const queue: CommandHandler = async interaction => {
@@ -13,31 +15,36 @@ const queue: CommandHandler = async interaction => {
 		const queue = await audioInterface.queueGetMultiple();
 
 		if (!queue.length) {
-			await interaction.editReply('The queue is empty.');
+			await interaction.editReply('ℹ️ The queue is empty.');
 			return;
 		}
 
 		const videoDetails = (await Promise.all(queue.map(url => getVideoDetails(url)))) as YtdlVideoInfoResolved[];
 
-		const reply = `**Displaying the first ${queue.length} items in the queue:**\n${videoDetails
-			.map((videoDetails, index) => {
-				const i = index ? index + 1 : 'CURRENT';
+		const fields: EmbedFieldData[] = videoDetails.map((videoDetails, index) => {
+			const number = index + 1;
+			const videoDetailsObj = videoDetails?.videoDetails;
 
-				if (!videoDetails) {
-					return `${i}) *Could not fetch. This video may be age restricted, private, or something else.*`;
-				}
+			if (!videoDetailsObj?.title || !videoDetailsObj?.description) {
+				return {
+					name: `${number}) 🚨 FAILED`,
+					value: `Video private or age restricted or something else.`
+				};
+			}
 
-				const { title, viewCount } = videoDetails.videoDetails;
+			return {
+				name: `${number}) ${videoDetailsObj.title.substring(0, 100)}`,
+				value: videoDetailsObj.description.substring(0, 200) + '...'
+			};
+		});
 
-				if (!title || !parseInt(viewCount)) {
-					return 'Error getting video.';
-				}
+		const embed = new MessageEmbed()
+			.setColor(config.embedSuccess as ColorResolvable)
+			.setTitle(`📃 Current Queue`)
+			.setDescription(`There ${queue.length === 1 ? 'is' : 'are'} ${queue.length} item${queue.length === 1 ? '' : 's'} in the queue.`)
+			.setFields(...fields);
 
-				return `${i}) \`${title}\`, \`${parseInt(viewCount).toLocaleString()}\` views`;
-			})
-			.join('\n')}`;
-
-		await interaction.editReply(reply);
+		await interaction.editReply({ embeds: [embed] });
 	} catch (error) {
 		console.error(error);
 	}

@@ -27,7 +27,7 @@ const initOneTimeUseComponentInteraction = (interactableMessage: Message, initia
 		setTimeout(() => {
 			if (!collector.ended) {
 				collector.emit('end');
-				initialInteraction.followUp('You took too long! I have disabled the dropdown.');
+				initialInteraction.followUp('🤦 You took too long! I have disabled the dropdown.');
 			}
 		}, config.searchExpiryMilliseconds);
 	} catch (error) {
