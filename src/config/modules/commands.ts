@@ -12,7 +12,10 @@ const commands = [
 		),
 	new SlashCommandBuilder().setName('pause').setDescription('Pause the bot from playing audio.'),
 	new SlashCommandBuilder().setName('resume').setDescription('Resume the bot if it is paused.'),
-	new SlashCommandBuilder().setName('queue').setDescription('Get a list of all the items in the queue.'),
+	new SlashCommandBuilder()
+		.setName('queue')
+		.setDescription('Get a list of all the items in the queue.')
+		.addNumberOption(option => option.setName('page').setDescription('Page number for if your queue is really long!')),
 	new SlashCommandBuilder().setName('start').setDescription('Start the queue if the bot is not already playing.'),
 	new SlashCommandBuilder()
 		.setName('enqueue')

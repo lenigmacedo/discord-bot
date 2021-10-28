@@ -183,10 +183,10 @@ export default class AudioInterface {
 	}
 
 	/**
-	 * Get many items in the guild's queue. Default limit is 9, which means 10 items are returned.
+	 * Get many items in the guild's queue. Default limit is one less than defined in the config because it starts at index 0.
 	 */
-	async queueGetMultiple(limit: number = 9) {
-		const results = await LRANGE(this.redisQueueNamespace, 0, limit);
+	async queueGetMultiple(limit: number = config.paginateMaxLength - 1, start: number = 0) {
+		const results = await LRANGE(this.redisQueueNamespace, start, limit);
 		return results;
 	}
 

@@ -12,16 +12,31 @@ const queue: CommandHandler = async interaction => {
 
 		await interaction.deferReply();
 		const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
-		const queue = await audioInterface.queueGetMultiple();
+		const queueLength = await audioInterface.queueGetLength();
 
-		if (!queue.length) {
-			await interaction.editReply('ℹ️ The queue is empty.');
+		if (!queueLength) {
+			await interaction.editReply('ℹ️ Queue is empty.');
 			return;
 		}
 
+		const page = interaction.options.getNumber('page') || 1;
+		const pageIndex = page - 1;
+		const pageCount = Math.ceil(queueLength / config.paginateMaxLength);
+
+		if (page > pageCount) {
+			await interaction.editReply(`🚨 Page number specified is larger than the amount of actual pages. Did you intend for page ${pageCount}?`);
+			return;
+		} else if (page < 1) {
+			await interaction.editReply(`🚨 Page number must not be lower than 1.`);
+			return;
+		}
+
+		const queue = await audioInterface.queueGetMultiple(config.paginateMaxLength, config.paginateMaxLength * pageIndex);
 		const videoDetails = (await Promise.all(queue.map(url => getVideoDetails(url)))) as YtdlVideoInfoResolved[];
 
-		if (videoDetails.length > config.paginateMaxLength) videoDetails.length = config.paginateMaxLength;
+		if (videoDetails.length > config.paginateMaxLength) {
+			videoDetails.length = config.paginateMaxLength;
+		}
 
 		const fields: EmbedFieldData[] = videoDetails.map((videoDetails, index) => {
 			const number = index + 1;
@@ -43,7 +58,9 @@ const queue: CommandHandler = async interaction => {
 		const embed = new MessageEmbed()
 			.setColor(config.embedSuccess as ColorResolvable)
 			.setTitle(`📃 Current Queue`)
-			.setDescription(`There ${queue.length === 1 ? 'is' : 'are'} ${queue.length} item${queue.length === 1 ? '' : 's'} in the queue.`)
+			.setDescription(
+				`There ${queueLength === 1 ? 'is' : 'are'} ${queueLength} item${queueLength === 1 ? '' : 's'} in the queue.\nPage ${page}/${pageCount}`
+			)
 			.setFields(...fields);
 
 		await interaction.editReply({ embeds: [embed] });
