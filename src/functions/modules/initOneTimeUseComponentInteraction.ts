@@ -1,3 +1,4 @@
+import config from 'bot-config';
 import { handleMessageComponentEvent } from 'bot-functions';
 import { CollectorFilter, CommandInteraction, Message, MessageComponentInteraction } from 'discord.js';
 
@@ -22,6 +23,13 @@ const initOneTimeUseComponentInteraction = (interactableMessage: Message, initia
 		});
 
 		collector.on('end', handleMessageComponentEvent);
+
+		setTimeout(() => {
+			if (!collector.ended) {
+				collector.emit('end');
+				initialInteraction.followUp('You took too long! I have disabled the dropdown.');
+			}
+		}, config.searchExpiryMilliseconds);
 	} catch (error) {
 		console.error(error);
 	}

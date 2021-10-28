@@ -1,8 +1,10 @@
 import { MessageComponentHandler } from 'bot-message-component-handlers/MessageComponentHandler.types';
 import { Awaitable, Collection, MessageComponentInteraction } from 'discord.js';
 
-const handleMessageComponentEvent: (collected: Collection<string, MessageComponentInteraction>, reason: string) => Awaitable<void> =
+const handleMessageComponentEvent: (collected: Collection<string, MessageComponentInteraction | undefined>, reason: string) => Awaitable<void> =
 	async interaction => {
+		if (!interaction) return;
+
 		const message = interaction.first();
 
 		if (!message) {
