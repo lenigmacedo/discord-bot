@@ -15,7 +15,7 @@ const skip: CommandHandler = async interaction => {
 		const voiceChannel = guildMember.voice.channel;
 
 		if (!voiceChannel) {
-			await interaction.editReply('You must be connected to a voice channel for me to skip the audio!');
+			await interaction.editReply('🚨 You must be connected to a voice channel for me to skip the audio!');
 			return;
 		}
 
