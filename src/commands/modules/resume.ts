@@ -7,11 +7,11 @@ const resume: CommandHandler = async interaction => {
 			return;
 		}
 
-		await interaction.reply('🔃 Trying to resume...');
+		await interaction.deferReply();
 		const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
 		const unpaused = audioInterface.getPlayer().unpause();
 		if (unpaused) await interaction.editReply('✅ The audio has been resumed.');
-		else await interaction.editReply('🚨 I could not unpause the audio.');
+		else await interaction.editReply('🚨 Nothing to resume.');
 	} catch (error) {
 		console.error(error);
 	}

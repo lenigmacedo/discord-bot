@@ -6,12 +6,12 @@ import { CommandHandler } from '../CommandHandler.types';
 const start: CommandHandler = async interaction => {
 	try {
 		const guildMember = interaction.member;
-		await interaction.deferReply();
 
 		if (!interaction?.guild?.id || !(guildMember instanceof GuildMember)) {
 			return;
 		}
 
+		await interaction.deferReply();
 		const voiceChannel = guildMember.voice.channel;
 
 		if (!voiceChannel) {

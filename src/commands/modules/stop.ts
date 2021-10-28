@@ -11,12 +11,12 @@ const stop: CommandHandler = async interaction => {
 		const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
 
 		if (!audioInterface.isBusy()) {
-			await interaction.editReply('🚨 I am not doing anything that needs stopping.');
+			await interaction.editReply('🚨 Nothing to stop.');
 			return;
 		}
 
 		audioInterface.deleteConnection();
-		await interaction.editReply('✅ The bot has been stopped.');
+		await interaction.editReply('✅ I have been stopped.');
 	} catch (error) {
 		console.error(error);
 	}

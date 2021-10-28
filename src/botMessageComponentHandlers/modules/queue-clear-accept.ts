@@ -9,15 +9,14 @@ const queueClearAccept: MessageComponentHandler = async interaction => {
 		}
 
 		const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
+		await interaction.deferReply();
 
 		if ((await audioInterface.queueGetLength()) > 0) {
-			await audioInterface.queueDelete();
-			await interaction.reply("🚮 The queue has been deleted. I hope that wasn't a mistake!");
+			const deleted = await audioInterface.queueDelete();
+			if (deleted) await interaction.editReply("🚮 The queue has been deleted. I hope that wasn't a mistake!");
+			else await interaction.editReply('🚨 I was unable to delete the queue.');
 		} else {
-			await interaction.reply({
-				content: 'ℹ️ Uhhh, the queue is now empty. Maybe it was deleted whilst you was making your decision.',
-				ephemeral: true
-			});
+			await interaction.editReply('🚨 The queue is empty. Maybe it was deleted whilst you was making your decision.');
 		}
 	} catch (error) {
 		console.error(error);

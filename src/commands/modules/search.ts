@@ -18,7 +18,7 @@ const search: CommandHandler = async interaction => {
 			return;
 		}
 
-		await interaction.reply({ content: '🔃 Searching YouTube...', ephemeral: true });
+		await interaction.reply({ content: '🔃 Searching YouTube please wait...', ephemeral: true });
 		const searchQuery = interaction.options.getString('search-query', true);
 		const searchResult = await findYouTubeUrls(searchQuery);
 
@@ -42,7 +42,7 @@ const search: CommandHandler = async interaction => {
 			new MessageSelectMenu().setCustomId('search-video-selection').setPlaceholder('Select a video').addOptions(selectOptions)
 		);
 
-		const botMessage = await interaction.editReply({ content: '✅ I found something!', components: [actionRow] });
+		const botMessage = await interaction.editReply({ content: '✅ I found some results!', components: [actionRow] });
 
 		if (!(botMessage instanceof Message)) return;
 

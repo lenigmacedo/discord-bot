@@ -7,11 +7,11 @@ const pause: CommandHandler = async interaction => {
 			return;
 		}
 
-		await interaction.reply('Trying to pause...');
+		await interaction.deferReply();
 		const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
 		const paused = audioInterface.getPlayer().pause(true);
 		if (paused) await interaction.editReply('✅ The audio has been paused.');
-		else await interaction.editReply('🚨 I could not pause the audio.');
+		else await interaction.editReply('🚨 Nothing to pause.');
 	} catch (error) {
 		console.error(error);
 	}

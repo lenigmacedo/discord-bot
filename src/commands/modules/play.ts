@@ -6,16 +6,17 @@ import { CommandHandler } from '../CommandHandler.types';
 const play: CommandHandler = async interaction => {
 	try {
 		const guildMember = interaction.member;
-		await interaction.reply('🔃 Going to play...');
 
 		if (!interaction?.guild?.id || !(guildMember instanceof GuildMember)) {
 			return;
 		}
 
+		await interaction.deferReply();
+
 		const voiceChannel = guildMember.voice.channel;
 
 		if (!voiceChannel) {
-			await interaction.editReply('🚨 You must be connected to a voice channel for me to know where to join!');
+			await interaction.editReply('🚨 You must be connected to a voice channel!');
 			return;
 		}
 

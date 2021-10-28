@@ -8,7 +8,7 @@ const enqueue: CommandHandler = async interaction => {
 			return;
 		}
 
-		await interaction.deferReply({ ephemeral: true });
+		await interaction.deferReply();
 		const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
 		const youtubeUrl = interaction.options.getString('youtube-url', true);
 		const videoDetails = await getVideoDetails(youtubeUrl);

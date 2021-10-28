@@ -11,10 +11,11 @@ const clear: CommandHandler = async interaction => {
 			return;
 		}
 
+		await interaction.deferReply({ ephemeral: true });
 		const voiceChannel = guildMember.voice.channel;
 
 		if (!voiceChannel) {
-			await interaction.reply('🚨 You must be connected to a voice channel for me to clear the queue!');
+			await interaction.editReply('🚨 You must be connected to a voice channel for me to clear the queue!');
 			return;
 		}
 
@@ -26,11 +27,10 @@ const clear: CommandHandler = async interaction => {
 				new MessageButton().setCustomId('queue-clear-decline').setLabel('Leave it!').setStyle('SUCCESS')
 			);
 
-			await interaction.deferReply({ ephemeral: true });
 			const queueLength = await audioInterface.queueGetLength();
 
 			const botMessage = await interaction.editReply({
-				content: `ℹ️ Are you sure you want to delete the ENTIRE queue? ${queueLength} item(s) will be removed if you do!`,
+				content: `ℹ️ Are you sure you want to delete the ENTIRE queue? ${queueLength} item${queueLength > 1 ? 's' : ''} will be removed if you do!`,
 				components: [actionRow]
 			});
 
@@ -40,7 +40,7 @@ const clear: CommandHandler = async interaction => {
 
 			initOneTimeUseComponentInteraction(botMessage, interaction);
 		} else {
-			await interaction.reply({ content: 'ℹ️ The queue seems to be empty.', ephemeral: true });
+			await interaction.editReply({ content: 'ℹ️ The queue seems to be empty.' });
 		}
 	} catch (error) {
 		console.error(error);
