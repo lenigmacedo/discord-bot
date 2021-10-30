@@ -52,9 +52,7 @@ This means that many audio problems with the original bot have been fixed and th
 
 1. Pull the latest code from this repository with `git pull`. This will not override your .env file, but it should be a good idea to check that the .env-example file has not changed.
 2. Rebuild the Docker containers with `docker-compose up --build --detach`.
-3. Done! Also, as this bot uses Redis all queues will be retained.
-
-If you have any issues, try and backup your .env file, run `git reset --hard FETCH_HEAD` (which ensures your files match this GitHub repository exactly, like `git pull` but extreme), put your .env file back. Then run `docker compose up --build`.
+3. Done!
 
 ## Plans
 

@@ -6,6 +6,7 @@
 		"target": "ESNext",
 		"moduleResolution": "node",
 		"module": "CommonJS",
-		"forceConsistentCasingInFileNames": true
+		"forceConsistentCasingInFileNames": true,
+		"sourceMap": true
 	}
 }
