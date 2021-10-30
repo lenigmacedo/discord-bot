@@ -50,7 +50,8 @@ export default class YouTubeInterface extends QueueManager {
 	 * Download the audio resource for a video. By default it will be the oldest item in the queue, but you can specify an index.
 	 */
 	async downloadFromQueue(queueItemIndex: number = 0) {
-		if (queueItemIndex >= (await this.queueGetLength())) return null;
+		const queueLength = await this.queueGetLength();
+		if (queueItemIndex >= queueLength) return null;
 		const queueItem = (await this.queueGetFromIndex(queueItemIndex)) || '';
 		const audioResource = await downloadYouTubeVideo(queueItem);
 		return audioResource;

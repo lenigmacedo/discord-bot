@@ -28,11 +28,11 @@ const search: CommandHandler = async interaction => {
 		}
 
 		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
-		const videoDetails = (await Promise.all(searchResult.map(url => audioInterface.getYouTubeVideoDetails(url)))).filter(
-			Boolean
-		) as YtdlVideoInfoResolved[];
+		const unresolvedVideoDetails = searchResult.map(url => audioInterface.getYouTubeVideoDetails(url));
+		const fetchedVideoDetails = await Promise.all(unresolvedVideoDetails);
+		const filteredVideoDetails = fetchedVideoDetails.filter(Boolean) as YtdlVideoInfoResolved[];
 
-		const selectOptions = videoDetails.map((details, index) => {
+		const selectOptions = filteredVideoDetails.map((details, index) => {
 			const option: MessageSelectOptionData = {
 				label: `${index + 1}) ${details.videoDetails.title}`.substring(0, 100),
 				description: details.videoDetails.description?.substring(0, 100) || '',

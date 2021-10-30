@@ -20,14 +20,13 @@ const clear: CommandHandler = async interaction => {
 		}
 
 		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
+		const queueLength = await audioInterface.queueGetLength();
 
-		if ((await audioInterface.queueGetLength()) > 0) {
+		if (queueLength > 0) {
 			const actionRow = new MessageActionRow().addComponents(
 				new MessageButton().setCustomId('queue-clear-accept').setLabel('Delete!').setStyle('DANGER'),
 				new MessageButton().setCustomId('queue-clear-decline').setLabel('Leave it!').setStyle('SUCCESS')
 			);
-
-			const queueLength = await audioInterface.queueGetLength();
 
 			const botMessage = await interaction.editReply({
 				content: `ℹ️ Are you sure you want to delete the ENTIRE queue? ${queueLength} item${queueLength > 1 ? 's' : ''} will be removed if you do!`,

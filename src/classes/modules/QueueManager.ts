@@ -51,7 +51,7 @@ export default class QueueManager {
 		const startIndex = pageIndex * limit;
 		const endIndex = pageIndex * limit + limit - 1;
 		const videoIds = await LRANGE(this.redisQueueNamespace, startIndex, endIndex);
-		const urls = videoIds.map(getYouTubeUrl).filter(Boolean) as string[];
+		const urls = videoIds.map(getYouTubeUrl).filter(url => typeof url === 'string') as string[];
 		return urls;
 	}
 

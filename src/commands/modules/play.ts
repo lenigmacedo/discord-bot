@@ -32,12 +32,12 @@ const play: CommandHandler = async interaction => {
 		let url = '';
 
 		if (!prepended) {
+			console.log('Query not URL, trying a search...');
 			const urls = await getYouTubeUrls(queryOrUrl, 1);
 			url = urls[0];
 			prepended = await audioInterface.queuePrepend(url);
 
 			if (!prepended) {
-				console.log('Query not URL, trying a search...');
 				await interaction.editReply('🚨 I could not find a video. Try something less specific?');
 				console.log('Search failed.');
 				return;

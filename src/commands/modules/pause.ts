@@ -10,8 +10,12 @@ const pause: CommandHandler = async interaction => {
 		await interaction.deferReply();
 		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
 		const paused = audioInterface.getPlayer().pause(true);
-		if (paused) await interaction.editReply('✅ The audio has been paused.');
-		else await interaction.editReply('🚨 Nothing to pause.');
+
+		if (paused) {
+			await interaction.editReply('✅ The audio has been paused.');
+		} else {
+			await interaction.editReply('🚨 Nothing to pause.');
+		}
 	} catch (error) {
 		console.error(error);
 	}

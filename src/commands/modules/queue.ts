@@ -33,7 +33,7 @@ const queue: CommandHandler = async interaction => {
 			const itemNumber = index + 1 + itemNumberOffset;
 			const videoDetailsObj = videoDetails?.videoDetails;
 
-			if (!videoDetailsObj?.title || !videoDetailsObj?.description) {
+			if (!videoDetailsObj?.title || !videoDetailsObj.description) {
 				return {
 					name: `${itemNumber}) 🚨 FAILED`,
 					value: `Video private or age restricted or something else.`
@@ -42,7 +42,7 @@ const queue: CommandHandler = async interaction => {
 
 			return {
 				name: `${itemNumber}) ${videoDetailsObj.title.substring(0, 100)}`,
-				value: videoDetailsObj.description.substring(0, 200) + '...'
+				value: `By \`${videoDetailsObj.author.name}\`.`
 			};
 		});
 
