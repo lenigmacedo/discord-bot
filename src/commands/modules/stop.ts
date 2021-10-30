@@ -1,4 +1,4 @@
-import { AudioInterface } from 'bot-classes';
+import { YouTubeInterface } from 'bot-classes';
 import { CommandHandler } from '../CommandHandler.types';
 
 const stop: CommandHandler = async interaction => {
@@ -8,7 +8,7 @@ const stop: CommandHandler = async interaction => {
 		}
 
 		await interaction.deferReply();
-		const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
+		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
 
 		if (!audioInterface.isBusy()) {
 			await interaction.editReply('🚨 Nothing to stop.');

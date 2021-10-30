@@ -1,4 +1,4 @@
-import { AudioInterface } from 'bot-classes';
+import { YouTubeInterface } from 'bot-classes';
 import { CommandHandler } from '../CommandHandler.types';
 
 const resume: CommandHandler = async interaction => {
@@ -8,7 +8,7 @@ const resume: CommandHandler = async interaction => {
 		}
 
 		await interaction.deferReply();
-		const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
+		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
 		const unpaused = audioInterface.getPlayer().unpause();
 		if (unpaused) await interaction.editReply('✅ The audio has been resumed.');
 		else await interaction.editReply('🚨 Nothing to resume.');

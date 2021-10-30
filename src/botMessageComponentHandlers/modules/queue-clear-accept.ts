@@ -1,4 +1,4 @@
-import { AudioInterface } from 'bot-classes';
+import { YouTubeInterface } from 'bot-classes';
 import { Guild } from 'discord.js';
 import { MessageComponentHandler } from '../MessageComponentHandler.types';
 
@@ -8,7 +8,7 @@ const queueClearAccept: MessageComponentHandler = async interaction => {
 			return;
 		}
 
-		const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
+		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
 		await interaction.deferReply();
 
 		if ((await audioInterface.queueGetLength()) > 0) {

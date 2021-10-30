@@ -1,4 +1,4 @@
-import { AudioInterface } from 'bot-classes';
+import { YouTubeInterface } from 'bot-classes';
 import { getVideoDetails, getYouTubeUrls, safeJoinVoiceChannel } from 'bot-functions';
 import { GuildMember } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
@@ -21,7 +21,7 @@ const play: CommandHandler = async interaction => {
 		}
 
 		const queryOrUrl = interaction.options.getString('url-or-query', true);
-		const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
+		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
 
 		if (audioInterface.isBusy()) {
 			await interaction.editReply('🚨 I am busy!');

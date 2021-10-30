@@ -1,4 +1,4 @@
-import { AudioInterface } from 'bot-classes';
+import { YouTubeInterface } from 'bot-classes';
 import { GuildMember } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
 
@@ -19,7 +19,7 @@ const skip: CommandHandler = async interaction => {
 			return;
 		}
 
-		const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
+		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
 		const skipped = audioInterface.emitAudioFinish();
 
 		if (skipped) {

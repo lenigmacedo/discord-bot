@@ -1,4 +1,4 @@
-import { AudioInterface } from 'bot-classes';
+import { YouTubeInterface } from 'bot-classes';
 import config from 'bot-config';
 import { getVideoDetails, YtdlVideoInfoResolved } from 'bot-functions';
 import { ColorResolvable, EmbedFieldData, MessageEmbed } from 'discord.js';
@@ -11,7 +11,7 @@ const queue: CommandHandler = async interaction => {
 		}
 
 		await interaction.deferReply();
-		const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
+		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
 		const queueLength = await audioInterface.queueGetLength();
 
 		if (!queueLength) {

@@ -1,4 +1,4 @@
-import { AudioInterface } from 'bot-classes';
+import { YouTubeInterface } from 'bot-classes';
 import initOneTimeUseComponentInteraction from 'bot-functions/modules/initOneTimeUseComponentInteraction';
 import { GuildMember, Message, MessageActionRow, MessageButton } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
@@ -19,7 +19,7 @@ const clear: CommandHandler = async interaction => {
 			return;
 		}
 
-		const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
+		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
 
 		if ((await audioInterface.queueGetLength()) > 0) {
 			const actionRow = new MessageActionRow().addComponents(

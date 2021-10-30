@@ -1,5 +1,4 @@
-import { getVideoDetails, getYouTubeUrls, YtdlVideoInfoResolved } from 'bot-functions';
-import initOneTimeUseComponentInteraction from 'bot-functions/modules/initOneTimeUseComponentInteraction';
+import { getVideoDetails, getYouTubeUrls, initOneTimeUseComponentInteraction, YtdlVideoInfoResolved } from 'bot-functions';
 import { GuildMember, Message, MessageActionRow, MessageSelectMenu, MessageSelectOptionData } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
 

@@ -1,4 +1,4 @@
-import { AudioInterface } from 'bot-classes';
+import { YouTubeInterface } from 'bot-classes';
 import { getVideoDetails, safeJoinVoiceChannel } from 'bot-functions';
 import { GuildMember } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
@@ -19,7 +19,7 @@ const start: CommandHandler = async interaction => {
 			return;
 		}
 
-		const audioInterface = AudioInterface.getInterfaceForGuild(interaction.guild);
+		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
 		const queue = await audioInterface.queueGetMultiple();
 
 		if (!queue.length) {
