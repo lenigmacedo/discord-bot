@@ -1,4 +1,13 @@
+# Directories
 /node_modules
+/coverage
+/tests
+
+# Files
+*.test.ts
+*.md
+.git*
 .env-example
-.git
-.gitignore
+.vscode
+.jest.config.js
+.prettierrc.yml
