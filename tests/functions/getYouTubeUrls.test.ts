@@ -1,5 +1,5 @@
 import config from 'bot-config';
-import { findYouTubeUrls } from 'bot-functions';
+import { getYouTubeUrls } from 'bot-functions';
 
 const resultLength = config.paginateMaxLength;
 
@@ -8,15 +8,15 @@ const resultLength = config.paginateMaxLength;
  */
 
 test('Test a search query that definitely has results', async () => {
-	expect(await findYouTubeUrls('rick astley')).toHaveLength(resultLength);
+	expect(await getYouTubeUrls('rick astley')).toHaveLength(resultLength);
 });
 
 test('Test a search query that definitely has results', async () => {
-	expect(await findYouTubeUrls('rick astley')).toBeInstanceOf(Array);
+	expect(await getYouTubeUrls('rick astley')).toBeInstanceOf(Array);
 });
 
 test('Test a search query that definitely has results', async () => {
-	const results = await findYouTubeUrls('rick astley');
+	const results = await getYouTubeUrls('rick astley');
 	expect(results.find(result => typeof result !== 'string')).toBe(undefined);
 });
 
@@ -25,20 +25,20 @@ test('Test a search query that definitely has results', async () => {
  */
 
 test('Test a search query with no results', async () => {
-	expect(await findYouTubeUrls('alsiugdaspiugdpusaugdpiuyasgdpuyasgfpduygaspdiyugaspiudgfapsiugdpasiugdpasug')).toStrictEqual([]);
+	expect(await getYouTubeUrls('alsiugdaspiugdpusaugdpiuyasgdpuyasgfpduygaspdiyugaspiudgfapsiugdpasiugdpasug')).toStrictEqual([]);
 });
 
 test('Search query with null', async () => {
 	//@ts-ignore
-	expect(await findYouTubeUrls(null)).toStrictEqual([]);
+	expect(await getYouTubeUrls(null)).toStrictEqual([]);
 });
 
 test('Search query with null', async () => {
 	//@ts-ignore
-	expect(await findYouTubeUrls(false)).toStrictEqual([]);
+	expect(await getYouTubeUrls(false)).toStrictEqual([]);
 });
 
 test('Search query with empty array', async () => {
 	//@ts-ignore
-	expect(await findYouTubeUrls([])).toStrictEqual([]);
+	expect(await getYouTubeUrls([])).toStrictEqual([]);
 });

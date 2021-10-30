@@ -1,4 +1,4 @@
-import { findYouTubeUrls, getVideoDetails, YtdlVideoInfoResolved } from 'bot-functions';
+import { getVideoDetails, getYouTubeUrls, YtdlVideoInfoResolved } from 'bot-functions';
 import initOneTimeUseComponentInteraction from 'bot-functions/modules/initOneTimeUseComponentInteraction';
 import { GuildMember, Message, MessageActionRow, MessageSelectMenu, MessageSelectOptionData } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
@@ -20,7 +20,7 @@ const search: CommandHandler = async interaction => {
 
 		await interaction.reply({ content: '🔃 Searching YouTube please wait...', ephemeral: true });
 		const searchQuery = interaction.options.getString('search-query', true);
-		const searchResult = await findYouTubeUrls(searchQuery);
+		const searchResult = await getYouTubeUrls(searchQuery);
 
 		if (!searchResult.length) {
 			await interaction.editReply('ℹ️ I could not find any results for that search query. Try searching for something less specific?');

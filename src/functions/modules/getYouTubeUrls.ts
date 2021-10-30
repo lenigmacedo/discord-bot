@@ -4,7 +4,7 @@ import config, { globals } from 'bot-config';
 /**
  * With a string, search for an array of video URLs
  */
-export default function findYouTubeUrls(query: string, limit = config.paginateMaxLength) {
+export default function getYouTubeUrls(query: string, limit = config.paginateMaxLength) {
 	return new Promise<string[] | []>(async resolve => {
 		try {
 			const params: youtube_v3.Params$Resource$Search$List = {

@@ -1,5 +1,5 @@
 import { AudioInterface } from 'bot-classes';
-import { findYouTubeUrls, getVideoDetails, safeJoinVoiceChannel } from 'bot-functions';
+import { getVideoDetails, getYouTubeUrls, safeJoinVoiceChannel } from 'bot-functions';
 import { GuildMember } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
 
@@ -32,7 +32,7 @@ const play: CommandHandler = async interaction => {
 		let url = '';
 
 		if (!prepended) {
-			const urls = await findYouTubeUrls(queryOrUrl, 1);
+			const urls = await getYouTubeUrls(queryOrUrl, 1);
 			url = urls[0];
 			prepended = await audioInterface.queuePrepend(url);
 
