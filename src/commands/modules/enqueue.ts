@@ -1,5 +1,4 @@
 import { YouTubeInterface } from 'bot-classes';
-import { getVideoDetails } from 'bot-functions';
 import { CommandHandler } from '../CommandHandler.types';
 
 const enqueue: CommandHandler = async interaction => {
@@ -11,7 +10,7 @@ const enqueue: CommandHandler = async interaction => {
 		await interaction.deferReply();
 		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
 		const youtubeUrl = interaction.options.getString('youtube-url', true);
-		const videoDetails = await getVideoDetails(youtubeUrl);
+		const videoDetails = await audioInterface.getYouTubeVideoDetails(youtubeUrl);
 
 		if (!videoDetails) {
 			await interaction.editReply('🚨 I could not add that item to the queue. Is it a valid URL? Is it age restricted or private?');

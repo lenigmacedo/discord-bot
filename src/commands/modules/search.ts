@@ -1,4 +1,5 @@
-import { getVideoDetails, getYouTubeUrls, initOneTimeUseComponentInteraction, YtdlVideoInfoResolved } from 'bot-functions';
+import { YouTubeInterface, YtdlVideoInfoResolved } from 'bot-classes';
+import { getYouTubeUrls, initOneTimeUseComponentInteraction } from 'bot-functions';
 import { GuildMember, Message, MessageActionRow, MessageSelectMenu, MessageSelectOptionData } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
 
@@ -26,7 +27,10 @@ const search: CommandHandler = async interaction => {
 			return;
 		}
 
-		const videoDetails = (await Promise.all(searchResult.map(url => getVideoDetails(url)))).filter(Boolean) as YtdlVideoInfoResolved[];
+		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
+		const videoDetails = (await Promise.all(searchResult.map(url => audioInterface.getYouTubeVideoDetails(url)))).filter(
+			Boolean
+		) as YtdlVideoInfoResolved[];
 
 		const selectOptions = videoDetails.map((details, index) => {
 			const option: MessageSelectOptionData = {

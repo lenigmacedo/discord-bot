@@ -1,6 +1,5 @@
-import { YouTubeInterface } from 'bot-classes';
+import { YouTubeInterface, YtdlVideoInfoResolved } from 'bot-classes';
 import config from 'bot-config';
-import { getVideoDetails, YtdlVideoInfoResolved } from 'bot-functions';
 import { ColorResolvable, EmbedFieldData, MessageEmbed } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
 
@@ -26,7 +25,7 @@ const queue: CommandHandler = async interaction => {
 		else if (page < 1) page = 1;
 
 		const queue = await audioInterface.queueGetMultiple(page);
-		const videoDetailPromiseArray = queue.map(url => getVideoDetails(url));
+		const videoDetailPromiseArray = queue.map(url => audioInterface.getYouTubeVideoDetails(url));
 		const videoDetails = (await Promise.all(videoDetailPromiseArray)) as YtdlVideoInfoResolved[];
 
 		const fields: EmbedFieldData[] = videoDetails.map((videoDetails, index) => {

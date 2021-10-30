@@ -1,5 +1,5 @@
 import { YouTubeInterface } from 'bot-classes';
-import { getVideoDetails, getYouTubeUrls, safeJoinVoiceChannel } from 'bot-functions';
+import { getYouTubeUrls, safeJoinVoiceChannel } from 'bot-functions';
 import { GuildMember } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
 
@@ -49,7 +49,7 @@ const play: CommandHandler = async interaction => {
 
 		await interaction.editReply('🔃 Preparing to play...');
 		audioInterface.setConnection(safeJoinVoiceChannel(interaction));
-		const videoDetails = await getVideoDetails(url);
+		const videoDetails = await audioInterface.getYouTubeVideoDetails(url);
 		await interaction.editReply(`🔊 Playing \`${videoDetails?.videoDetails.title}\`.`);
 		while (await audioInterface.queueRunner());
 		audioInterface.deleteConnection();

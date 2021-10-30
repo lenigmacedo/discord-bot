@@ -10,8 +10,17 @@ import {
 } from '@discordjs/voice';
 import { QueueManager } from 'bot-classes';
 import config, { globals } from 'bot-config';
-import { downloadYouTubeVideo, getVideoDetails } from 'bot-functions';
+import { downloadYouTubeVideo } from 'bot-functions';
 import { Guild } from 'discord.js';
+import { promisify } from 'util';
+import ytdl from 'ytdl-core-discord';
+
+const GET = promisify(globals.redisClient.GET).bind(globals.redisClient);
+const SET = promisify(globals.redisClient.SET).bind(globals.redisClient);
+const EXPIRE = promisify(globals.redisClient.EXPIRE).bind(globals.redisClient);
+
+type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
+export type YtdlVideoInfoResolved = Awaited<ReturnType<typeof ytdl.getBasicInfo>>;
 
 /**
  * An easy toolbox for managing audio for this bot.
@@ -22,7 +31,7 @@ export default class YouTubeInterface extends QueueManager {
 	currentResource?: AudioResource | null;
 
 	constructor(guild: Guild) {
-		super(guild, `${config.redisNamespace}:${guild.id}:queue`);
+		super(guild, `${config.redisNamespace}:${guild.id}:queue:youtube`);
 		this.player = createAudioPlayer();
 	}
 
@@ -53,7 +62,7 @@ export default class YouTubeInterface extends QueueManager {
 	async queueGetQueueItemInfo(queueItemIndex: number = 0) {
 		const queueItem = await this.queueGetFromIndex(queueItemIndex);
 		if (!queueItem) return null;
-		const info = await getVideoDetails(queueItem);
+		const info = await this.getYouTubeVideoDetails(queueItem);
 		return info;
 	}
 
@@ -174,5 +183,31 @@ export default class YouTubeInterface extends QueueManager {
 
 		player.emit('stateChange', oldState, newState);
 		return true;
+	}
+
+	async getYouTubeVideoDetails(url: string): Promise<YtdlVideoInfoResolved | null> {
+		try {
+			const videoId = ytdl.getVideoID(url);
+			if (!videoId) return null;
+			const namespace = `${this.redisQueueNamespace}:${videoId}`;
+			const searchCache = await GET(namespace);
+
+			if (searchCache) {
+				console.log(`Video id ${videoId} found in cache! Using cache.`);
+				return JSON.parse(searchCache);
+			} else {
+				if (!ytdl.validateURL(url)) return null;
+				console.log(`Video id ${videoId} not found in cache! Getting video details.`);
+				const results = await ytdl.getBasicInfo(url);
+				const json = JSON.stringify(results);
+				await SET(namespace, json);
+				// Set an expiry on the cache, so that it will be forced to re-fetch in the future to keep the data up to date
+				await EXPIRE(namespace, config.cacheExpiryHours * 3600); // 3600 seconds in an hour
+				return results;
+			}
+		} catch (error) {
+			console.error(error);
+			return null;
+		}
 	}
 }

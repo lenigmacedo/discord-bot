@@ -1,7 +1,7 @@
 import config, { globals } from 'bot-config';
+import { getYouTubeUrl, getYouTubeVideoId } from 'bot-functions';
 import { Guild } from 'discord.js';
 import { promisify } from 'util';
-import ytdl from 'ytdl-core-discord';
 
 const RPUSH = promisify<string, string>(globals.redisClient.RPUSH).bind(globals.redisClient);
 const LPUSH = promisify<string, string>(globals.redisClient.LPUSH).bind(globals.redisClient);
@@ -24,20 +24,22 @@ export default class QueueManager {
 	}
 
 	/**
-	 * Add a URL to the end of the guild's queue.
+	 * Add a video id to the end of the guild's queue.
 	 */
-	async queueAppend(url: string) {
-		if (!ytdl.validateURL(url)) return null;
-		await RPUSH(this.redisQueueNamespace, url);
+	async queueAppend(urlOrId: string) {
+		const videoId = getYouTubeVideoId(urlOrId);
+		if (!videoId) return null;
+		await RPUSH(this.redisQueueNamespace, videoId);
 		return true;
 	}
 
 	/**
-	 * Add a URL to the end of the guild's queue.
+	 * Add a video id to the end of the guild's queue.
 	 */
-	async queuePrepend(url: string) {
-		if (!ytdl.validateURL(url)) return null;
-		await LPUSH(this.redisQueueNamespace, url);
+	async queuePrepend(urlOrId: string) {
+		const videoId = getYouTubeVideoId(urlOrId);
+		if (!videoId) return null;
+		await LPUSH(this.redisQueueNamespace, videoId);
 		return true;
 	}
 
@@ -48,9 +50,9 @@ export default class QueueManager {
 		const pageIndex = page - 1; // Redis starts from index 0
 		const startIndex = pageIndex * limit;
 		const endIndex = pageIndex * limit + limit - 1;
-
-		const results = await LRANGE(this.redisQueueNamespace, startIndex, endIndex);
-		return results;
+		const videoIds = await LRANGE(this.redisQueueNamespace, startIndex, endIndex);
+		const urls = videoIds.map(getYouTubeUrl).filter(Boolean) as string[];
+		return urls;
 	}
 
 	/**
@@ -58,15 +60,18 @@ export default class QueueManager {
 	 */
 	async queueGetFromIndex(indexNumber: number) {
 		const results = await LRANGE(this.redisQueueNamespace, indexNumber, indexNumber);
-		return results[0];
+		const url = getYouTubeUrl(results[0]);
+		return url;
 	}
 
 	/**
 	 * Get the oldest (first in line) item in the guild's queue.
 	 */
 	async queueGetOldest() {
-		const results = await this.queueGetFromIndex(0);
-		return results || null;
+		const result = await this.queueGetFromIndex(0);
+		if (!result) return null;
+		const url = getYouTubeUrl(result);
+		return url;
 	}
 
 	/**

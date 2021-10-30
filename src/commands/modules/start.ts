@@ -1,5 +1,5 @@
 import { YouTubeInterface } from 'bot-classes';
-import { getVideoDetails, safeJoinVoiceChannel } from 'bot-functions';
+import { safeJoinVoiceChannel } from 'bot-functions';
 import { GuildMember } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
 
@@ -34,7 +34,7 @@ const start: CommandHandler = async interaction => {
 
 		await interaction.editReply('🔃 Preparing to play...');
 		audioInterface.setConnection(safeJoinVoiceChannel(interaction));
-		const videoDetails = await getVideoDetails((await audioInterface.queueGetOldest()) as string);
+		const videoDetails = await audioInterface.getYouTubeVideoDetails((await audioInterface.queueGetOldest()) as string);
 
 		if (videoDetails) {
 			await interaction.editReply(`🔊 I am now playing the queue. First up \`${videoDetails.videoDetails.title}\`!`);
