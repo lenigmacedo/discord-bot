@@ -11,7 +11,7 @@ const queue: CommandHandler = async interaction => {
 
 		await interaction.deferReply();
 		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
-		const queueLength = await audioInterface.queueGetLength();
+		const queueLength = await audioInterface.queueLength();
 
 		if (!queueLength) {
 			await interaction.editReply('ℹ️ Queue is empty.');

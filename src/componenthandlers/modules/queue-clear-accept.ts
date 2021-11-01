@@ -11,8 +11,8 @@ const queueClearAccept: MessageComponentHandler = async interaction => {
 		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
 		await interaction.deferReply();
 
-		if ((await audioInterface.queueGetLength()) > 0) {
-			const deleted = await audioInterface.queueDelete();
+		if ((await audioInterface.queueLength()) > 0) {
+			const deleted = await audioInterface.queuePurge();
 			if (deleted) await interaction.editReply("🚮 The queue has been deleted. I hope that wasn't a mistake!");
 			else await interaction.editReply('🚨 I was unable to delete the queue.');
 		} else {

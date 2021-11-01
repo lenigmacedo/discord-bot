@@ -9,7 +9,6 @@ import redis from 'redis';
  * Set values that should NOT be user changeable yet used throughout many parts of the code as reference.
  */
 const globals = {
-	players: new Map<Guild['id'], YouTubeInterface>(),
 	redisClient: redis.createClient({
 		host: config.redisHost,
 		port: config.redisPort
@@ -17,7 +16,8 @@ const globals = {
 	youtubeApi: youtube({
 		version: 'v3',
 		auth: config.googleApiToken
-	})
+	}),
+	youtubePlayers: new Map<Guild['id'], YouTubeInterface>()
 };
 
 export default globals;

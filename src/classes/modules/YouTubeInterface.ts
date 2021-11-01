@@ -40,18 +40,18 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 	 * Return the queue instance for this guild. Will contstruct a new one if one does not already exist.
 	 */
 	static getInterfaceForGuild(guild: Guild) {
-		if (!globals.players.has(guild.id)) {
-			globals.players.set(guild.id, new YouTubeInterface(guild));
+		if (!globals.youtubePlayers.has(guild.id)) {
+			globals.youtubePlayers.set(guild.id, new YouTubeInterface(guild));
 		}
 
-		return globals.players.get(guild.id) as YouTubeInterface;
+		return globals.youtubePlayers.get(guild.id) as YouTubeInterface;
 	}
 
 	/**
 	 * Download the audio resource for a video. By default it will be the oldest item in the queue, but you can specify an index.
 	 */
-	async downloadFromQueue(queueItemIndex: number = 0) {
-		const queueLength = await this.queueGetLength();
+	async download(queueItemIndex: number = 0) {
+		const queueLength = await this.queueLength();
 		if (queueItemIndex >= queueLength) return null;
 		const queueItem = (await this.queueGetFromIndex(queueItemIndex)) || '';
 		const audioResource = await downloadYouTubeVideo(queueItem);
@@ -61,7 +61,7 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 	/**
 	 * Get the video info. By default it is the first item in the queue.
 	 */
-	async queueGetQueueItemInfo(queueItemIndex: number = 0) {
+	async getItemInfo(queueItemIndex: number = 0) {
 		const queueItem = await this.queueGetFromIndex(queueItemIndex);
 		if (!queueItem) return null;
 		const info = await this.getDetails(queueItem);
@@ -78,7 +78,7 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 	/**
 	 * Is the bot playing audio in thie guild?
 	 */
-	isBusy() {
+	getBusyStatus() {
 		const connection = this.getConnection();
 		if (!connection?.state.status) return false;
 		if (connection?.state.status !== 'destroyed') return true;
@@ -93,12 +93,12 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 			try {
 				const player = this.getPlayer();
 
-				if ((await this.queueGetLength()) < 1) {
+				if ((await this.queueLength()) < 1) {
 					resolve(null);
 					return;
 				}
 
-				const audioResource = await this.downloadFromQueue();
+				const audioResource = await this.download();
 
 				if (!audioResource) {
 					await this.queueDeleteOldest();
@@ -139,8 +139,9 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 	 */
 	deleteConnection() {
 		this.currentResource = null;
+		const destroyed = this.connection?.state.status === 'destroyed';
 
-		if (this.connection instanceof VoiceConnection) {
+		if (this.connection instanceof VoiceConnection && !destroyed) {
 			this.connection.disconnect();
 			this.connection.destroy();
 			return true;

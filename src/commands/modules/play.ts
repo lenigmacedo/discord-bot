@@ -23,7 +23,7 @@ const play: CommandHandler = async interaction => {
 		const queryOrUrl = interaction.options.getString('url-or-query', true);
 		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
 
-		if (audioInterface.isBusy()) {
+		if (audioInterface.getBusyStatus()) {
 			await interaction.editReply('🚨 I am busy!');
 			return;
 		}

@@ -20,7 +20,7 @@ const clear: CommandHandler = async interaction => {
 		}
 
 		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
-		const queueLength = await audioInterface.queueGetLength();
+		const queueLength = await audioInterface.queueLength();
 
 		if (queueLength > 0) {
 			const actionRow = new MessageActionRow().addComponents(

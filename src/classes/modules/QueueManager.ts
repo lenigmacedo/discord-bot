@@ -34,7 +34,7 @@ export default class QueueManager {
 	}
 
 	/**
-	 * Add a video id to the end of the guild's queue.
+	 * Add a video id to the #1 spot in the queue.
 	 */
 	async queuePrepend(urlOrId: string) {
 		const videoId = getYouTubeVideoId(urlOrId);
@@ -44,7 +44,7 @@ export default class QueueManager {
 	}
 
 	/**
-	 * Get many items in the guild's queue. Default limit is one less than defined in the config because it starts at index 0.
+	 * Get many items in the guild's queue.
 	 */
 	async queueGetMultiple(page = 1, limit: number = config.paginateMaxLength) {
 		const pageIndex = page - 1; // Redis starts from index 0
@@ -56,7 +56,7 @@ export default class QueueManager {
 	}
 
 	/**
-	 * Get a queue item from its index. 0 = first item the same as arrays.
+	 * Get a queue item from its index.
 	 */
 	async queueGetFromIndex(indexNumber: number) {
 		const results = await LRANGE(this.redisQueueNamespace, indexNumber, indexNumber);
@@ -65,7 +65,7 @@ export default class QueueManager {
 	}
 
 	/**
-	 * Get the oldest (first in line) item in the guild's queue.
+	 * Get the #1 item in the guild's queue.
 	 */
 	async queueGetOldest() {
 		const result = await this.queueGetFromIndex(0);
@@ -75,7 +75,7 @@ export default class QueueManager {
 	}
 
 	/**
-	 * Remove the oldest item from the queue
+	 * Remove the #1 item from the queue.
 	 */
 	async queueDeleteOldest() {
 		await LPOP(this.redisQueueNamespace);
@@ -85,7 +85,7 @@ export default class QueueManager {
 	/**
 	 * Get how long the queue is.
 	 */
-	async queueGetLength() {
+	async queueLength() {
 		const result = await LLEN(this.redisQueueNamespace);
 		return result;
 	}
@@ -94,15 +94,15 @@ export default class QueueManager {
 	 * Is the queue empty?
 	 */
 	async queueIsEmpty() {
-		const queueLength = await this.queueGetLength();
+		const queueLength = await this.queueLength();
 		return queueLength < 1;
 	}
 
 	/**
 	 * Delete all items in the queue for the guild
 	 */
-	async queueDelete() {
-		const queueLength = await this.queueGetLength();
+	async queuePurge() {
+		const queueLength = await this.queueLength();
 		if (queueLength === 1) await DEL(this.redisQueueNamespace);
 		else if (queueLength > 1) await LTRIM(this.redisQueueNamespace, -1, 0);
 		// LTRIM does not work if there is more than one value

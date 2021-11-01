@@ -27,13 +27,20 @@ const start: CommandHandler = async interaction => {
 			return;
 		}
 
-		if (audioInterface.isBusy()) {
+		if (audioInterface.getBusyStatus()) {
 			await interaction.editReply('🚨 I am busy!');
 			return;
 		}
 
 		await interaction.editReply('🔃 Preparing to play...');
 		audioInterface.setConnection(safeJoinVoiceChannel(interaction));
+		const firstItemInQueue = await audioInterface.queueGetOldest();
+
+		if (!firstItemInQueue) {
+			interaction.editReply('🚨 Unable to play the track.');
+			return;
+		}
+
 		const videoDetails = await audioInterface.getDetails((await audioInterface.queueGetOldest()) as string);
 
 		if (videoDetails) {

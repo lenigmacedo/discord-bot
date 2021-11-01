@@ -8,7 +8,7 @@ export interface InterfaceDefinition extends QueueManager {
 	/**
 	 * Based off of a queue index number, get an item in the queue.
 	 */
-	queueGetQueueItemInfo(queueItemIndex: number): Promise<any | null>;
+	getItemInfo(queueItemIndex: number): Promise<any | null>;
 
 	/**
 	 * Get the player instance
@@ -18,7 +18,7 @@ export interface InterfaceDefinition extends QueueManager {
 	/**
 	 * Is the bot busy playing something?
 	 */
-	isBusy(): boolean;
+	getBusyStatus(): boolean;
 
 	/**
 	 * A runner method that resolves to true when the track is finished, and null when there is no more audio resources to play.
@@ -44,6 +44,11 @@ export interface InterfaceDefinition extends QueueManager {
 	 * Get the current audio resource for this bot.
 	 */
 	getCurrentAudioResource(): AudioResource | null;
+
+	/**
+	 * Download the audio resource
+	 */
+	download(queueItemIndex: number): Promise<AudioResource | null>;
 
 	/**
 	 * Emit a fake audio finish event to be used to simulate a track finishing. Useful for skipping.

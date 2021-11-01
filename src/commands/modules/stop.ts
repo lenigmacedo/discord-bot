@@ -10,7 +10,7 @@ const stop: CommandHandler = async interaction => {
 		await interaction.deferReply();
 		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
 
-		if (!audioInterface.isBusy()) {
+		if (!audioInterface.getBusyStatus()) {
 			await interaction.editReply('🚨 Nothing to stop.');
 			return;
 		}
