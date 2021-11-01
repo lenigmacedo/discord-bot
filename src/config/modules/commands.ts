@@ -22,10 +22,10 @@ const commands = [
 		.setDescription('Add a YouTube video to the end of the queue.')
 		.addStringOption(option => option.setName('youtube-url').setDescription('The YouTube video URL.').setRequired(true)),
 	new SlashCommandBuilder().setName('stop').setDescription('Stop the bot from playing.'),
-	new SlashCommandBuilder().setName('skip').setDescription('Skip the current playing audio.'),
+	new SlashCommandBuilder().setName('skip').setDescription('Skip the current playing.'),
 	new SlashCommandBuilder()
 		.setName('search')
-		.setDescription('Search YouTube for videos and use reactions to select a result.')
+		.setDescription('Search YouTube for videos and use an interactive dropdown to select a result.')
 		.addStringOption(option => option.setName('search-query').setDescription('The video you would like to search for.').setRequired(true)),
 	new SlashCommandBuilder().setName('clear').setDescription('Clear the entire queue.')
 ];

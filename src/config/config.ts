@@ -18,16 +18,7 @@ const config = {
 	paginateMaxLength: 5,
 	searchExpiryMilliseconds: 60 * 1000,
 	cacheExpiryHours: 24,
-	redisHost: (() => {
-		switch (process.env.NODE_ENV) {
-			case 'production':
-				return 'redis';
-			case 'development':
-				return 'localhost';
-			default:
-				return 'localhost';
-		}
-	})(),
+	redisHost: process.env.NODE_ENV === 'production' ? 'redis' : 'localhost',
 	redisPort: 6379,
 	embedSuccess: '#00ff00',
 	embedDanger: '#ff0000',
