@@ -28,7 +28,7 @@ const search: CommandHandler = async interaction => {
 		}
 
 		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
-		const unresolvedVideoDetails = searchResult.map(url => audioInterface.getYouTubeVideoDetails(url));
+		const unresolvedVideoDetails = searchResult.map(url => audioInterface.getDetails(url));
 		const fetchedVideoDetails = await Promise.all(unresolvedVideoDetails);
 		const filteredVideoDetails = fetchedVideoDetails.filter(Boolean) as YtdlVideoInfoResolved[];
 

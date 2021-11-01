@@ -14,6 +14,7 @@ import { downloadYouTubeVideo } from 'bot-functions';
 import { Guild } from 'discord.js';
 import { promisify } from 'util';
 import ytdl from 'ytdl-core-discord';
+import { InterfaceDefinition } from '../InterfaceDefinition.types';
 
 const GET = promisify(globals.redisClient.GET).bind(globals.redisClient);
 const SET = promisify(globals.redisClient.SET).bind(globals.redisClient);
@@ -25,13 +26,13 @@ export type YtdlVideoInfoResolved = Awaited<ReturnType<typeof ytdl.getBasicInfo>
 /**
  * An easy toolbox for managing audio for this bot.
  */
-export default class YouTubeInterface extends QueueManager {
+export default class YouTubeInterface extends QueueManager implements InterfaceDefinition {
 	player: AudioPlayer;
 	connection?: VoiceConnection;
 	currentResource?: AudioResource | null;
 
 	constructor(guild: Guild) {
-		super(guild, `${config.redisNamespace}:${guild.id}:queue:youtube`);
+		super(guild, 'youtube'); // Creates a namespace for youtube-only tracks
 		this.player = createAudioPlayer();
 	}
 
@@ -63,7 +64,7 @@ export default class YouTubeInterface extends QueueManager {
 	async queueGetQueueItemInfo(queueItemIndex: number = 0) {
 		const queueItem = await this.queueGetFromIndex(queueItemIndex);
 		if (!queueItem) return null;
-		const info = await this.getYouTubeVideoDetails(queueItem);
+		const info = await this.getDetails(queueItem);
 		return info;
 	}
 
@@ -186,7 +187,7 @@ export default class YouTubeInterface extends QueueManager {
 		return true;
 	}
 
-	async getYouTubeVideoDetails(url: string): Promise<YtdlVideoInfoResolved | null> {
+	async getDetails(url: string): Promise<YtdlVideoInfoResolved | null> {
 		try {
 			const videoId = ytdl.getVideoID(url);
 			if (!videoId) return null;

@@ -49,7 +49,7 @@ const play: CommandHandler = async interaction => {
 
 		await interaction.editReply('🔃 Preparing to play...');
 		audioInterface.setConnection(safeJoinVoiceChannel(interaction));
-		const videoDetails = await audioInterface.getYouTubeVideoDetails(url);
+		const videoDetails = await audioInterface.getDetails(url);
 		await interaction.editReply(`🔊 Playing \`${videoDetails?.videoDetails.title}\`.`);
 		while (await audioInterface.queueRunner());
 		audioInterface.deleteConnection();

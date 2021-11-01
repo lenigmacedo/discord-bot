@@ -25,7 +25,7 @@ const queue: CommandHandler = async interaction => {
 		else if (page < 1) page = 1;
 
 		const queue = await audioInterface.queueGetMultiple(page);
-		const videoDetailPromiseArray = queue.map(url => audioInterface.getYouTubeVideoDetails(url));
+		const videoDetailPromiseArray = queue.map(url => audioInterface.getDetails(url));
 		const videoDetails = (await Promise.all(videoDetailPromiseArray)) as YtdlVideoInfoResolved[];
 
 		const fields: EmbedFieldData[] = videoDetails.map((videoDetails, index) => {

@@ -20,7 +20,7 @@ export default class QueueManager {
 
 	constructor(guild: Guild, redisNamespace: string) {
 		this.guild = guild;
-		this.redisQueueNamespace = redisNamespace;
+		this.redisQueueNamespace = `${config.redisNamespace}:${guild.id}:queue:${redisNamespace}`;
 	}
 
 	/**
