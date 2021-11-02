@@ -14,7 +14,7 @@ const stop: CommandHandler = async initialInteraction => {
 		await interaction.deferReply();
 
 		if (!guildMember.voice.channel) {
-			await interaction.editReply('🚨 You must be connected to a voice channel for me to start the queue!');
+			await interaction.editReply('🚨 You must be connected to a voice channel for me to stop the queue!');
 			return;
 		}
 

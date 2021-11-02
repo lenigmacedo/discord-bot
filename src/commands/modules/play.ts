@@ -15,7 +15,7 @@ const play: CommandHandler = async initialInteraction => {
 		const voiceChannel = guildMember.voice.channel;
 
 		if (!voiceChannel) {
-			await interaction.editReply('🚨 You must be connected to a voice channel!');
+			await interaction.editReply('🚨 You must be connected to a voice channel for me to play something!');
 			return;
 		}
 
