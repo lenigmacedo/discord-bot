@@ -53,11 +53,16 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 	 * Download the audio resource for a video. By default it will be the oldest item in the queue, but you can specify an index.
 	 */
 	async download(queueItemIndex: number = 0) {
-		const queueLength = await this.queueLength();
-		if (queueItemIndex >= queueLength) return null;
-		const queueItem = (await this.queueGetFromIndex(queueItemIndex)) || '';
-		const audioResource = await downloadYouTubeVideo(queueItem);
-		return audioResource;
+		try {
+			const queueLength = await this.queueLength();
+			if (queueItemIndex >= queueLength) return null;
+			const queueItem = (await this.queueGetFromIndex(queueItemIndex)) || '';
+			const audioResource = await downloadYouTubeVideo(queueItem);
+			return audioResource;
+		} catch (error) {
+			console.error(error);
+			return null;
+		}
 	}
 
 	/**

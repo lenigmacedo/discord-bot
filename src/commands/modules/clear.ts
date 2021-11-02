@@ -1,16 +1,17 @@
 import { YouTubeInterface } from 'bot-classes';
-import { initOneTimeUseComponentInteraction } from 'bot-functions';
-import { GuildMember, Message, MessageActionRow, MessageButton } from 'discord.js';
+import { getCommandIntraction, initOneTimeUseComponentInteraction } from 'bot-functions';
+import { Message, MessageActionRow, MessageButton } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
 
-const clear: CommandHandler = async interaction => {
+const clear: CommandHandler = async initialInteraction => {
 	try {
-		const guildMember = interaction.member;
+		const commandInteraction = getCommandIntraction(initialInteraction);
 
-		if (!interaction?.guild?.id || !(guildMember instanceof GuildMember)) {
+		if (!commandInteraction) {
 			return;
 		}
 
+		const { interaction, guild, guildMember } = commandInteraction;
 		await interaction.deferReply({ ephemeral: true });
 		const voiceChannel = guildMember.voice.channel;
 
@@ -19,7 +20,7 @@ const clear: CommandHandler = async interaction => {
 			return;
 		}
 
-		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
+		const audioInterface = YouTubeInterface.getInterfaceForGuild(guild);
 		const queueLength = await audioInterface.queueLength();
 
 		if (queueLength > 0) {

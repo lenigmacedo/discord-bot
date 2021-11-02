@@ -1,20 +1,21 @@
 import { YouTubeInterface, YtdlVideoInfoResolved } from 'bot-classes';
 import { globals } from 'bot-config';
-import { getYouTubeUrls, initOneTimeUseComponentInteraction } from 'bot-functions';
-import { GuildMember, Message, MessageActionRow, MessageSelectMenu, MessageSelectOptionData } from 'discord.js';
+import { getCommandIntraction, getYouTubeUrls, initOneTimeUseComponentInteraction } from 'bot-functions';
+import { Message, MessageActionRow, MessageSelectMenu, MessageSelectOptionData } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
 
-const search: CommandHandler = async interaction => {
+const search: CommandHandler = async initialInteraction => {
 	try {
-		const guildMember = interaction.member;
+		const commandInteraction = getCommandIntraction(initialInteraction);
 
-		if (!interaction?.guild?.id || !(guildMember instanceof GuildMember)) {
+		if (!commandInteraction) {
 			return;
 		}
 
-		const voiceChannel = guildMember.voice.channel;
+		const { interaction, guild, guildMember } = commandInteraction;
+		await interaction.deferReply();
 
-		if (!voiceChannel) {
+		if (!guildMember.voice.channel) {
 			await interaction.reply('🚨 You must be connected to a voice channel for me to search!');
 			return;
 		}
@@ -28,7 +29,7 @@ const search: CommandHandler = async interaction => {
 			return;
 		}
 
-		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
+		const audioInterface = YouTubeInterface.getInterfaceForGuild(guild);
 		const unresolvedVideoDetails = searchResult.map(url => audioInterface.getDetails(url));
 		const fetchedVideoDetails = await Promise.all(unresolvedVideoDetails);
 		const filteredVideoDetails = fetchedVideoDetails.filter(Boolean) as YtdlVideoInfoResolved[];

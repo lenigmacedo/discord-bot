@@ -1,25 +1,24 @@
 import { YouTubeInterface } from 'bot-classes';
-import { safeJoinVoiceChannel } from 'bot-functions';
-import { GuildMember } from 'discord.js';
+import { getCommandIntraction, safeJoinVoiceChannel } from 'bot-functions';
 import { CommandHandler } from '../CommandHandler.types';
 
-const start: CommandHandler = async interaction => {
+const start: CommandHandler = async initialInteraction => {
 	try {
-		const guildMember = interaction.member;
+		const commandInteraction = getCommandIntraction(initialInteraction);
 
-		if (!interaction?.guild?.id || !(guildMember instanceof GuildMember)) {
+		if (!commandInteraction) {
 			return;
 		}
 
+		const { interaction, guild, guildMember } = commandInteraction;
 		await interaction.deferReply();
-		const voiceChannel = guildMember.voice.channel;
 
-		if (!voiceChannel) {
-			await interaction.editReply('🚨 You must be connected to a voice channel for me to know where to join!');
+		if (!guildMember.voice.channel) {
+			await interaction.editReply('🚨 You must be connected to a voice channel for me to start the queue!');
 			return;
 		}
 
-		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
+		const audioInterface = YouTubeInterface.getInterfaceForGuild(guild);
 		const queue = await audioInterface.queueGetMultiple();
 
 		if (!queue.length) {

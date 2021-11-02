@@ -1,18 +1,17 @@
 import { YouTubeInterface } from 'bot-classes';
-import { getYouTubeUrls, safeJoinVoiceChannel } from 'bot-functions';
-import { GuildMember } from 'discord.js';
+import { getCommandIntraction, getYouTubeUrls, safeJoinVoiceChannel } from 'bot-functions';
 import { CommandHandler } from '../CommandHandler.types';
 
-const play: CommandHandler = async interaction => {
+const play: CommandHandler = async initialInteraction => {
 	try {
-		const guildMember = interaction.member;
+		const commandInteraction = getCommandIntraction(initialInteraction);
 
-		if (!interaction?.guild?.id || !(guildMember instanceof GuildMember)) {
+		if (!commandInteraction) {
 			return;
 		}
 
+		const { interaction, guild, guildMember } = commandInteraction;
 		await interaction.deferReply();
-
 		const voiceChannel = guildMember.voice.channel;
 
 		if (!voiceChannel) {
@@ -21,7 +20,7 @@ const play: CommandHandler = async interaction => {
 		}
 
 		const queryOrUrl = interaction.options.getString('url-or-query', true);
-		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
+		const audioInterface = YouTubeInterface.getInterfaceForGuild(guild);
 
 		if (audioInterface.getBusyStatus()) {
 			await interaction.editReply('🚨 I am busy!');

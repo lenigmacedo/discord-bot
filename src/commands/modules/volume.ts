@@ -6,13 +6,14 @@ const volume: CommandHandler = async initialInteraction => {
 	try {
 		const commandInteraction = getCommandIntraction(initialInteraction);
 
-		if (!commandInteraction) return;
+		if (!commandInteraction) {
+			return;
+		}
 
 		const { interaction, guild, guildMember } = commandInteraction;
-		const voiceChannel = guildMember.voice.channel;
 		await interaction.deferReply();
 
-		if (!voiceChannel) {
+		if (!guildMember.voice.channel) {
 			await interaction.editReply('🚨 You must be connected to a voice channel for me to modify the volume!');
 			return;
 		}

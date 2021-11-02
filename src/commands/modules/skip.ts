@@ -1,25 +1,24 @@
 import { YouTubeInterface } from 'bot-classes';
-import { GuildMember } from 'discord.js';
+import { getCommandIntraction } from 'bot-functions';
 import { CommandHandler } from '../CommandHandler.types';
 
-const skip: CommandHandler = async interaction => {
+const skip: CommandHandler = async initialInteraction => {
 	try {
-		const guildMember = interaction.member;
-		await interaction.deferReply();
+		const commandInteraction = getCommandIntraction(initialInteraction);
 
-		if (!interaction?.guild?.id || !(guildMember instanceof GuildMember)) {
+		if (!commandInteraction) {
 			return;
 		}
 
-		// Prevents cheeky people from skipping when they're not connected with the people listening!
-		const voiceChannel = guildMember.voice.channel;
+		const { interaction, guild, guildMember } = commandInteraction;
+		await interaction.deferReply();
 
-		if (!voiceChannel) {
+		if (!guildMember.voice.channel) {
 			await interaction.editReply('🚨 You must be connected to a voice channel for me to skip the audio!');
 			return;
 		}
 
-		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
+		const audioInterface = YouTubeInterface.getInterfaceForGuild(guild);
 		const skipped = audioInterface.emitAudioFinish();
 
 		if (skipped) {

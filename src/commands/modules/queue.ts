@@ -1,16 +1,20 @@
 import { YouTubeInterface, YtdlVideoInfoResolved } from 'bot-classes';
 import config from 'bot-config';
+import { getCommandIntraction } from 'bot-functions';
 import { ColorResolvable, EmbedFieldData, MessageEmbed } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
 
-const queue: CommandHandler = async interaction => {
+const queue: CommandHandler = async initialInteraction => {
 	try {
-		if (!interaction.guild) {
+		const commandInteraction = getCommandIntraction(initialInteraction);
+
+		if (!commandInteraction) {
 			return;
 		}
 
+		const { interaction, guild } = commandInteraction;
 		await interaction.deferReply();
-		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
+		const audioInterface = YouTubeInterface.getInterfaceForGuild(guild);
 		const queueLength = await audioInterface.queueLength();
 
 		if (!queueLength) {

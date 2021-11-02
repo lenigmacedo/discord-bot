@@ -1,14 +1,24 @@
 import { YouTubeInterface } from 'bot-classes';
+import { getCommandIntraction } from 'bot-functions';
 import { CommandHandler } from '../CommandHandler.types';
 
-const pause: CommandHandler = async interaction => {
+const pause: CommandHandler = async initialInteraction => {
 	try {
-		if (!interaction.guild) {
+		const commandInteraction = getCommandIntraction(initialInteraction);
+
+		if (!commandInteraction) {
 			return;
 		}
 
+		const { interaction, guild, guildMember } = commandInteraction;
 		await interaction.deferReply();
-		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
+
+		if (!guildMember.voice.channel) {
+			await interaction.editReply('🚨 You must be connected to a voice channel for me to pause!');
+			return;
+		}
+
+		const audioInterface = YouTubeInterface.getInterfaceForGuild(guild);
 		const paused = audioInterface.getPlayer().pause(true);
 
 		if (paused) {
