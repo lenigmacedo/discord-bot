@@ -13,7 +13,7 @@ const globals = {
 		host: config.redisHost,
 		port: config.redisPort
 	}),
-	numberFormatter: new Intl.NumberFormat(config.numberFormat),
+	numberToLocale: new Intl.NumberFormat(config.numberFormat),
 	youtubeApi: youtube({
 		version: 'v3',
 		auth: config.googleApiToken

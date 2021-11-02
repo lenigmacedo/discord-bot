@@ -43,7 +43,7 @@ const search: CommandHandler = async interaction => {
 				})(),
 				description: (() => {
 					const { author, viewCount } = details.videoDetails;
-					const reply = `By ${author.name} | ${globals.numberFormatter.format(+viewCount)} views.`;
+					const reply = `By ${author.name} | ${globals.numberToLocale.format(+viewCount)} views.`;
 					return reply.substring(0, 100);
 				})(),
 				value: details.videoDetails.video_url
