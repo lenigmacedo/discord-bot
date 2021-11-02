@@ -22,7 +22,8 @@ const config = {
 	redisPort: 6379,
 	embedSuccess: '#00ff00',
 	embedDanger: '#ff0000',
-	embedWarning: '#ffff00'
+	embedWarning: '#ffff00',
+	numberFormat: 'en-GB'
 };
 
 export default config;

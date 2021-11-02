@@ -1,4 +1,5 @@
 import { YouTubeInterface, YtdlVideoInfoResolved } from 'bot-classes';
+import { globals } from 'bot-config';
 import { getYouTubeUrls, initOneTimeUseComponentInteraction } from 'bot-functions';
 import { GuildMember, Message, MessageActionRow, MessageSelectMenu, MessageSelectOptionData } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
@@ -34,8 +35,17 @@ const search: CommandHandler = async interaction => {
 
 		const selectOptions = filteredVideoDetails.map((details, index) => {
 			const option: MessageSelectOptionData = {
-				label: `${index + 1}) ${details.videoDetails.title}`.substring(0, 100),
-				description: details.videoDetails.description?.substring(0, 100) || '',
+				label: (() => {
+					const position = index + 1;
+					const { title } = details.videoDetails;
+					const reply = `${position}) ${title}`;
+					return reply.substring(0, 100);
+				})(),
+				description: (() => {
+					const { author, viewCount } = details.videoDetails;
+					const reply = `By ${author.name} | ${globals.numberFormatter.format(+viewCount)} views.`;
+					return reply.substring(0, 100);
+				})(),
 				value: details.videoDetails.video_url
 			};
 			return option;

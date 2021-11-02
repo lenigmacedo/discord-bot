@@ -1,5 +1,5 @@
 import { YouTubeInterface } from 'bot-classes';
-import initOneTimeUseComponentInteraction from 'bot-functions/modules/initOneTimeUseComponentInteraction';
+import { initOneTimeUseComponentInteraction } from 'bot-functions';
 import { GuildMember, Message, MessageActionRow, MessageButton } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
 
