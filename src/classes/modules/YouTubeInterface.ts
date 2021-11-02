@@ -28,12 +28,14 @@ export type YtdlVideoInfoResolved = Awaited<ReturnType<typeof ytdl.getBasicInfo>
  */
 export default class YouTubeInterface extends QueueManager implements InterfaceDefinition {
 	player: AudioPlayer;
+	volume: number;
 	connection?: VoiceConnection;
 	currentResource?: AudioResource | null;
 
 	constructor(guild: Guild) {
 		super(guild, 'youtube'); // Creates a namespace for youtube-only tracks
 		this.player = createAudioPlayer();
+		this.volume = config.audioVolume;
 	}
 
 	/**
@@ -107,6 +109,7 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 				}
 
 				this.currentResource = audioResource;
+				this.currentResource.volume?.setVolume(this.volume);
 				this.getPlayer().play(this.currentResource);
 
 				const onIdleCallback = async (oldState: AudioPlayerState, newState: AudioPlayerState) => {
@@ -162,6 +165,28 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 	 */
 	getCurrentAudioResource() {
 		return this.currentResource || null;
+	}
+
+	/**
+	 * Set the audible volume
+	 */
+	setVolume(volume: number): boolean {
+		try {
+			if (volume < 0 || volume > 100) {
+				return false;
+			}
+
+			this.volume = volume / 100; // 0 is mute, 1 is max volume.
+			const currentAudioResource = this.getCurrentAudioResource();
+
+			if (currentAudioResource) {
+				currentAudioResource.volume?.setVolume(this.volume);
+			}
+
+			return true;
+		} catch (error) {
+			return false;
+		}
 	}
 
 	/**

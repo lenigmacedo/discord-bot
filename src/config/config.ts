@@ -20,6 +20,7 @@ const config = {
 	cacheExpiryHours: 24,
 	redisHost: process.env.NODE_ENV === 'production' ? 'redis' : 'localhost',
 	redisPort: 6379,
+	audioVolume: 0.8,
 	embedSuccess: '#00ff00',
 	embedDanger: '#ff0000',
 	embedWarning: '#ffff00',

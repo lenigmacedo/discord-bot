@@ -18,6 +18,10 @@ const commands = [
 		.addNumberOption(option => option.setName('page').setDescription('Page number for if your queue is really long!')),
 	new SlashCommandBuilder().setName('start').setDescription('Start the queue if the bot is not already playing.'),
 	new SlashCommandBuilder()
+		.setName('volume')
+		.setDescription('Set the volume of the bot. Affects all listeners.')
+		.addNumberOption(option => option.setName('level').setRequired(true).setDescription('Value between 0 and 100.')),
+	new SlashCommandBuilder()
 		.setName('enqueue')
 		.setDescription('Add a YouTube video to the end of the queue.')
 		.addStringOption(option => option.setName('youtube-url').setDescription('The YouTube video URL.').setRequired(true)),

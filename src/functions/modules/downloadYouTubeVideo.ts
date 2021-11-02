@@ -5,7 +5,12 @@ export default async function downloadYtVideo(url: string) {
 	try {
 		if (!ytdl.validateURL(url)) return null;
 		const audioBitstream = await ytdl(url, { filter: 'audioonly' });
-		const audioResource = createAudioResource(audioBitstream);
+
+		if (!audioBitstream) {
+			return null;
+		}
+
+		const audioResource = createAudioResource(audioBitstream, { inlineVolume: true });
 		return audioResource;
 	} catch (error) {
 		console.error(error);
