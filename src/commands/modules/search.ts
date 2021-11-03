@@ -20,7 +20,7 @@ const search: CommandHandler = async initialInteraction => {
 			return;
 		}
 
-		await interaction.reply({ content: '🔃 Searching YouTube please wait...', ephemeral: true });
+		await interaction.reply({ content: '🔃 Searching YouTube. Please wait...', ephemeral: true });
 		const searchQuery = interaction.options.getString('search-query', true);
 		const searchResult = await getYouTubeUrls(searchQuery);
 
@@ -31,8 +31,8 @@ const search: CommandHandler = async initialInteraction => {
 
 		const audioInterface = YouTubeInterface.getInterfaceForGuild(guild);
 		const unresolvedVideoDetails = searchResult.map(url => audioInterface.getDetails(url));
-		const fetchedVideoDetails = await Promise.all(unresolvedVideoDetails);
-		const filteredVideoDetails = fetchedVideoDetails.filter(Boolean) as YtdlVideoInfoResolved[];
+		const resolvedVideoDetails = await Promise.all(unresolvedVideoDetails);
+		const filteredVideoDetails = resolvedVideoDetails.filter(Boolean) as YtdlVideoInfoResolved[];
 
 		const selectOptions = filteredVideoDetails.map((details, index) => {
 			const option: MessageSelectOptionData = {

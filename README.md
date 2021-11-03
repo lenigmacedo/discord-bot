@@ -6,19 +6,20 @@ A lot of music bots are private and proprietary (and lock features behind a payw
 
 ## Features
 
-| Command  | What it does                                                                       |
-| -------- | ---------------------------------------------------------------------------------- |
-| /play    | Play a YouTube video with a URL                                                    |
-| /pause   | Pause the current playing audio.                                                   |
-| /volume  | Set the audio playback volume of the bot.                                          |
-| /resume  | Unpause the bot.                                                                   |
-| /enqueue | Add a YouTube video to the queue                                                   |
-| /queue   | Get a list of items in the queue.                                                  |
-| /start   | Start playing the queue whilst the bot is inactive.                                |
-| /stop    | Stop the playing of audio and disconnect the bot.                                  |
-| /skip    | Skip the current item in the queue. Disconnects if the queue is empty.             |
-| /search  | Search YouTube and pick a video to add to the queue using an interactive dropdown. |
-| /clear   | Purge the queue of all of its contents.                                            |
+| Command   | What it does                                                               |
+| --------- | -------------------------------------------------------------------------- |
+| /play     | Play a video with a URL.                                                   |
+| /pause    | Pause the current playing audio.                                           |
+| /volume   | Set the audio playback volume of the bot.                                  |
+| /resume   | Unpause the bot.                                                           |
+| /enqueue  | Add a video to the queue.                                                  |
+| /playlist | Bulk import a playlist into the queue.                                     |
+| /queue    | Get a list of items in the queue.                                          |
+| /start    | Start playing the queue whilst the bot is inactive.                        |
+| /stop     | Stop the playing of audio and disconnect the bot.                          |
+| /skip     | Skip the current item in the queue. Disconnects if the queue is empty.     |
+| /search   | Search and pick a video to add to the queue using an interactive dropdown. |
+| /clear    | Purge the queue of all of its contents.                                    |
 
 TIP: Typing "/" in the Discord text channel will give you automatic suggestions of commands and will auto-complete options as you type the command!
 

@@ -16,8 +16,10 @@ const config = {
 	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MESSAGE_TYPING],
 	redisNamespace: 'discord-youtube-bot',
 	paginateMaxLength: 5,
+	playlistImportMaxSize: 50, // YouTube API limit is 50
 	searchExpiryMilliseconds: 60 * 1000,
 	cacheExpiryHours: 24,
+	cacheMaxSize: 2,
 	redisHost: process.env.NODE_ENV === 'production' ? 'redis' : 'localhost',
 	redisPort: 6379,
 	audioVolume: 0.8,

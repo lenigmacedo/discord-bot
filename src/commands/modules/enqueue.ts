@@ -19,7 +19,7 @@ const enqueue: CommandHandler = async initialInteraction => {
 		}
 
 		const audioInterface = YouTubeInterface.getInterfaceForGuild(guild);
-		const youtubeUrl = interaction.options.getString('youtube-url', true);
+		const youtubeUrl = interaction.options.getString('url', true);
 		const videoDetails = await audioInterface.getDetails(youtubeUrl);
 
 		if (!videoDetails) {
