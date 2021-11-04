@@ -22,7 +22,7 @@ const queue: CommandHandler = async initialInteraction => {
 			return;
 		}
 
-		let page = interaction.options.getNumber('page') || 1;
+		let page = interaction.options.getInteger('page') || 1;
 		const pageCount = Math.ceil(queueLength / config.paginateMaxLength);
 
 		if (page > pageCount) page = pageCount;

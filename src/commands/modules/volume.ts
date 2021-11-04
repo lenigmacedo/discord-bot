@@ -19,7 +19,7 @@ const volume: CommandHandler = async initialInteraction => {
 		}
 
 		const audioInterface = YouTubeInterface.getInterfaceForGuild(guild);
-		const volumeLevel = interaction.options.getNumber('level', true);
+		const volumeLevel = interaction.options.getInteger('level', true);
 		const isSet = audioInterface.setVolume(volumeLevel);
 
 		if (isSet) interaction.editReply(`🔊 Set volume to \`${volumeLevel}%\``);

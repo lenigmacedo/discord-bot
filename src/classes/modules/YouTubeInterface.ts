@@ -10,7 +10,7 @@ import {
 } from '@discordjs/voice';
 import { QueueManager } from 'bot-classes';
 import config, { globals } from 'bot-config';
-import { downloadYouTubeVideo } from 'bot-functions';
+import { downloadYouTubeVideo, getYouTubeUrl } from 'bot-functions';
 import { Guild } from 'discord.js';
 import { promisify } from 'util';
 import ytdl from 'ytdl-core-discord';
@@ -56,8 +56,10 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 		try {
 			const queueLength = await this.queueLength();
 			if (queueItemIndex >= queueLength) return null;
-			const queueItem = (await this.queueGetFromIndex(queueItemIndex)) || '';
-			const audioResource = await downloadYouTubeVideo(queueItem);
+			const queueItem = await this.queueGetFromIndex(queueItemIndex);
+			const queueItemUrl = getYouTubeUrl(queueItem);
+			if (!queueItemUrl) return null;
+			const audioResource = await downloadYouTubeVideo(queueItemUrl);
 			return audioResource;
 		} catch (error) {
 			console.error(error);

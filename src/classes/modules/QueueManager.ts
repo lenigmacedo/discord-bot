@@ -10,6 +10,7 @@ const LLEN = promisify(globals.redisClient.LLEN).bind(globals.redisClient);
 const LPOP = promisify(globals.redisClient.LPOP).bind(globals.redisClient);
 const LTRIM = promisify(globals.redisClient.LTRIM).bind(globals.redisClient);
 const DEL = promisify<string>(globals.redisClient.DEL).bind(globals.redisClient);
+const LREM = promisify(globals.redisClient.LREM).bind(globals.redisClient);
 
 /**
  * An easy toolbox for managing audio for this bot.
@@ -60,8 +61,7 @@ export default class QueueManager {
 	 */
 	async queueGetFromIndex(indexNumber: number) {
 		const results = await LRANGE(this.redisQueueNamespace, indexNumber, indexNumber);
-		const url = getYouTubeUrl(results[0]);
-		return url;
+		return results[0];
 	}
 
 	/**
@@ -72,6 +72,17 @@ export default class QueueManager {
 		if (!result) return null;
 		const url = getYouTubeUrl(result);
 		return url;
+	}
+
+	/**
+	 * Delete an item from the queue via its item number.
+	 */
+	async queueDelete(queueItemIndex: number) {
+		const queueItem = await this.queueGetFromIndex(queueItemIndex);
+		if (!queueItem) return false;
+		const result = await LREM(this.redisQueueNamespace, 0, queueItem);
+		if (result) return true;
+		return false;
 	}
 
 	/**
