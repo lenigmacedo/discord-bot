@@ -13,14 +13,14 @@ const search: CommandHandler = async initialInteraction => {
 		}
 
 		const { interaction, guild, guildMember } = commandInteraction;
-		await interaction.deferReply();
+		await interaction.deferReply({ ephemeral: true });
 
 		if (!guildMember.voice.channel) {
-			await interaction.reply('🚨 You must be connected to a voice channel for me to search!');
+			await interaction.editReply('🚨 You must be connected to a voice channel for me to search!');
 			return;
 		}
 
-		await interaction.reply({ content: '🔃 Searching YouTube. Please wait...', ephemeral: true });
+		await interaction.editReply({ content: '🔃 Searching YouTube. Please wait...' });
 		const searchQuery = interaction.options.getString('search-query', true);
 		const searchResult = await getYouTubeUrls(searchQuery);
 
