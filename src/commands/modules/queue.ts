@@ -46,7 +46,7 @@ const queue: CommandHandler = async initialInteraction => {
 
 			return {
 				name: `${itemNumber}) ${videoDetailsObj.title.substring(0, 100)}`,
-				value: `By \`${videoDetailsObj.author.name}\`.\n>> ${videoDetails.videoDetails.video_url}`
+				value: `By \`${videoDetailsObj.author.name}\`.\n>> ${videoDetailsObj.video_url}`
 			};
 		});
 
