@@ -49,7 +49,8 @@ const play: CommandHandler = async initialInteraction => {
 		await interaction.editReply('🔃 Preparing to play...');
 		audioInterface.setConnection(safeJoinVoiceChannel(interaction));
 		const videoDetails = await audioInterface.getDetails(url);
-		await interaction.editReply(`🔊 Playing \`${videoDetails?.videoDetails.title}\`.`);
+		if (videoDetails) await interaction.editReply(`🔊 Playing \`${videoDetails?.videoDetails.title}\`.`);
+		else await interaction.editReply('🚨 Unable to play the video. It might be private, age restricted or something else. It will be skipped.');
 		while (await audioInterface.queueRunner());
 		audioInterface.deleteConnection();
 	} catch (error) {
