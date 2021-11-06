@@ -1,39 +1,139 @@
 import { YouTubeInterface, YtdlVideoInfoResolved } from 'bot-classes';
 import config from 'bot-config';
 import { getCommandIntraction } from 'bot-functions';
-import { ColorResolvable, EmbedFieldData, MessageEmbed } from 'discord.js';
+import { ColorResolvable, CommandInteraction, EmbedFieldData, Guild, Message, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
 
 const queue: CommandHandler = async initialInteraction => {
 	try {
+		const interactiveQueue = new InteractiveQueue(initialInteraction);
+		const initialMessage = await interactiveQueue.runInitialResponse();
+		if (!(initialMessage instanceof Message)) return;
+		interactiveQueue.registerButtonInteractionLogic(initialMessage);
+	} catch (error) {
+		console.error(error);
+	}
+};
+
+class InteractiveQueue {
+	interaction: CommandInteraction;
+	guild: Guild;
+	audioInterface: YouTubeInterface;
+	page: number;
+	pageCount: number;
+
+	constructor(initialInteraction: CommandInteraction) {
+		this.page = 1;
+		this.pageCount = 1;
+
 		const commandInteraction = getCommandIntraction(initialInteraction);
+		if (!commandInteraction) throw TypeError('Command interaction for /queue is not performed in a Discord server and was cancelled.'); // The "getCommandInteraction" function should handle this.
 
-		if (!commandInteraction) {
-			return;
+		this.interaction = commandInteraction.interaction;
+		this.guild = commandInteraction.guild;
+		this.audioInterface = YouTubeInterface.getInterfaceForGuild(this.guild);
+	}
+
+	async runInitialResponse() {
+		const ephemeral = this.interaction.options.getBoolean('hide-in-chat') || false;
+		await this.interaction.deferReply({ ephemeral });
+		const initialQueueLength = await this.audioInterface.queueLength();
+
+		if (!initialQueueLength) {
+			await this.interaction.editReply('ℹ️ Queue is empty.');
+			return false;
 		}
 
-		const { interaction, guild } = commandInteraction;
-		await interaction.deferReply();
-		const audioInterface = YouTubeInterface.getInterfaceForGuild(guild);
-		const queueLength = await audioInterface.queueLength();
+		this.page = this.interaction.options.getInteger('page') || 1;
+		this.pageCount = Math.ceil(initialQueueLength / config.paginateMaxLength);
 
-		if (!queueLength) {
-			await interaction.editReply('ℹ️ Queue is empty.');
-			return;
-		}
+		// Make sure that the user has defined a page within the right range and modify the value if not.
+		if (this.page > this.pageCount) this.page = this.pageCount;
+		else if (this.page < 1) this.page = 1;
 
-		let page = interaction.options.getInteger('page') || 1;
-		const pageCount = Math.ceil(queueLength / config.paginateMaxLength);
+		const components = this.createButtonsComponent();
+		const embedFields = await this.getPageEmbedFieldData();
+		const embeds = await this.getPageMessageEmbed(embedFields);
+		const botMessage = await this.interaction.editReply({ embeds: [embeds], components });
+		return botMessage;
+	}
 
-		if (page > pageCount) page = pageCount;
-		else if (page < 1) page = 1;
+	async registerButtonInteractionLogic(interactableMessage: Message) {
+		const collector = interactableMessage.createMessageComponentCollector({
+			time: config.queueButtonExpiryMilliseconds
+		});
 
-		const queue = await audioInterface.queueGetMultiple(page);
-		const videoDetailPromiseArray = queue.map(url => audioInterface.getDetails(url));
+		collector.on('collect', async collected => {
+			const newQueueLength = await this.audioInterface.queueLength();
+			this.pageCount = Math.ceil(newQueueLength / config.paginateMaxLength);
+
+			// Identify what action they want to do.
+			// Also make sure that the user has navigated to a page within the right range and modify the value if not.
+			// If a user has an old button that lets them go to an empty page, this will put them on the next best page.
+			switch (collected.customId) {
+				case 'queue-navigate-next':
+					this.page++;
+					if (this.page > this.pageCount) this.page = this.pageCount;
+					break;
+				case 'queue-navigate-prev':
+					this.page--;
+					if (this.page < 1) this.page = 1;
+					break;
+				case 'queue-navigate-start':
+					this.page = 1;
+					if (this.page < 1) this.page = 1;
+					break;
+				case 'queue-navigate-last':
+					this.page = this.pageCount;
+					if (this.page > this.pageCount) this.page = this.pageCount;
+					break;
+			}
+
+			const components = this.createButtonsComponent();
+			const newEmbedFields = await this.getPageEmbedFieldData();
+			const newEmbeds = await this.getPageMessageEmbed(newEmbedFields);
+			await this.interaction.editReply({ embeds: [newEmbeds], components });
+			collected.deferUpdate(); // Without this, the interaction will show as failed for the user.
+		});
+	}
+
+	async getPageMessageEmbed(embedFields: EmbedFieldData[]) {
+		const queueLength = (await this.audioInterface?.queueLength()) || 0;
+
+		return new MessageEmbed()
+			.setColor(config.embedSuccess as ColorResolvable)
+			.setTitle(`📃 Current Queue`)
+			.setDescription(
+				`There ${queueLength === 1 ? 'is' : 'are'} ${queueLength} item${queueLength === 1 ? '' : 's'} in the queue.\nPage ${this.page}/${
+					this.pageCount
+				}`
+			)
+			.setFields(...embedFields);
+	}
+
+	createButtonsComponent() {
+		const prevButton = new MessageButton().setCustomId('queue-navigate-prev').setLabel('<< Prev').setStyle('PRIMARY');
+		const nextButton = new MessageButton().setCustomId('queue-navigate-next').setLabel('Next >>').setStyle('PRIMARY');
+		const firstPageButton = new MessageButton().setCustomId('queue-navigate-start').setLabel('First page').setStyle('PRIMARY');
+		const lastPageButton = new MessageButton().setCustomId('queue-navigate-last').setLabel('Last page').setStyle('PRIMARY');
+		const buttons = new MessageActionRow();
+
+		if (this.page > 2) buttons.addComponents(firstPageButton);
+		if (this.page > 1) buttons.addComponents(prevButton);
+		if (this.page < this.pageCount) buttons.addComponents(nextButton);
+		if (this.page < this.pageCount - 1) buttons.addComponents(lastPageButton);
+
+		const components = buttons.components.length ? [buttons] : undefined;
+		return components;
+	}
+
+	async getPageEmbedFieldData() {
+		const queue = await this.audioInterface.queueGetMultiple(this.page);
+		const videoDetailPromiseArray = queue.map(url => this.audioInterface?.getDetails(url));
 		const videoDetails = (await Promise.all(videoDetailPromiseArray)) as YtdlVideoInfoResolved[];
 
-		const fields: EmbedFieldData[] = videoDetails.map((videoDetails, index) => {
-			const itemNumberOffset = (page - 1) * config.paginateMaxLength;
+		const embedFields: EmbedFieldData[] = videoDetails.map((videoDetails, index) => {
+			const itemNumberOffset = (this.page - 1) * config.paginateMaxLength;
 			const itemNumber = index + 1 + itemNumberOffset;
 			const videoDetailsObj = videoDetails?.videoDetails;
 
@@ -50,18 +150,8 @@ const queue: CommandHandler = async initialInteraction => {
 			};
 		});
 
-		const embed = new MessageEmbed()
-			.setColor(config.embedSuccess as ColorResolvable)
-			.setTitle(`📃 Current Queue`)
-			.setDescription(
-				`There ${queueLength === 1 ? 'is' : 'are'} ${queueLength} item${queueLength === 1 ? '' : 's'} in the queue.\nPage ${page}/${pageCount}`
-			)
-			.setFields(...fields);
-
-		await interaction.editReply({ embeds: [embed] });
-	} catch (error) {
-		console.error(error);
+		return embedFields;
 	}
-};
+}
 
 export default queue;

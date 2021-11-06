@@ -15,7 +15,8 @@ const commands = [
 	new SlashCommandBuilder()
 		.setName('queue')
 		.setDescription('Get a list of all the items in the queue.')
-		.addIntegerOption(option => option.setName('page').setDescription('Page number for if your queue is really long!')),
+		.addIntegerOption(option => option.setName('page').setDescription('Page number for if your queue is really long!'))
+		.addBooleanOption(option => option.setName('hide-in-chat').setDescription('Want no one to tamper with your queue? Set this to true.')),
 	new SlashCommandBuilder().setName('start').setDescription('Start the queue if the bot is not already playing.'),
 	new SlashCommandBuilder()
 		.setName('volume')

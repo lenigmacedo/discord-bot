@@ -18,6 +18,7 @@ const config = {
 	paginateMaxLength: 5,
 	playlistImportMaxSize: 50, // YouTube API limit is 50
 	searchExpiryMilliseconds: 60 * 1000,
+	queueButtonExpiryMilliseconds: 600 * 1000,
 	cacheExpiryHours: 24,
 	cacheMaxSize: 2,
 	redisHost: process.env.NODE_ENV === 'production' ? 'redis' : 'localhost',
