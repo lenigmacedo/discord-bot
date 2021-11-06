@@ -39,7 +39,8 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 	}
 
 	/**
-	 * Return the queue instance for this guild. Will contstruct a new one if one does not already exist.
+	 * Get the queue instance for a given guild.
+	 * @param guild The guild to get the instance for.
 	 */
 	static getInterfaceForGuild(guild: Guild) {
 		if (!globals.youtubePlayers.has(guild.id)) {
@@ -50,7 +51,8 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 	}
 
 	/**
-	 * Download the audio resource for a video. By default it will be the oldest item in the queue, but you can specify an index.
+	 * Download a Discord audio resource via ytdl.
+	 * @param queueItemIndex The queue item index.
 	 */
 	async download(queueItemIndex: number = 0) {
 		try {
@@ -69,6 +71,7 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 
 	/**
 	 * Get the video info. By default it is the first item in the queue.
+	 * @param queueItemIndex The queue item index.
 	 */
 	async getItemInfo(queueItemIndex: number = 0) {
 		const queueItem = await this.queueGetFromIndex(queueItemIndex);
@@ -96,6 +99,7 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 
 	/**
 	 * Start the execution of the queue by joining the bot and playing audio.
+	 * To use this, await this method in a while loop. Will resolve true to indicate finish, and null to stop.
 	 */
 	queueRunner(): Promise<true | null> {
 		return new Promise(async resolve => {
@@ -145,7 +149,8 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 	}
 
 	/**
-	 * Set the connection instance associated with this guild.
+	 * Set a connection instance to the guild.
+	 * @param connection Connection to set.
 	 */
 	setConnection(connection: VoiceConnection) {
 		this.connection = connection;
@@ -183,7 +188,8 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 	}
 
 	/**
-	 * Set the audible volume
+	 * Set the audible volume of the bot.
+	 * @param volume Volume between 0 and 100
 	 */
 	setVolume(volume: number): boolean {
 		try {
@@ -228,6 +234,10 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 		return true;
 	}
 
+	/**
+	 * Get the video details via ytdl.
+	 * @param url The video URL.
+	 */
 	async getDetails(url: string): Promise<YtdlVideoInfoResolved | null> {
 		try {
 			const videoId = ytdl.getVideoID(url);

@@ -23,6 +23,6 @@ const registerCommands = async () => {
 
 registerCommands();
 
-client.on('ready', ready);
+client.on('ready', () => ready(client));
 client.on('interactionCreate', interactionCreate);
 client.login(discordToken);
