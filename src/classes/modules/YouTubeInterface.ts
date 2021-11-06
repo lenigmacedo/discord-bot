@@ -117,7 +117,7 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 
 				this.currentResource = audioResource;
 				this.currentResource.volume?.setVolume(this.volume);
-				this.getPlayer().play(this.currentResource);
+				player.play(this.currentResource);
 
 				const onIdleCallback = async (oldState: AudioPlayerState, newState: AudioPlayerState) => {
 					if (oldState.status === 'playing' && newState.status === 'idle') {
@@ -126,6 +126,14 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 						resolve(true);
 					}
 				};
+
+				// Ytdl core sometimes does not reliably download the audio data, so this handles the error.
+				player.on('error', async () => {
+					console.error('Audio playback skipped due to invalid stream data!');
+					await this.queueDeleteOldest();
+					player.removeListener('stateChange', onIdleCallback);
+					resolve(true);
+				});
 
 				player.on('stateChange', onIdleCallback);
 			} catch (error) {
