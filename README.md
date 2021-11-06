@@ -1,6 +1,6 @@
 # Discord YouTube Bot 2 (beta)
 
-This is the new Discord bot that will soon supersede the old v1 discord bot at https://github.com/jack3898/discord-youtube-bot.
+This is the new Discord bot that supersedes the old v1 discord bot at https://github.com/jack3898/discord-youtube-bot.
 
 A lot of music bots are private and proprietary (and lock features behind a paywall), and additionally, YouTube have been targeting large Discord bots for takedown. As this bot is open source, you can use it assured YouTube can't do anything to bring it down as you have the code on your own server and is not commercially available.
 
@@ -8,10 +8,10 @@ A lot of music bots are private and proprietary (and lock features behind a payw
 
 | Command   | What it does                                                               |
 | --------- | -------------------------------------------------------------------------- |
-| /play     | Play a video with a URL.                                                   |
+| /play     | Play something straight away with a URL or search query.                   |
 | /pause    | Pause the current playing audio.                                           |
-| /volume   | Set the audio playback volume of the bot.                                  |
 | /resume   | Unpause the bot.                                                           |
+| /volume   | Set the audio playback volume of the bot. Affects all listeners.           |
 | /enqueue  | Add a video to the queue.                                                  |
 | /playlist | Bulk import a playlist into the queue.                                     |
 | /queue    | Get a list of items in the queue.                                          |
@@ -28,31 +28,40 @@ TIP: Typing "/" in the Discord text channel will give you automatic suggestions 
 
 You can invite a demo bot to your server that I host free of charge. Do keep in mind that:
 
-- I reserve the right to restart this bot at any time to apply updates so audio may suddenly cut out in the evenings (British time).
-- This bot is not capable of running on hundreds of servers.
+- I reserve the right to restart the demo bot at any time to apply updates so audio may suddenly cut out in the evenings (British time).
+- The demo bot is not capable of running on hundreds of servers.
 - It should be treated as a demo, and to not be used seriously. I encourage you to download the bot and host your own.
 
-https://discord.com/api/oauth2/authorize?client_id=743546623421841456&permissions=2184301632&scope=bot%20applications.commands
+[>> Bot invitation link <<](https://discord.com/api/oauth2/authorize?client_id=743546623421841456&permissions=2184301632&scope=bot%20applications.commands)
 
 ## Technologies
 
 This bot is proudly powered with Node.js, TypeScript & Redis.
 It also uses the all-new Discord.js v13 library which leverages the latest Discord v9 bot API!
-This means that many audio problems with the original bot have been fixed and the bot leverages **slash commands**!
 
-- Node.js
+- Node.js v16/v17
 - Discord.js v13
-- Discord bot API v9
 - TypeScript
-- Redis (in-memory database for queue management)
+- Redis
+
+Because of Discord.js v13 using the very new Discord v9 API, the bot leverages **slash commands** and **interactive message components**!
+
+Advantages of v13:
+
+- `!help` is not needed. Typing "/" will give you a list of commands natively in Discord.
+- Commands can be autocompleted and give you a description of each argument as you go.
+- Discord type checks your arguments and enforces required arguments so its much harder to make a mistake typing a command.
+- This bot has interactive buttons and dropdown lists! In the chat!
+- No conflict with other bots that are also using slash commands. This bot will ALWAYS use a forward slash to initiate a command.
 
 ## Setup for production
 
-1. Install Docker, Docker Compose and Git for your own OS.
-2. `cd` into a directory you want to place the project directory in.
-3. Clone this repository using Git: `git clone https://github.com/jack3898/discord-youtube-bot-2`
+1. Install Docker, Docker Compose and Git for your own OS. Linux is highly recommended as a platform to host this bot on. Windows (Server) will work, but you will be missing out on a lot of performance.
+2. Navigate into a directory you want to place the project directory in using `cd`.
+3. Clone this repository using Git: `git clone https://github.com/jack3898/discord-youtube-bot-2`.
 4. Rename `.env-example` to `.env`.
-5. In the empty .env, fill in the keys.
+   1. Note: Using .env is not a requirement. You can create environment variables in your system instead.
+5. Fill in the requirements for the environment variables.
 
    1. `DISCORD_TOKEN` & `CLIENT_ID` - Which you can create/find https://discord.com/developers. This bot also requires the `applications.commands` permission otherwise you will not be able to use slash commands.
    2. `DEV_GUILD_ID` - For developers only. You do not need to fill this in if you are not a developer.
@@ -63,8 +72,8 @@ This means that many audio problems with the original bot have been fixed and th
 
 ## How to update the bot
 
-1. Pull the latest code from this repository with `git pull`. This will not override your .env file, but it should be a good idea to check that the .env-example file has not changed.
-2. Rebuild the Docker containers with `docker-compose up --build --detach`.
+1. Pull the latest code from this repository with `git pull`. This will not override your .env file, but it is a good idea to check the .env-example file to ensure you meet the latest environment variable requirements.
+2. Rebuild the Docker containers with `docker-compose up --build`.
 3. Done!
 
 ## Plans
