@@ -7,6 +7,7 @@ type ComponentInteractionFilter = CollectorFilter<[MessageComponentInteraction]>
  * This function creates an event listener for the interaction response for things like buttons and dropdown menus.
  * It checks that the user who originally sent the message is the one that interacts and then disposes of the event listener when it is used once.
  * It also removes any components that are no longer in use.
+ * This will hook into the componententeractions/modules folder. Make sure the file is the same name as the component's custom id to register it.
  */
 const initOneTimeUseComponentInteraction = (interactableMessage: Message, initialInteraction: CommandInteraction) => {
 	try {
@@ -34,7 +35,7 @@ const initOneTimeUseComponentInteraction = (interactableMessage: Message, initia
 			}
 
 			const handlerModule = await import(`bot-message-component-handlers/modules/${message.customId}`);
-			handlerModule.default(message);
+			handlerModule.default(message, initialInteraction);
 		});
 	} catch (error) {
 		console.error(error);

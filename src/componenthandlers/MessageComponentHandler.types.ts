@@ -1,3 +1,3 @@
-import { MessageComponentInteraction } from 'discord.js';
+import { CommandInteraction, MessageComponentInteraction } from 'discord.js';
 
-export type MessageComponentHandler = (event: MessageComponentInteraction) => void;
+export type MessageComponentHandler = (event: MessageComponentInteraction, initialInteraction?: CommandInteraction) => void;

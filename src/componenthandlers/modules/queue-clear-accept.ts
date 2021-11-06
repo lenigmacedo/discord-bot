@@ -2,21 +2,32 @@ import { YouTubeInterface } from 'bot-classes';
 import { Guild } from 'discord.js';
 import { MessageComponentHandler } from '../MessageComponentHandler.types';
 
-const queueClearAccept: MessageComponentHandler = async interaction => {
+const queueClearAccept: MessageComponentHandler = async (interaction, initialInteraction) => {
 	try {
 		if (!(interaction.guild instanceof Guild)) {
 			return;
 		}
 
 		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
-		await interaction.deferReply();
 
 		if ((await audioInterface.queueLength()) > 0) {
 			const deleted = await audioInterface.queuePurge();
-			if (deleted) await interaction.editReply("🚮 The queue has been deleted. I hope that wasn't a mistake!");
-			else await interaction.editReply('🚨 I was unable to delete the queue.');
+
+			if (deleted)
+				await initialInteraction?.editReply({
+					content: "🚮 The queue has been deleted. I hope that wasn't a mistake!",
+					components: []
+				});
+			else
+				await initialInteraction?.editReply({
+					content: '🚨 I was unable to delete the queue.',
+					components: []
+				});
 		} else {
-			await interaction.editReply('🚨 The queue is empty. Maybe it was deleted whilst you was making your decision.');
+			await initialInteraction?.editReply({
+				content: '🚨 The queue is empty. Maybe it was deleted whilst you was making your decision.',
+				components: []
+			});
 		}
 	} catch (error) {
 		console.error(error);
