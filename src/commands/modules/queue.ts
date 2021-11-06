@@ -72,27 +72,23 @@ class InteractiveQueue {
 			const newQueueLength = await this.audioInterface.queueLength();
 			this.pageCount = Math.ceil(newQueueLength / config.paginateMaxLength);
 
-			// Identify what action they want to do.
-			// Also make sure that the user has navigated to a page within the right range and modify the value if not.
-			// If a user has an old button that lets them go to an empty page, this will put them on the next best page.
 			switch (collected.customId) {
 				case 'queue-navigate-next':
 					this.page++;
-					if (this.page > this.pageCount) this.page = this.pageCount;
 					break;
 				case 'queue-navigate-prev':
 					this.page--;
-					if (this.page < 1) this.page = 1;
 					break;
 				case 'queue-navigate-start':
 					this.page = 1;
-					if (this.page < 1) this.page = 1;
 					break;
 				case 'queue-navigate-last':
 					this.page = this.pageCount;
-					if (this.page > this.pageCount) this.page = this.pageCount;
 					break;
 			}
+
+			if (this.page > this.pageCount) this.page = this.pageCount;
+			else if (this.page < 1) this.page = 1;
 
 			collected.deferUpdate(); // Without this, the interaction will show as failed for the user.
 			const components = this.createButtonsComponent();
