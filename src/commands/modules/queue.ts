@@ -60,7 +60,12 @@ class InteractiveQueue {
 
 	async registerButtonInteractionLogic(interactableMessage: Message) {
 		const collector = interactableMessage.createMessageComponentCollector({
-			time: config.queueButtonExpiryMilliseconds
+			time: config.queueButtonExpiryMilliseconds // Expires for memory reasons.
+		});
+
+		// This removes the buttons when the buttons expire as they no longer work.
+		collector.on('end', async () => {
+			await this.interaction.editReply({ components: [] });
 		});
 
 		collector.on('collect', async collected => {

@@ -1,6 +1,6 @@
 import { YouTubeInterface, YtdlVideoInfoResolved } from 'bot-classes';
 import { globals } from 'bot-config';
-import { getCommandIntraction, getYouTubeUrls, initOneTimeUseComponentInteraction } from 'bot-functions';
+import { getCommandIntraction, getYouTubeUrls, initComponentInteractionHandler } from 'bot-functions';
 import { Message, MessageActionRow, MessageSelectMenu, MessageSelectOptionData } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
 
@@ -60,7 +60,7 @@ const search: CommandHandler = async initialInteraction => {
 
 		if (!(botMessage instanceof Message)) return;
 
-		initOneTimeUseComponentInteraction(botMessage, interaction);
+		initComponentInteractionHandler(botMessage, interaction);
 	} catch (error) {
 		console.error(error);
 	}

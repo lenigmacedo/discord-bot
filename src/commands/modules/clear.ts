@@ -1,5 +1,5 @@
 import { YouTubeInterface } from 'bot-classes';
-import { getCommandIntraction, initOneTimeUseComponentInteraction } from 'bot-functions';
+import { getCommandIntraction, initComponentInteractionHandler } from 'bot-functions';
 import { Message, MessageActionRow, MessageButton } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
 
@@ -38,7 +38,7 @@ const clear: CommandHandler = async initialInteraction => {
 				return;
 			}
 
-			initOneTimeUseComponentInteraction(botMessage, interaction);
+			initComponentInteractionHandler(botMessage, interaction);
 		} else {
 			await interaction.editReply({ content: 'ℹ️ The queue seems to be empty.' });
 		}

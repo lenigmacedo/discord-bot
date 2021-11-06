@@ -1,10 +1,12 @@
 import config from 'bot-config';
-import { handleMessageComponentEvent } from 'bot-functions';
 import { CollectorFilter, CommandInteraction, Message, MessageComponentInteraction } from 'discord.js';
+
+type ComponentInteractionFilter = CollectorFilter<[MessageComponentInteraction]>;
 
 /**
  * This function creates an event listener for the interaction response for things like buttons and dropdown menus.
  * It checks that the user who originally sent the message is the one that interacts and then disposes of the event listener when it is used once.
+ * It also removes any components that are no longer in use.
  */
 const initOneTimeUseComponentInteraction = (interactableMessage: Message, initialInteraction: CommandInteraction) => {
 	try {
@@ -12,24 +14,28 @@ const initOneTimeUseComponentInteraction = (interactableMessage: Message, initia
 			return;
 		}
 
-		const filter: CollectorFilter<[MessageComponentInteraction]> = messageComponentInteraction => {
+		const filter: ComponentInteractionFilter = messageComponentInteraction => {
 			if (messageComponentInteraction.user.id === initialInteraction.member?.user.id) return true;
 			return false;
 		};
 
 		const collector = interactableMessage.createMessageComponentCollector({
 			max: 1,
+			time: config.searchExpiryMilliseconds,
 			filter
 		});
 
-		collector.on('end', handleMessageComponentEvent);
+		collector.on('end', async collected => {
+			const message = collected.first();
 
-		setTimeout(() => {
-			if (!collector.ended) {
-				collector.emit('end');
-				initialInteraction.followUp('🤦 You took too long! I have disabled the interaction.');
+			if (!message) {
+				initialInteraction.editReply({ components: [] });
+				return;
 			}
-		}, config.searchExpiryMilliseconds);
+
+			const handlerModule = await import(`bot-message-component-handlers/modules/${message.customId}`);
+			handlerModule.default(message);
+		});
 	} catch (error) {
 		console.error(error);
 	}
