@@ -11,4 +11,3 @@ services:
     depends_on:
       - redis
     build: .
-    restart: always
