@@ -3,8 +3,6 @@ import { config as env } from 'dotenv';
 
 env();
 
-console.log(process.env.NODE_ENV);
-
 /**
  * CONFIG
  * Set values that are meant to be user-changeable here!
@@ -33,7 +31,6 @@ const config = {
 	searchExpiryMilliseconds: 60 * 1000,
 	queueButtonExpiryMilliseconds: 600 * 1000,
 	cacheExpiryHours: 24,
-	cacheMaxSize: 2,
 	audioVolume: 0.8,
 
 	// THEME AND STYLE

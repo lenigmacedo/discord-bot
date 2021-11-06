@@ -94,11 +94,11 @@ class InteractiveQueue {
 					break;
 			}
 
+			collected.deferUpdate(); // Without this, the interaction will show as failed for the user.
 			const components = this.createButtonsComponent();
 			const newEmbedFields = await this.getPageEmbedFieldData();
 			const newEmbeds = await this.getPageMessageEmbed(newEmbedFields);
 			await this.interaction.editReply({ embeds: [newEmbeds], components });
-			collected.deferUpdate(); // Without this, the interaction will show as failed for the user.
 		});
 	}
 
