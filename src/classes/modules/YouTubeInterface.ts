@@ -105,23 +105,14 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 		return new Promise(async resolve => {
 			try {
 				const player = this.getPlayer();
+				const queueLength = await this.queueLength();
 
-				if ((await this.queueLength()) < 1) {
+				if (queueLength < 1) {
 					resolve(null);
 					return;
 				}
 
 				const audioResource = await this.download();
-
-				if (!audioResource) {
-					await this.queueDeleteOldest();
-					resolve(true);
-					return;
-				}
-
-				this.currentResource = audioResource;
-				this.currentResource.volume?.setVolume(this.volume);
-				player.play(this.currentResource);
 
 				const onIdleCallback = async (oldState: AudioPlayerState, newState: AudioPlayerState) => {
 					if (oldState.status === 'playing' && newState.status === 'idle') {
@@ -131,15 +122,28 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 					}
 				};
 
+				player.on('stateChange', onIdleCallback);
+
+				if (!audioResource) {
+					console.error('Audio playback skipped due to no audio resource being detected.');
+					player.removeListener('stateChange', onIdleCallback);
+					await this.queueDeleteOldest();
+					resolve(true);
+					return;
+				}
+
+				this.currentResource = audioResource;
+				this.currentResource.volume?.setVolume(this.volume);
+
+				player.play(this.currentResource);
+
 				// Ytdl core sometimes does not reliably download the audio data, so this handles the error.
-				player.on('error', async () => {
+				player.once('error', async () => {
 					console.error('Audio playback skipped due to invalid stream data!');
 					await this.queueDeleteOldest();
 					player.removeListener('stateChange', onIdleCallback);
 					resolve(true);
 				});
-
-				player.on('stateChange', onIdleCallback);
 			} catch (error) {
 				console.error(error);
 				await this.queueDeleteOldest();

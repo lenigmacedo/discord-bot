@@ -4,7 +4,7 @@ import ytdl from 'ytdl-core-discord';
 export default async function downloadYtVideo(url: string) {
 	try {
 		if (!ytdl.validateURL(url)) return null;
-		const audioBitstream = await ytdl(url, { filter: 'audioonly' });
+		const audioBitstream = await ytdl(url, { filter: 'audioonly', highWaterMark: 1 << 25 });
 
 		if (!audioBitstream) {
 			return null;
