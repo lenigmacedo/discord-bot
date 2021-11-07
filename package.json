@@ -20,8 +20,8 @@
 		"url": "git+https://github.com/jack3898/discord-youtube-bot-2.git"
 	},
 	"keywords": [],
-	"author": "",
-	"license": "ISC",
+	"author": "Jack Wright",
+	"license": "GPL-3.0-or-later",
 	"bugs": {
 		"url": "https://github.com/jack3898/discord-youtube-bot-2/issues"
 	},
