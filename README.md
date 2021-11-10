@@ -24,16 +24,6 @@ A lot of music bots are private and proprietary (and lock features behind a payw
 
 TIP: Typing "/" in the Discord text channel will give you automatic suggestions of commands and will auto-complete options as you type the command!
 
-## Try the demo bot
-
-You can invite a demo bot to your server that I host free of charge. Do keep in mind that:
-
-- I reserve the right to restart the demo bot at any time to apply updates so audio may suddenly cut out in the evenings (British time).
-- The demo bot is not capable of running on hundreds of servers.
-- It should be treated as a demo, and to not be used seriously. I encourage you to download the bot and host your own.
-
-[>> Bot invitation link <<](https://discord.com/api/oauth2/authorize?client_id=743546623421841456&permissions=2184301632&scope=bot%20applications.commands)
-
 ## Technologies
 
 This bot is proudly powered with Node.js, TypeScript & Redis.
