@@ -37,7 +37,7 @@ class InteractiveQueue {
 	async runInitialResponse() {
 		const ephemeral = this.interaction.options.getBoolean('hide-in-chat') || false;
 		await this.interaction.deferReply({ ephemeral });
-		const initialQueueLength = await this.audioInterface.queueLength();
+		const initialQueueLength = await this.audioInterface.queue.queueLength();
 
 		if (!initialQueueLength) {
 			await this.interaction.editReply('ℹ️ Queue is empty.');
@@ -69,7 +69,7 @@ class InteractiveQueue {
 		});
 
 		collector.on('collect', async collected => {
-			const newQueueLength = await this.audioInterface.queueLength();
+			const newQueueLength = await this.audioInterface.queue.queueLength();
 			this.pageCount = Math.ceil(newQueueLength / config.paginateMaxLength);
 
 			switch (collected.customId) {
@@ -99,7 +99,7 @@ class InteractiveQueue {
 	}
 
 	async getPageMessageEmbed(embedFields: EmbedFieldData[]) {
-		const queueLength = (await this.audioInterface?.queueLength()) || 0;
+		const queueLength = (await this.audioInterface?.queue.queueLength()) || 0;
 
 		return new MessageEmbed()
 			.setColor(config.embedSuccess as ColorResolvable)
@@ -129,7 +129,7 @@ class InteractiveQueue {
 	}
 
 	async getPageEmbedFieldData() {
-		const queue = await this.audioInterface.queueGetMultiple(this.page);
+		const queue = await this.audioInterface.queue.queueGetMultiple(this.page);
 		const videoDetailPromiseArray = queue.map(url => this.audioInterface?.getDetails(url));
 		const videoDetails = (await Promise.all(videoDetailPromiseArray)) as YtdlVideoInfoResolved[];
 

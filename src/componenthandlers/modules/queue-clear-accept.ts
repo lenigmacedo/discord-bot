@@ -10,8 +10,8 @@ const queueClearAccept: MessageComponentHandler = async (interaction, initialInt
 
 		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
 
-		if ((await audioInterface.queueLength()) > 0) {
-			const deleted = await audioInterface.queuePurge();
+		if ((await audioInterface.queue.queueLength()) > 0) {
+			const deleted = await audioInterface.queue.queuePurge();
 
 			if (deleted)
 				await initialInteraction?.editReply({

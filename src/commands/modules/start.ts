@@ -19,7 +19,7 @@ const start: CommandHandler = async initialInteraction => {
 		}
 
 		const audioInterface = YouTubeInterface.getInterfaceForGuild(guild);
-		const queue = await audioInterface.queueGetMultiple();
+		const queue = await audioInterface.queue.queueGetMultiple();
 
 		if (!queue.length) {
 			await interaction.editReply('🚨 The queue is empty.');
@@ -33,14 +33,14 @@ const start: CommandHandler = async initialInteraction => {
 
 		await interaction.editReply('🔃 Preparing to play...');
 		audioInterface.setConnection(safeJoinVoiceChannel(interaction));
-		const firstItemInQueue = await audioInterface.queueGetOldest();
+		const firstItemInQueue = await audioInterface.queue.queueGetOldest();
 
 		if (!firstItemInQueue) {
 			interaction.editReply('🚨 Unable to play the track.');
 			return;
 		}
 
-		const videoDetails = await audioInterface.getDetails((await audioInterface.queueGetOldest()) as string);
+		const videoDetails = await audioInterface.getDetails((await audioInterface.queue.queueGetOldest()) as string);
 
 		if (videoDetails) {
 			await interaction.editReply(`🔊 I am now playing the queue. First up \`${videoDetails.videoDetails.title}\`!`);

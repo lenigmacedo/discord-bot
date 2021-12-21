@@ -27,7 +27,7 @@ const remove: CommandHandler = async initialInteraction => {
 			return;
 		}
 
-		const removed = await audioInterface.queueDelete(itemToDeleteIndex - 1);
+		const removed = await audioInterface.queue.queueDelete(itemToDeleteIndex - 1);
 
 		if (removed) {
 			await interaction.editReply(`✅ Removed \`${removedDetails.videoDetails.title}\`.`);

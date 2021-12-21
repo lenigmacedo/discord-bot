@@ -26,16 +26,17 @@ export type YtdlVideoInfoResolved = Awaited<ReturnType<typeof ytdl.getBasicInfo>
 /**
  * An easy toolbox for managing audio for this bot.
  */
-export default class YouTubeInterface extends QueueManager implements InterfaceDefinition {
+export default class YouTubeInterface implements InterfaceDefinition {
 	player: AudioPlayer;
+	queue: QueueManager;
 	volume: number;
 	connection?: VoiceConnection;
 	currentResource?: AudioResource | null;
 
 	constructor(guild: Guild) {
-		super(guild, 'youtube'); // Creates a namespace for youtube-only tracks
 		this.player = createAudioPlayer();
 		this.volume = config.audioVolume;
+		this.queue = new QueueManager(guild, 'youtube');
 	}
 
 	/**
@@ -56,9 +57,9 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 	 */
 	async download(queueItemIndex: number = 0) {
 		try {
-			const queueLength = await this.queueLength();
+			const queueLength = await this.queue.queueLength();
 			if (queueItemIndex >= queueLength) return null;
-			const queueItem = await this.queueGetFromIndex(queueItemIndex);
+			const queueItem = await this.queue.queueGetFromIndex(queueItemIndex);
 			const queueItemUrl = getYouTubeUrl(queueItem);
 			if (!queueItemUrl) return null;
 			const audioResource = await downloadYouTubeVideo(queueItemUrl);
@@ -74,7 +75,7 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 	 * @param queueItemIndex The queue item index.
 	 */
 	async getItemInfo(queueItemIndex: number = 0) {
-		const queueItem = await this.queueGetFromIndex(queueItemIndex);
+		const queueItem = await this.queue.queueGetFromIndex(queueItemIndex);
 		if (!queueItem) return null;
 		const info = await this.getDetails(queueItem);
 		return info;
@@ -105,7 +106,7 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 		return new Promise(async resolve => {
 			try {
 				const player = this.getPlayer();
-				const queueLength = await this.queueLength();
+				const queueLength = await this.queue.queueLength();
 
 				if (queueLength < 1) {
 					resolve(null);
@@ -117,7 +118,7 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 				const onIdleCallback = async (oldState: AudioPlayerState, newState: AudioPlayerState) => {
 					if (oldState.status === 'playing' && newState.status === 'idle') {
 						player.removeListener('stateChange', onIdleCallback);
-						await this.queueDeleteOldest();
+						await this.queue.queueDeleteOldest();
 						resolve(true);
 					}
 				};
@@ -127,7 +128,7 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 				if (!audioResource) {
 					console.error('Audio playback skipped due to no audio resource being detected.');
 					player.removeListener('stateChange', onIdleCallback);
-					await this.queueDeleteOldest();
+					await this.queue.queueDeleteOldest();
 					resolve(true);
 					return;
 				}
@@ -140,13 +141,13 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 				// Ytdl core sometimes does not reliably download the audio data, so this handles the error.
 				player.once('error', async () => {
 					console.error('Audio playback skipped due to invalid stream data!');
-					await this.queueDeleteOldest();
+					await this.queue.queueDeleteOldest();
 					player.removeListener('stateChange', onIdleCallback);
 					resolve(true);
 				});
 			} catch (error) {
 				console.error(error);
-				await this.queueDeleteOldest();
+				await this.queue.queueDeleteOldest();
 				resolve(true);
 			}
 		});
@@ -246,7 +247,7 @@ export default class YouTubeInterface extends QueueManager implements InterfaceD
 		try {
 			const videoId = ytdl.getVideoID(url);
 			if (!videoId) return null;
-			const namespace = `${this.redisQueueNamespace}:${videoId}`;
+			const namespace = `${this.queue.redisQueueNamespace}:${videoId}`;
 			const searchCache = await GET(namespace);
 
 			if (searchCache) {

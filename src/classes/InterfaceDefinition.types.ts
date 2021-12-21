@@ -1,10 +1,9 @@
 import { AudioPlayer, AudioResource, VoiceConnection } from '@discordjs/voice';
-import { QueueManager } from 'bot-classes';
 
 /**
  * Ensure a new audio interface class (e.g. in the future we may want SoundCloudInterface, VimeoInterface etc.) has these methods to be fully implementable.
  */
-export interface InterfaceDefinition extends QueueManager {
+export interface InterfaceDefinition {
 	/**
 	 * Based off of a queue index number, get an item in the queue.
 	 */

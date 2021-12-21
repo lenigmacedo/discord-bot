@@ -27,14 +27,14 @@ const play: CommandHandler = async initialInteraction => {
 			return;
 		}
 
-		let prepended = await audioInterface.queuePrepend(queryOrUrl);
+		let prepended = await audioInterface.queue.queuePrepend(queryOrUrl);
 		let url = '';
 
 		if (!prepended) {
 			console.log('Query not URL, trying a search...');
 			const urls = await getYouTubeUrls(queryOrUrl, 1);
 			url = urls[0];
-			prepended = await audioInterface.queuePrepend(url);
+			prepended = await audioInterface.queue.queuePrepend(url);
 
 			if (!prepended) {
 				await interaction.editReply('🚨 I could not find a video. Try something less specific?');

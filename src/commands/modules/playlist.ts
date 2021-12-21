@@ -31,7 +31,7 @@ const playlist: CommandHandler = async initialInteraction => {
 
 		await interaction.editReply('🔃 Searching for videos in the playlist. Please wait...');
 		const videoUrlsFromPlaylist = await getYoutubePlaylistUrls(playlistId);
-		const awaitingAppendedUrls = videoUrlsFromPlaylist.map(videoUrl => audioInterface.queueAppend(videoUrl));
+		const awaitingAppendedUrls = videoUrlsFromPlaylist.map(videoUrl => audioInterface.queue.queueAppend(videoUrl));
 		const resolvedAppendedUrls = await Promise.all(awaitingAppendedUrls);
 		const filteredAppendedUrls = resolvedAppendedUrls.filter(Boolean);
 		const count = filteredAppendedUrls.length;

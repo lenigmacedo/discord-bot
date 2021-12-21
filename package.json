@@ -30,7 +30,7 @@
 		"@discordjs/builders": "^0.8.2",
 		"@discordjs/opus": "^0.5.3",
 		"@discordjs/rest": "^0.1.0-canary.0",
-		"@discordjs/voice": "^0.7.2",
+		"@discordjs/voice": "^0.7.5",
 		"@googleapis/youtube": "^2.0.0",
 		"cross-env": "^7.0.3",
 		"discord.js": "^13.3.1",

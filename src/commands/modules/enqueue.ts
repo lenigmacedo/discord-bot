@@ -27,7 +27,7 @@ const enqueue: CommandHandler = async initialInteraction => {
 			return;
 		}
 
-		const appended = await audioInterface.queueAppend(youtubeUrl);
+		const appended = await audioInterface.queue.queueAppend(youtubeUrl);
 
 		if (appended) {
 			await interaction.editReply(`✅ Enqueued \`${videoDetails.videoDetails.title}\`.`);
