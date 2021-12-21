@@ -12,13 +12,8 @@ import { QueueManager } from 'bot-classes';
 import config, { globals } from 'bot-config';
 import { downloadYouTubeVideo, getYouTubeUrl } from 'bot-functions';
 import { Guild } from 'discord.js';
-import { promisify } from 'util';
 import ytdl from 'ytdl-core-discord';
 import { InterfaceDefinition } from '../InterfaceDefinition.types';
-
-const GET = promisify(globals.redisClient.GET).bind(globals.redisClient);
-const SET = promisify(globals.redisClient.SET).bind(globals.redisClient);
-const EXPIRE = promisify(globals.redisClient.EXPIRE).bind(globals.redisClient);
 
 type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
 export type YtdlVideoInfoResolved = Awaited<ReturnType<typeof ytdl.getBasicInfo>>;
@@ -248,7 +243,7 @@ export default class YouTubeInterface implements InterfaceDefinition {
 			const videoId = ytdl.getVideoID(url);
 			if (!videoId) return null;
 			const namespace = `${this.queue.redisQueueNamespace}:${videoId}`;
-			const searchCache = await GET(namespace);
+			const searchCache = await this.queue.redis.GET(namespace);
 
 			if (searchCache) {
 				console.log(`Video id ${videoId} found in cache! Using cache.`);
@@ -258,9 +253,9 @@ export default class YouTubeInterface implements InterfaceDefinition {
 				console.log(`Video id ${videoId} not found in cache! Getting video details.`);
 				const results = await ytdl.getBasicInfo(url);
 				const json = JSON.stringify(results);
-				await SET(namespace, json);
+				await this.queue.redis.SET(namespace, json);
 				// Set an expiry on the cache, so that it will be forced to re-fetch in the future to keep the data up to date
-				await EXPIRE(namespace, config.cacheExpiryHours * 3600); // 3600 seconds in an hour
+				await this.queue.redis.EXPIRE(namespace, config.cacheExpiryHours * 3600); // 3600 seconds in an hour
 				return results;
 			}
 		} catch (error) {

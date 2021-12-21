@@ -55,6 +55,7 @@ class InteractiveQueue {
 		const embedFields = await this.getPageEmbedFieldData();
 		const embeds = await this.getPageMessageEmbed(embedFields);
 		const botMessage = await this.interaction.editReply({ embeds: [embeds], components });
+
 		return botMessage;
 	}
 

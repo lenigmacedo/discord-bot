@@ -1,16 +1,6 @@
 import config, { globals } from 'bot-config';
 import { getYouTubeUrl, getYouTubeVideoId } from 'bot-functions';
 import { Guild } from 'discord.js';
-import { promisify } from 'util';
-
-const RPUSH = promisify<string, string>(globals.redisClient.RPUSH).bind(globals.redisClient);
-const LPUSH = promisify<string, string>(globals.redisClient.LPUSH).bind(globals.redisClient);
-const LRANGE = promisify(globals.redisClient.LRANGE).bind(globals.redisClient);
-const LLEN = promisify(globals.redisClient.LLEN).bind(globals.redisClient);
-const LPOP = promisify(globals.redisClient.LPOP).bind(globals.redisClient);
-const LTRIM = promisify(globals.redisClient.LTRIM).bind(globals.redisClient);
-const DEL = promisify<string>(globals.redisClient.DEL).bind(globals.redisClient);
-const LREM = promisify(globals.redisClient.LREM).bind(globals.redisClient);
 
 /**
  * An easy toolbox for managing audio for this bot.
@@ -19,30 +9,38 @@ export default class QueueManager {
 	guild: Guild;
 	redisQueueNamespace: string;
 
-	constructor(guild: Guild, redisNamespace: string) {
+	constructor(guild: Guild, namespace: string) {
 		this.guild = guild;
-		this.redisQueueNamespace = `${config.redisNamespace}:${guild.id}:queue:${redisNamespace}`;
+		this.redisQueueNamespace = `${config.redisNamespace}:${guild.id}:queue:${namespace}`;
+	}
+
+	/**
+	 * Get the redis client instance
+	 * Is getter to store method in prototype.
+	 */
+	get redis() {
+		return globals.redisClient;
 	}
 
 	/**
 	 * Append an item to the queue.
-	 * @param urlOrId A YouTube URL or ID.
+	 * @param key A YouTube URL or ID.
 	 */
-	async queueAppend(urlOrId: string) {
-		const videoId = getYouTubeVideoId(urlOrId);
+	async queueAppend(key: string) {
+		const videoId = getYouTubeVideoId(key);
 		if (!videoId) return null;
-		await RPUSH(this.redisQueueNamespace, videoId);
+		await this.redis.RPUSH(this.redisQueueNamespace, videoId);
 		return true;
 	}
 
 	/**
 	 * Add a video id to the #1 spot in the queue.
-	 * @param urlOrId A YouTube URL or ID.
+	 * @param key A YouTube URL or ID.
 	 */
-	async queuePrepend(urlOrId: string) {
-		const videoId = getYouTubeVideoId(urlOrId);
+	async queuePrepend(key: string) {
+		const videoId = getYouTubeVideoId(key);
 		if (!videoId) return null;
-		await LPUSH(this.redisQueueNamespace, videoId);
+		await this.redis.LPUSH(this.redisQueueNamespace, videoId);
 		return true;
 	}
 
@@ -55,17 +53,17 @@ export default class QueueManager {
 		const pageIndex = page - 1; // Redis starts from index 0
 		const startIndex = pageIndex * limit;
 		const endIndex = pageIndex * limit + limit - 1;
-		const videoIds = await LRANGE(this.redisQueueNamespace, startIndex, endIndex);
+		const videoIds = await this.redis.LRANGE(this.redisQueueNamespace, startIndex, endIndex);
 		const urls = videoIds.map(getYouTubeUrl).filter(url => typeof url === 'string') as string[];
 		return urls;
 	}
 
 	/**
 	 * Get a queue item via its index. Returns the video ID.
-	 * @param indexNumber Queue index number.
+	 * @param index Queue index number.
 	 */
-	async queueGetFromIndex(indexNumber: number) {
-		const results = await LRANGE(this.redisQueueNamespace, indexNumber, indexNumber);
+	async queueGetFromIndex(index: number) {
+		const results = await this.redis.LRANGE(this.redisQueueNamespace, index, index);
 		return results[0];
 	}
 
@@ -81,12 +79,12 @@ export default class QueueManager {
 
 	/**
 	 * Delete an item from the queue.
-	 * @param queueItemIndex The item index of the queue.
+	 * @param index The item index of the queue.
 	 */
-	async queueDelete(queueItemIndex: number) {
-		const queueItem = await this.queueGetFromIndex(queueItemIndex);
+	async queueDelete(index: number) {
+		const queueItem = await this.queueGetFromIndex(index);
 		if (!queueItem) return false;
-		const result = await LREM(this.redisQueueNamespace, 0, queueItem);
+		const result = await this.redis.LREM(this.redisQueueNamespace, 0, queueItem);
 		if (result) return true;
 		return false;
 	}
@@ -95,7 +93,7 @@ export default class QueueManager {
 	 * Delete the #1 item in the queue.
 	 */
 	async queueDeleteOldest() {
-		await LPOP(this.redisQueueNamespace);
+		await this.redis.LPOP(this.redisQueueNamespace);
 		return true;
 	}
 
@@ -103,7 +101,7 @@ export default class QueueManager {
 	 * Get how long the queue is.
 	 */
 	async queueLength() {
-		const result = await LLEN(this.redisQueueNamespace);
+		const result = await this.redis.LLEN(this.redisQueueNamespace);
 		return result;
 	}
 
@@ -120,8 +118,8 @@ export default class QueueManager {
 	 */
 	async queuePurge() {
 		const queueLength = await this.queueLength();
-		if (queueLength === 1) await DEL(this.redisQueueNamespace);
-		else if (queueLength > 1) await LTRIM(this.redisQueueNamespace, -1, 0);
+		if (queueLength === 1) await this.redis.DEL(this.redisQueueNamespace);
+		else if (queueLength > 1) await this.redis.LTRIM(this.redisQueueNamespace, -1, 0);
 		// LTRIM does not work if there is more than one value
 		else return false;
 		return true;
