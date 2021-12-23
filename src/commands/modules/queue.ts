@@ -1,5 +1,5 @@
 import { YouTubeInterface, YtdlVideoInfoResolved } from 'bot-classes';
-import config from 'bot-config';
+import config, { ColourScheme } from 'bot-config';
 import { getCommandIntraction } from 'bot-functions';
 import { ColorResolvable, CommandInteraction, EmbedFieldData, Guild, Message, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
@@ -103,7 +103,7 @@ class InteractiveQueue {
 		const queueLength = (await this.audioInterface?.queue.queueLength()) || 0;
 
 		return new MessageEmbed()
-			.setColor(config.embedSuccess as ColorResolvable)
+			.setColor(ColourScheme.Success as ColorResolvable)
 			.setTitle(`📃 Current Queue`)
 			.setDescription(
 				`There ${queueLength === 1 ? 'is' : 'are'} ${queueLength} item${queueLength === 1 ? '' : 's'} in the queue.\nPage ${this.page}/${

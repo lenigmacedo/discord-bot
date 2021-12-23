@@ -33,13 +33,27 @@ const config = {
 	cacheExpiryHours: 24,
 	audioVolume: 0.8,
 
-	// THEME AND STYLE
-	embedSuccess: '#00ff00',
-	embedDanger: '#ff0000',
-	embedWarning: '#ffff00',
 	numberFormat: 'en-GB'
 };
 
+export enum ColourScheme {
+	'Success' = '#77B155',
+	'Danger' = '#ff0000',
+	'Warning' = '#ffff00'
+}
+
+export enum ResponseEmojis {
+	'Success' = '✅',
+	'Info' = 'ℹ️',
+	'Loading' = '🔃',
+	'Danger' = '🚨',
+	'ArrowRight' = '➡️',
+	'Rubbish' = '🚮',
+	'Speaker' = '🔊',
+	'Scroll' = '📃'
+}
+
 export default config;
+
 export { default as commands } from './modules/commands';
 export { default as globals } from './modules/globals';

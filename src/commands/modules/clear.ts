@@ -1,48 +1,42 @@
-import { YouTubeInterface } from 'bot-classes';
-import { getCommandIntraction, initComponentInteractionHandler } from 'bot-functions';
+import { Command, YouTubeInterface } from 'bot-classes';
+import { ResponseEmojis } from 'bot-config';
+import { initComponentInteractionHandler } from 'bot-functions';
 import { Message, MessageActionRow, MessageButton } from 'discord.js';
 import { CommandHandler } from '../CommandHandler.types';
 
 const clear: CommandHandler = async initialInteraction => {
+	const handler = await new Command(initialInteraction).init();
+
 	try {
-		const commandInteraction = getCommandIntraction(initialInteraction);
+		handler.voiceChannel;
 
-		if (!commandInteraction) {
+		const guild = handler.guild;
+		const youtubeHandler = YouTubeInterface.getInterfaceForGuild(guild);
+		const queueLength = await youtubeHandler.queue.queueLength();
+
+		if (queueLength < 1) {
+			handler.editWithEmoji('The queue is empty!', ResponseEmojis.Info);
 			return;
 		}
 
-		const { interaction, guild, guildMember } = commandInteraction;
-		await interaction.deferReply({ ephemeral: true });
-		const voiceChannel = guildMember.voice.channel;
+		const actionRow = new MessageActionRow().addComponents(
+			new MessageButton().setCustomId('queue-clear-accept').setLabel('Delete!').setStyle('DANGER'),
+			new MessageButton().setCustomId('queue-clear-decline').setLabel('Leave it!').setStyle('SUCCESS')
+		);
 
-		if (!voiceChannel) {
-			await interaction.editReply('🚨 You must be connected to a voice channel for me to clear the queue!');
-			return;
-		}
-
-		const audioInterface = YouTubeInterface.getInterfaceForGuild(guild);
-		const queueLength = await audioInterface.queue.queueLength();
-
-		if (queueLength > 0) {
-			const actionRow = new MessageActionRow().addComponents(
-				new MessageButton().setCustomId('queue-clear-accept').setLabel('Delete!').setStyle('DANGER'),
-				new MessageButton().setCustomId('queue-clear-decline').setLabel('Leave it!').setStyle('SUCCESS')
-			);
-
-			const botMessage = await interaction.editReply({
-				content: `ℹ️ Are you sure you want to delete the ENTIRE queue? ${queueLength} item${queueLength > 1 ? 's' : ''} will be removed if you do!`,
+		const botMessage = await handler.editWithEmoji(
+			{
+				content: `Are you sure you want to delete the ENTIRE queue?\n${queueLength} item${queueLength > 1 ? 's' : ''} will be removed.`,
 				components: [actionRow]
-			});
+			},
+			ResponseEmojis.Info
+		);
 
-			if (!(botMessage instanceof Message)) {
-				return;
-			}
-
-			initComponentInteractionHandler(botMessage, interaction);
-		} else {
-			await interaction.editReply({ content: 'ℹ️ The queue seems to be empty.' });
+		if (botMessage instanceof Message) {
+			initComponentInteractionHandler(botMessage, handler.commandInteraction);
 		}
 	} catch (error) {
+		handler.followUpEmoji('There was a problem executing your request.', ResponseEmojis.Danger);
 		console.error(error);
 	}
 };
