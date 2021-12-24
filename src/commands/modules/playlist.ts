@@ -1,49 +1,43 @@
-import { YouTubeInterface } from 'bot-classes';
-import { getCommandIntraction } from 'bot-functions';
+import { Command, YouTubeInterface } from 'bot-classes';
+import { ResponseEmojis } from 'bot-config';
 import getYoutubePlaylistUrls from 'bot-functions/modules/getPlaylistUrls';
 import getYoutubePlaylistId from 'bot-functions/modules/getYouTubePlaylistId';
-import { CommandHandler } from '../CommandHandler.types';
+import { CommandInteraction } from 'discord.js';
+import { BaseCommand } from '../BaseCommand';
 
-const playlist: CommandHandler = async initialInteraction => {
-	try {
-		const commandInteraction = getCommandIntraction(initialInteraction);
+export class Playlist implements BaseCommand {
+	constructor(public commandInteraction: CommandInteraction) {}
 
-		if (!commandInteraction) {
-			return;
+	async runner() {
+		const handler = await new Command(this.commandInteraction).init();
+
+		try {
+			handler.voiceChannel;
+
+			const audioInterface = YouTubeInterface.getInterfaceForGuild(handler.guild);
+			const playlistUrl = handler.commandInteraction.options.getString('url', true);
+			const playlistId = getYoutubePlaylistId(playlistUrl);
+
+			if (!playlistId) {
+				await handler.editWithEmoji('URL provided is not valid, try again?', ResponseEmojis.Danger);
+				return;
+			}
+
+			await handler.editWithEmoji('Searching for videos in the playlist. Please wait...', ResponseEmojis.Loading);
+			const videoUrlsFromPlaylist = await getYoutubePlaylistUrls(playlistId);
+			const awaitingAppendedUrls = videoUrlsFromPlaylist.map(videoUrl => audioInterface.queue.queueAppend(videoUrl));
+			const resolvedAppendedUrls = await Promise.all(awaitingAppendedUrls);
+			const filteredAppendedUrls = resolvedAppendedUrls.filter(Boolean);
+			const totalAppendedUrls = filteredAppendedUrls.length;
+
+			if (totalAppendedUrls > 0) {
+				await handler.editWithEmoji(`Added ${totalAppendedUrls} video${totalAppendedUrls > 1 ? 's' : ''} to the queue.`, ResponseEmojis.Success);
+			} else {
+				await handler.editWithEmoji('Failed to add playlist items to the queue. Is the URL valid?', ResponseEmojis.Danger);
+			}
+		} catch (error: any) {
+			handler.editWithEmoji(error.message, ResponseEmojis.Danger);
+			console.error(error);
 		}
-
-		const { interaction, guild, guildMember } = commandInteraction;
-		await interaction.deferReply();
-
-		if (!guildMember.voice.channel) {
-			await interaction.editReply('🚨 You must be connected to a voice channel for me to modify the queue!');
-			return;
-		}
-
-		const audioInterface = YouTubeInterface.getInterfaceForGuild(guild);
-		const playlistUrl = interaction.options.getString('url', true);
-		const playlistId = getYoutubePlaylistId(playlistUrl);
-
-		if (!playlistId) {
-			await interaction.editReply('🚨 URL provided is not valid, try again?');
-			return;
-		}
-
-		await interaction.editReply('🔃 Searching for videos in the playlist. Please wait...');
-		const videoUrlsFromPlaylist = await getYoutubePlaylistUrls(playlistId);
-		const awaitingAppendedUrls = videoUrlsFromPlaylist.map(videoUrl => audioInterface.queue.queueAppend(videoUrl));
-		const resolvedAppendedUrls = await Promise.all(awaitingAppendedUrls);
-		const filteredAppendedUrls = resolvedAppendedUrls.filter(Boolean);
-		const count = filteredAppendedUrls.length;
-
-		if (count > 0) {
-			await interaction.editReply(`✅ Added ${count} video${count > 1 ? 's' : ''} to the queue.`);
-		} else {
-			await interaction.editReply('🚨 Failed to add playlist items to the queue. Is the URL valid?');
-		}
-	} catch (error) {
-		console.error(error);
 	}
-};
-
-export default playlist;
+}

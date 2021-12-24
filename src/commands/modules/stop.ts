@@ -1,35 +1,29 @@
-import { YouTubeInterface } from 'bot-classes';
-import { getCommandIntraction } from 'bot-functions';
-import { CommandHandler } from '../CommandHandler.types';
+import { Command, YouTubeInterface } from 'bot-classes';
+import { ResponseEmojis } from 'bot-config';
+import { CommandInteraction } from 'discord.js';
+import { BaseCommand } from '../BaseCommand';
 
-const stop: CommandHandler = async initialInteraction => {
-	try {
-		const commandInteraction = getCommandIntraction(initialInteraction);
+export class Stop implements BaseCommand {
+	constructor(public commandInteraction: CommandInteraction) {}
 
-		if (!commandInteraction) {
-			return;
+	async runner() {
+		const handler = await new Command(this.commandInteraction).init();
+
+		try {
+			handler.voiceChannel;
+
+			const audioInterface = YouTubeInterface.getInterfaceForGuild(handler.guild);
+
+			if (!audioInterface.getBusyStatus()) {
+				await handler.editWithEmoji('Nothing to stop.', ResponseEmojis.Danger);
+				return;
+			}
+
+			audioInterface.deleteConnection();
+			await handler.editWithEmoji('I have been stopped.', ResponseEmojis.Success);
+		} catch (error: any) {
+			handler.editWithEmoji(error.message, ResponseEmojis.Danger);
+			console.error(error);
 		}
-
-		const { interaction, guild, guildMember } = commandInteraction;
-		await interaction.deferReply();
-
-		if (!guildMember.voice.channel) {
-			await interaction.editReply('🚨 You must be connected to a voice channel for me to stop the queue!');
-			return;
-		}
-
-		const audioInterface = YouTubeInterface.getInterfaceForGuild(guild);
-
-		if (!audioInterface.getBusyStatus()) {
-			await interaction.editReply('🚨 Nothing to stop.');
-			return;
-		}
-
-		audioInterface.deleteConnection();
-		await interaction.editReply('✅ I have been stopped.');
-	} catch (error) {
-		console.error(error);
 	}
-};
-
-export default stop;
+}

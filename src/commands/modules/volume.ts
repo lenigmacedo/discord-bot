@@ -1,32 +1,29 @@
-import { YouTubeInterface } from 'bot-classes';
-import { getCommandIntraction } from 'bot-functions';
-import { CommandHandler } from '../CommandHandler.types';
+import { Command, YouTubeInterface } from 'bot-classes';
+import { ResponseEmojis } from 'bot-config';
+import { CommandInteraction } from 'discord.js';
+import { BaseCommand } from '../BaseCommand';
 
-const volume: CommandHandler = async initialInteraction => {
-	try {
-		const commandInteraction = getCommandIntraction(initialInteraction);
+export class Volume implements BaseCommand {
+	constructor(public commandInteraction: CommandInteraction) {}
 
-		if (!commandInteraction) {
-			return;
+	async runner() {
+		const handler = await new Command(this.commandInteraction).init();
+
+		try {
+			handler.voiceChannel;
+
+			const audioInterface = YouTubeInterface.getInterfaceForGuild(handler.guild);
+			const volumeLevel = handler.commandInteraction.options.getInteger('level', true);
+			const isSet = audioInterface.setVolume(volumeLevel);
+
+			if (isSet) {
+				handler.editWithEmoji(`Set volume to \`${volumeLevel}%\``, ResponseEmojis.Speaker);
+			} else {
+				handler.editWithEmoji('Could not set the volume! Make sure it is between 0 and 100.', ResponseEmojis.Danger);
+			}
+		} catch (error: any) {
+			handler.editWithEmoji(error.message, ResponseEmojis.Danger);
+			console.error(error);
 		}
-
-		const { interaction, guild, guildMember } = commandInteraction;
-		await interaction.deferReply();
-
-		if (!guildMember.voice.channel) {
-			await interaction.editReply('🚨 You must be connected to a voice channel for me to modify the volume!');
-			return;
-		}
-
-		const audioInterface = YouTubeInterface.getInterfaceForGuild(guild);
-		const volumeLevel = interaction.options.getInteger('level', true);
-		const isSet = audioInterface.setVolume(volumeLevel);
-
-		if (isSet) interaction.editReply(`🔊 Set volume to \`${volumeLevel}%\``);
-		else interaction.editReply('🚨 Could not set the volume! Make sure it is between 0 and 100.');
-	} catch (error) {
-		console.error(error);
 	}
-};
-
-export default volume;
+}

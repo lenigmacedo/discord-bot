@@ -1,4 +1,5 @@
 import { YouTubeInterface } from 'bot-classes';
+import { ResponseEmojis } from 'bot-config';
 import { Guild } from 'discord.js';
 import { MessageComponentHandler } from '../MessageComponentHandler.types';
 
@@ -16,15 +17,15 @@ const searchVideoSelection: MessageComponentHandler = async interaction => {
 		const value = interaction?.values[0];
 
 		if (!value) {
-			await interaction.reply('🚨 I could not find the video from the selection. Try again?');
+			await interaction.reply(`${ResponseEmojis.Danger} I could not find the video from the selection. Try again?`);
 		}
 
 		const appended = await audioInterface.queue.queueAppend(value);
 
 		if (appended) {
-			await interaction.reply('✅ I have added it to the queue!');
+			await interaction.reply(`${ResponseEmojis.Success} I have added it to the queue!`);
 		} else {
-			await interaction.reply('🚨 I was unable to add that video to the queue. Try again?');
+			await interaction.reply(`${ResponseEmojis.Danger} I was unable to add that video to the queue. Try again?`);
 		}
 	} catch (error) {
 		console.error(error);

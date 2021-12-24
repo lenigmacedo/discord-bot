@@ -1,76 +1,138 @@
-import { YouTubeInterface, YtdlVideoInfoResolved } from 'bot-classes';
-import config, { ColourScheme } from 'bot-config';
-import { getCommandIntraction } from 'bot-functions';
-import { ColorResolvable, CommandInteraction, EmbedFieldData, Guild, Message, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
-import { CommandHandler } from '../CommandHandler.types';
+import { Command, YouTubeInterface, YtdlVideoInfoResolved } from 'bot-classes';
+import config, { ColourScheme, ResponseEmojis } from 'bot-config';
+import { ColorResolvable, CommandInteraction, EmbedFieldData, Message, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
+import { BaseCommand } from '../BaseCommand';
 
-const queue: CommandHandler = async initialInteraction => {
-	try {
-		const interactiveQueue = new InteractiveQueue(initialInteraction);
-		const initialMessage = await interactiveQueue.runInitialResponse();
-		if (!(initialMessage instanceof Message)) return;
-		interactiveQueue.registerButtonInteractionLogic(initialMessage);
-	} catch (error) {
-		console.error(error);
-	}
-};
+export class Queue implements BaseCommand {
+	commandInteraction: CommandInteraction;
+	page: number = 0;
+	pageCount: number = 0;
 
-class InteractiveQueue {
-	interaction: CommandInteraction;
-	guild: Guild;
-	audioInterface: YouTubeInterface;
-	page: number;
-	pageCount: number;
-
-	constructor(initialInteraction: CommandInteraction) {
-		this.page = 1;
-		this.pageCount = 1;
-
-		const commandInteraction = getCommandIntraction(initialInteraction);
-		if (!commandInteraction) throw TypeError('Command interaction for /queue is not performed in a Discord server and was cancelled.'); // The "getCommandInteraction" function should handle this.
-
-		this.interaction = commandInteraction.interaction;
-		this.guild = commandInteraction.guild;
-		this.audioInterface = YouTubeInterface.getInterfaceForGuild(this.guild);
+	constructor(commandInteraction: CommandInteraction) {
+		this.commandInteraction = commandInteraction;
 	}
 
-	async runInitialResponse() {
-		const ephemeral = this.interaction.options.getBoolean('hide-in-chat') || false;
-		await this.interaction.deferReply({ ephemeral });
-		const initialQueueLength = await this.audioInterface.queue.queueLength();
+	async runner() {
+		const ephemeral = this.commandInteraction.options.getBoolean('hide-in-chat') || false;
+		const handler = await new Command(this.commandInteraction).init(ephemeral);
 
-		if (!initialQueueLength) {
-			await this.interaction.editReply('ℹ️ Queue is empty.');
-			return false;
+		try {
+			const youtubeInterface = YouTubeInterface.getInterfaceForGuild(handler.guild);
+			const queueLength = await youtubeInterface.queue.queueLength();
+
+			if (!queueLength) {
+				handler.editWithEmoji('The queue is currently empty.', ResponseEmojis.Info);
+				return;
+			}
+
+			this.page = this.commandInteraction.options.getInteger('page') || 1;
+			this.pageCount = Math.ceil(queueLength / config.paginateMaxLength);
+
+			// Clamp user's defined page argument
+			if (this.page > this.pageCount) this.page = this.pageCount;
+			else if (this.page < 1) this.page = 1;
+
+			const components = this.createButtonsComponent();
+			const embedFields = await this.getPageEmbedFieldData(youtubeInterface);
+			const embeds = await this.getPageMessageEmbed(embedFields, queueLength);
+			const botMessage = await handler.commandInteraction.editReply({ embeds: [embeds], components });
+
+			if (botMessage instanceof Message) {
+				this.registerButtonInteractionLogic(botMessage, handler);
+			} else {
+				throw Error('Problem with button interaction. Try this command again.');
+			}
+		} catch (error: any) {
+			handler.editWithEmoji(error.message, ResponseEmojis.Danger);
+			console.error(error);
 		}
-
-		this.page = this.interaction.options.getInteger('page') || 1;
-		this.pageCount = Math.ceil(initialQueueLength / config.paginateMaxLength);
-
-		// Make sure that the user has defined a page within the right range and modify the value if not.
-		if (this.page > this.pageCount) this.page = this.pageCount;
-		else if (this.page < 1) this.page = 1;
-
-		const components = this.createButtonsComponent();
-		const embedFields = await this.getPageEmbedFieldData();
-		const embeds = await this.getPageMessageEmbed(embedFields);
-		const botMessage = await this.interaction.editReply({ embeds: [embeds], components });
-
-		return botMessage;
 	}
 
-	async registerButtonInteractionLogic(interactableMessage: Message) {
-		const collector = interactableMessage.createMessageComponentCollector({
+	/**
+	 * Create Discord message buttons. This method is useful because it shows and hides buttons dynamically depending on where they are in the queue.
+	 */
+	createButtonsComponent() {
+		const prevButton = new MessageButton().setCustomId('queue-navigate-prev').setLabel('<<').setStyle('PRIMARY');
+		const nextButton = new MessageButton().setCustomId('queue-navigate-next').setLabel('>>').setStyle('PRIMARY');
+		const firstPageButton = new MessageButton().setCustomId('queue-navigate-start').setLabel('1').setStyle('PRIMARY');
+		const lastPageButton = new MessageButton().setCustomId('queue-navigate-last').setLabel(`${this.pageCount}`).setStyle('PRIMARY');
+		const buttons = new MessageActionRow();
+
+		if (this.page > 2) buttons.addComponents(firstPageButton);
+		if (this.page > 1) buttons.addComponents(prevButton);
+		if (this.page < this.pageCount) buttons.addComponents(nextButton);
+		if (this.page < this.pageCount - 1) buttons.addComponents(lastPageButton);
+
+		const components = buttons.components.length ? [buttons] : undefined;
+		return components;
+	}
+
+	/**
+	 * A function that takes a list of queue items via a YouTube interface, and returns a list of Discord fields for use in an embed.
+	 * @param youtubeInterface The YouTube interface instance.
+	 */
+	async getPageEmbedFieldData(youtubeInterface: YouTubeInterface) {
+		const queue = await youtubeInterface.queue.queueGetMultiple(this.page);
+		const videoDetailPromiseArray = queue.map(url => youtubeInterface?.getDetails(url));
+		const videoDetails = (await Promise.all(videoDetailPromiseArray)) as YtdlVideoInfoResolved[];
+
+		const embedFields: EmbedFieldData[] = videoDetails.map((videoDetails, index) => {
+			const itemNumberOffset = (this.page - 1) * config.paginateMaxLength;
+			const itemNumber = index + 1 + itemNumberOffset;
+			const videoDetailsObj = videoDetails?.videoDetails;
+
+			if (!videoDetailsObj?.title || !videoDetailsObj.description) {
+				return {
+					name: `${itemNumber}) ${ResponseEmojis.Danger} FAILED`,
+					value: `Video private or age restricted or something else.`
+				};
+			}
+
+			return {
+				name: `${itemNumber}) ${videoDetailsObj.title.substring(0, 100)}`,
+				value: `By \`${videoDetailsObj.author.name}\`.\n>> ${videoDetailsObj.video_url}`
+			};
+		});
+
+		return embedFields;
+	}
+
+	/**
+	 * A simple function that will provide you with a Discord Embed styled specifically for displaying a queue.
+	 * Please use the return from this.getPageEmbedFieldData() first!
+	 * @param embedFields A list of discord embed fields containing video information.
+	 * @param queueLength The length of the current queue by items.
+	 */
+	async getPageMessageEmbed(embedFields: EmbedFieldData[], queueLength: number) {
+		return new MessageEmbed()
+			.setColor(ColourScheme.Success as ColorResolvable)
+			.setTitle(`${ResponseEmojis.Scroll} Current Queue`)
+			.setDescription(
+				`There ${queueLength === 1 ? 'is' : 'are'} ${queueLength} item${queueLength === 1 ? '' : 's'} in the queue.\nPage ${this.page}/${
+					this.pageCount
+				}`
+			)
+			.setFields(...embedFields);
+	}
+
+	/**
+	 * This method will take a bot's reply, and the original interaction to allow the interactive buttons to work.
+	 * @param botMessage An instance returned from a bot reply.
+	 * @param handler The Command instance with a valid commandInteraction instance applied to it.
+	 */
+	async registerButtonInteractionLogic(botMessage: Message, handler: Command) {
+		const collector = botMessage.createMessageComponentCollector({
 			time: config.queueButtonExpiryMilliseconds // Expires for memory reasons.
 		});
 
 		// This removes the buttons when the buttons expire as they no longer work.
 		collector.on('end', async () => {
-			await this.interaction.editReply({ components: [] });
+			await handler.commandInteraction.editReply({ components: [] });
 		});
 
 		collector.on('collect', async collected => {
-			const newQueueLength = await this.audioInterface.queue.queueLength();
+			const youtubeInterface = YouTubeInterface.getInterfaceForGuild(handler.guild);
+			const newQueueLength = await youtubeInterface.queue.queueLength();
 			this.pageCount = Math.ceil(newQueueLength / config.paginateMaxLength);
 
 			switch (collected.customId) {
@@ -93,67 +155,9 @@ class InteractiveQueue {
 
 			collected.deferUpdate(); // Without this, the interaction will show as failed for the user.
 			const components = this.createButtonsComponent();
-			const newEmbedFields = await this.getPageEmbedFieldData();
-			const newEmbeds = await this.getPageMessageEmbed(newEmbedFields);
-			await this.interaction.editReply({ embeds: [newEmbeds], components });
+			const newEmbedFields = await this.getPageEmbedFieldData(youtubeInterface);
+			const newEmbeds = await this.getPageMessageEmbed(newEmbedFields, newQueueLength);
+			await handler.commandInteraction.editReply({ embeds: [newEmbeds], components });
 		});
-	}
-
-	async getPageMessageEmbed(embedFields: EmbedFieldData[]) {
-		const queueLength = (await this.audioInterface?.queue.queueLength()) || 0;
-
-		return new MessageEmbed()
-			.setColor(ColourScheme.Success as ColorResolvable)
-			.setTitle(`📃 Current Queue`)
-			.setDescription(
-				`There ${queueLength === 1 ? 'is' : 'are'} ${queueLength} item${queueLength === 1 ? '' : 's'} in the queue.\nPage ${this.page}/${
-					this.pageCount
-				}`
-			)
-			.setFields(...embedFields);
-	}
-
-	createButtonsComponent() {
-		const prevButton = new MessageButton().setCustomId('queue-navigate-prev').setLabel('<< Prev').setStyle('PRIMARY');
-		const nextButton = new MessageButton().setCustomId('queue-navigate-next').setLabel('Next >>').setStyle('PRIMARY');
-		const firstPageButton = new MessageButton().setCustomId('queue-navigate-start').setLabel('First page').setStyle('PRIMARY');
-		const lastPageButton = new MessageButton().setCustomId('queue-navigate-last').setLabel('Last page').setStyle('PRIMARY');
-		const buttons = new MessageActionRow();
-
-		if (this.page > 2) buttons.addComponents(firstPageButton);
-		if (this.page > 1) buttons.addComponents(prevButton);
-		if (this.page < this.pageCount) buttons.addComponents(nextButton);
-		if (this.page < this.pageCount - 1) buttons.addComponents(lastPageButton);
-
-		const components = buttons.components.length ? [buttons] : undefined;
-		return components;
-	}
-
-	async getPageEmbedFieldData() {
-		const queue = await this.audioInterface.queue.queueGetMultiple(this.page);
-		const videoDetailPromiseArray = queue.map(url => this.audioInterface?.getDetails(url));
-		const videoDetails = (await Promise.all(videoDetailPromiseArray)) as YtdlVideoInfoResolved[];
-
-		const embedFields: EmbedFieldData[] = videoDetails.map((videoDetails, index) => {
-			const itemNumberOffset = (this.page - 1) * config.paginateMaxLength;
-			const itemNumber = index + 1 + itemNumberOffset;
-			const videoDetailsObj = videoDetails?.videoDetails;
-
-			if (!videoDetailsObj?.title || !videoDetailsObj.description) {
-				return {
-					name: `${itemNumber}) 🚨 FAILED`,
-					value: `Video private or age restricted or something else.`
-				};
-			}
-
-			return {
-				name: `${itemNumber}) ${videoDetailsObj.title.substring(0, 100)}`,
-				value: `By \`${videoDetailsObj.author.name}\`.\n>> ${videoDetailsObj.video_url}`
-			};
-		});
-
-		return embedFields;
 	}
 }
-
-export default queue;

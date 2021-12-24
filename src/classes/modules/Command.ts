@@ -1,14 +1,13 @@
 import { ResponseEmojis } from 'bot-config';
 import { CommandInteraction, Guild, GuildMember, InteractionReplyOptions } from 'discord.js';
-import { CommandHandler } from '../../commands/CommandHandler.types';
 
 /**
- * A toolbox for making interactions between the bot and the user easy.
+ * A toolbox for making interactions between the bot and the user easier.
  */
 export default class Command {
 	protected interaction: CommandInteraction;
 	protected invoked: Date; // A Date instance representing when this command was run.
-	protected handler?: CommandHandler;
+	protected handler?: typeof this;
 
 	constructor(interaction: CommandInteraction) {
 		this.interaction = interaction;
@@ -88,7 +87,7 @@ export default class Command {
 
 	editWithEmoji(message: string | InteractionReplyOptions, type: ResponseEmojis) {
 		if (typeof message === 'string') {
-			return this.interaction.followUp(`${type}  ${message}`);
+			return this.interaction.editReply(`${type}  ${message}`);
 		}
 
 		message.content = `${type}  ${message.content}`;

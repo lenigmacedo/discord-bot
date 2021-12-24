@@ -1,34 +1,28 @@
-import { YouTubeInterface } from 'bot-classes';
-import { getCommandIntraction } from 'bot-functions';
-import { CommandHandler } from '../CommandHandler.types';
+import { Command, YouTubeInterface } from 'bot-classes';
+import { ResponseEmojis } from 'bot-config';
+import { CommandInteraction } from 'discord.js';
+import { BaseCommand } from '../BaseCommand';
 
-const resume: CommandHandler = async initialInteraction => {
-	try {
-		const commandInteraction = getCommandIntraction(initialInteraction);
+export class Resume implements BaseCommand {
+	constructor(public commandInteraction: CommandInteraction) {}
 
-		if (!commandInteraction) {
-			return;
+	async runner() {
+		const handler = await new Command(this.commandInteraction).init();
+
+		try {
+			handler.voiceChannel;
+
+			const youtubeInterface = YouTubeInterface.getInterfaceForGuild(handler.guild);
+			const unpaused = youtubeInterface.player.unpause();
+
+			if (unpaused) {
+				await handler.editWithEmoji('The audio has been resumed.', ResponseEmojis.Success);
+			} else {
+				await handler.editWithEmoji('Nothing to resume.', ResponseEmojis.Danger);
+			}
+		} catch (error: any) {
+			handler.editWithEmoji(error.message, ResponseEmojis.Danger);
+			console.error(error);
 		}
-
-		const { interaction, guild, guildMember } = commandInteraction;
-		await interaction.deferReply();
-
-		if (!guildMember.voice.channel) {
-			await interaction.editReply('🚨 You must be connected to a voice channel for me to resume!');
-			return;
-		}
-
-		const audioInterface = YouTubeInterface.getInterfaceForGuild(guild);
-		const unpaused = audioInterface.getPlayer().unpause();
-
-		if (unpaused) {
-			await interaction.editReply('✅ The audio has been resumed.');
-		} else {
-			await interaction.editReply('🚨 Nothing to resume.');
-		}
-	} catch (error) {
-		console.error(error);
 	}
-};
-
-export default resume;
+}

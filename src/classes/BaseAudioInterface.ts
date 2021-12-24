@@ -1,61 +1,60 @@
 import { AudioPlayer, AudioResource, VoiceConnection } from '@discordjs/voice';
 
-/**
- * Ensure a new audio interface class (e.g. in the future we may want SoundCloudInterface, VimeoInterface etc.) has these methods to be fully implementable.
- */
-export interface InterfaceDefinition {
+export abstract class BaseAudioInterface {
+	constructor() {}
+
 	/**
 	 * Based off of a queue index number, get an item in the queue.
 	 */
-	getItemInfo(queueItemIndex: number): Promise<any | null>;
+	abstract getItemInfo(queueItemIndex: number): Promise<any | null>;
 
 	/**
 	 * Get the player instance
 	 */
-	getPlayer(): AudioPlayer;
+	abstract get player(): AudioPlayer;
 
 	/**
 	 * Is the bot busy playing something?
 	 */
-	getBusyStatus(): boolean;
+	abstract getBusyStatus(): boolean;
 
 	/**
 	 * A runner method that resolves to true when the track is finished, and null when there is no more audio resources to play.
 	 */
-	queueRunner(): Promise<true | null>;
+	abstract queueRunner(): Promise<true | null>;
 
 	/**
 	 * Set the connection for this instance.
 	 */
-	setConnection(connection: VoiceConnection): void;
+	abstract setConnection(connection: VoiceConnection): void;
 
 	/**
 	 * Delete the connection.
 	 */
-	deleteConnection(): true | null;
+	abstract deleteConnection(): true | null;
 
 	/**
 	 * Get this instance's connection.
 	 */
-	getConnection(): VoiceConnection | null;
+	abstract getConnection(): VoiceConnection | null;
 
 	/**
 	 * Get the current audio resource for this bot.
 	 */
-	getCurrentAudioResource(): AudioResource | null;
+	abstract getCurrentAudioResource(): AudioResource | null;
 
 	/**
 	 * Download the audio resource
 	 */
-	download(queueItemIndex: number): Promise<AudioResource | null>;
+	abstract download(queueItemIndex: number): Promise<AudioResource | null>;
 
 	/**
 	 * Emit a fake audio finish event to be used to simulate a track finishing. Useful for skipping.
 	 */
-	emitAudioFinish(): true | null;
+	abstract emitAudioFinish(): true | null;
 
 	/**
 	 * Get the video details for this instance.
 	 */
-	getDetails(url: string): Promise<any | null>;
+	abstract getDetails(url: string): Promise<any | null>;
 }

@@ -1,3 +1,4 @@
+import { ResponseEmojis } from 'bot-config';
 import { Guild } from 'discord.js';
 import { MessageComponentHandler } from '../MessageComponentHandler.types';
 
@@ -8,7 +9,7 @@ const queueClearDecline: MessageComponentHandler = async (interaction, initialIn
 		}
 
 		await initialInteraction?.editReply({
-			content: "😔 Ok! Don't scare me like that again!",
+			content: `${ResponseEmojis.Pensive} Ok! Don't scare me like that again!`,
 			components: []
 		});
 	} catch (error) {

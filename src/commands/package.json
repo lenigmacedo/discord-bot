@@ -1,4 +1,4 @@
 {
 	"name": "bot-commands",
-	"description": "Command modules for handling various commands."
+	"description": "Command modules for handling various commands. All module classnames must start with an uppercase letter."
 }

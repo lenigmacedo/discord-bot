@@ -1,34 +1,28 @@
-import { YouTubeInterface } from 'bot-classes';
-import { getCommandIntraction } from 'bot-functions';
-import { CommandHandler } from '../CommandHandler.types';
+import { Command, YouTubeInterface } from 'bot-classes';
+import { ResponseEmojis } from 'bot-config';
+import { CommandInteraction } from 'discord.js';
+import { BaseCommand } from '../BaseCommand';
 
-const skip: CommandHandler = async initialInteraction => {
-	try {
-		const commandInteraction = getCommandIntraction(initialInteraction);
+export class Skip implements BaseCommand {
+	constructor(public commandInteraction: CommandInteraction) {}
 
-		if (!commandInteraction) {
-			return;
+	async runner() {
+		const handler = await new Command(this.commandInteraction).init();
+
+		try {
+			handler.voiceChannel;
+
+			const audioInterface = YouTubeInterface.getInterfaceForGuild(handler.guild);
+			const skipped = audioInterface.emitAudioFinish();
+
+			if (skipped) {
+				await handler.editWithEmoji('The audio has been skipped.', ResponseEmojis.ArrowRight);
+			} else {
+				await handler.editWithEmoji('I cannot skip as I am not playing anything!', ResponseEmojis.Danger);
+			}
+		} catch (error: any) {
+			handler.editWithEmoji(error.message, ResponseEmojis.Danger);
+			console.error(error);
 		}
-
-		const { interaction, guild, guildMember } = commandInteraction;
-		await interaction.deferReply();
-
-		if (!guildMember.voice.channel) {
-			await interaction.editReply('🚨 You must be connected to a voice channel for me to skip the queue!');
-			return;
-		}
-
-		const audioInterface = YouTubeInterface.getInterfaceForGuild(guild);
-		const skipped = audioInterface.emitAudioFinish();
-
-		if (skipped) {
-			await interaction.editReply('➡️ The audio has been skipped.');
-		} else {
-			await interaction.editReply('🚨 I cannot skip as I am not playing anything!');
-		}
-	} catch (error) {
-		console.error(error);
 	}
-};
-
-export default skip;
+}

@@ -13,7 +13,7 @@ import config, { globals } from 'bot-config';
 import { downloadYouTubeVideo, getYouTubeUrl } from 'bot-functions';
 import { Guild } from 'discord.js';
 import ytdl from 'ytdl-core-discord';
-import { InterfaceDefinition } from '../InterfaceDefinition.types';
+import { BaseAudioInterface } from '../BaseAudioInterface';
 
 type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
 export type YtdlVideoInfoResolved = Awaited<ReturnType<typeof ytdl.getBasicInfo>>;
@@ -21,15 +21,15 @@ export type YtdlVideoInfoResolved = Awaited<ReturnType<typeof ytdl.getBasicInfo>
 /**
  * An easy toolbox for managing audio for this bot.
  */
-export default class YouTubeInterface implements InterfaceDefinition {
-	player: AudioPlayer;
+export default class YouTubeInterface implements BaseAudioInterface {
+	private audioPlayer: AudioPlayer;
+	private volume: number;
+	private connection?: VoiceConnection;
+	private currentResource?: AudioResource | null;
 	queue: QueueManager;
-	volume: number;
-	connection?: VoiceConnection;
-	currentResource?: AudioResource | null;
 
 	constructor(guild: Guild) {
-		this.player = createAudioPlayer();
+		this.audioPlayer = createAudioPlayer();
 		this.volume = config.audioVolume;
 		this.queue = new QueueManager(guild, 'youtube');
 	}
@@ -79,8 +79,8 @@ export default class YouTubeInterface implements InterfaceDefinition {
 	/**
 	 * Get the player instance associated with this guild.
 	 */
-	getPlayer() {
-		return this.player;
+	get player() {
+		return this.audioPlayer;
 	}
 
 	/**
@@ -100,7 +100,7 @@ export default class YouTubeInterface implements InterfaceDefinition {
 	queueRunner(): Promise<true | null> {
 		return new Promise(async resolve => {
 			try {
-				const player = this.getPlayer();
+				const player = this.player;
 				const queueLength = await this.queue.queueLength();
 
 				if (queueLength < 1) {
@@ -154,7 +154,7 @@ export default class YouTubeInterface implements InterfaceDefinition {
 	 */
 	setConnection(connection: VoiceConnection) {
 		this.connection = connection;
-		this.connection.subscribe(this.getPlayer());
+		this.connection.subscribe(this.player);
 	}
 
 	/**
@@ -215,7 +215,7 @@ export default class YouTubeInterface implements InterfaceDefinition {
 	 */
 	emitAudioFinish() {
 		const currentAudioResource = this.getCurrentAudioResource();
-		const player = this.getPlayer();
+		const player = this.player;
 		if (!(currentAudioResource instanceof AudioResource)) return null;
 
 		const oldState: AudioPlayerPlayingState = {
@@ -246,11 +246,10 @@ export default class YouTubeInterface implements InterfaceDefinition {
 			const searchCache = await this.queue.redis.GET(namespace);
 
 			if (searchCache) {
-				console.log(`Video id ${videoId} found in cache! Using cache.`);
 				return JSON.parse(searchCache);
 			} else {
 				if (!ytdl.validateURL(url)) return null;
-				console.log(`Video id ${videoId} not found in cache! Getting video details.`);
+
 				const results = await ytdl.getBasicInfo(url);
 				const json = JSON.stringify(results);
 				await this.queue.redis.SET(namespace, json);

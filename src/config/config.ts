@@ -50,7 +50,8 @@ export enum ResponseEmojis {
 	'ArrowRight' = '➡️',
 	'Rubbish' = '🚮',
 	'Speaker' = '🔊',
-	'Scroll' = '📃'
+	'Scroll' = '📃',
+	'Pensive' = '😔'
 }
 
 export default config;
