@@ -27,12 +27,12 @@ TIP: Typing "/" in the Discord text channel will give you automatic suggestions 
 ## Technologies
 
 This bot is proudly powered with Node.js, TypeScript & Redis.
-It also uses the all-new Discord.js v13 library which leverages the latest Discord v9 bot API!
+It also uses the newest Discord.js v13 library which leverages the latest Discord v9 bot API!
 
 - Node.js v16/v17
 - Discord.js v13
 - TypeScript
-- Redis
+- Redis (using the new v4 npm library)
 
 Because of Discord.js v13 using the very new Discord v9 API, the bot leverages **slash commands** and **interactive message components**!
 
