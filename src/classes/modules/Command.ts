@@ -7,7 +7,6 @@ import { CommandInteraction, Guild, GuildMember, InteractionReplyOptions } from 
 export default class Command {
 	protected interaction: CommandInteraction;
 	protected invoked: Date; // A Date instance representing when this command was run.
-	protected handler?: typeof this;
 
 	constructor(interaction: CommandInteraction) {
 		this.interaction = interaction;
@@ -20,9 +19,6 @@ export default class Command {
 	 */
 	async init(ephemeral = true) {
 		if (this.commandName) {
-			const commandModule = await import(`bot-commands/modules/${this.commandName}`);
-			this.handler = commandModule.default;
-
 			await this.interaction.deferReply({ ephemeral });
 
 			return this;
