@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { Command, YouTubeInterface } from 'bot-classes';
+import { UserInteraction, YouTubeInterface } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import getYoutubePlaylistUrls from 'bot-functions/modules/getPlaylistUrls';
 import getYoutubePlaylistId from 'bot-functions/modules/getYouTubePlaylistId';
@@ -17,7 +17,7 @@ export default class Playlist implements BaseCommand {
 	}
 
 	async runner() {
-		const handler = await new Command(this.commandInteraction).init();
+		const handler = await new UserInteraction(this.commandInteraction).init();
 
 		try {
 			handler.voiceChannel;

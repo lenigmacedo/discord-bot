@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { Command, YouTubeInterface, YtdlVideoInfoResolved } from 'bot-classes';
+import { UserInteraction, YouTubeInterface, YtdlVideoInfoResolved } from 'bot-classes';
 import { globals, ResponseEmojis } from 'bot-config';
 import { getYouTubeUrls, initComponentInteractionHandler } from 'bot-functions';
 import { CommandInteraction, Message, MessageActionRow, MessageSelectMenu, MessageSelectOptionData } from 'discord.js';
@@ -16,7 +16,7 @@ export default class Search implements BaseCommand {
 	}
 
 	async runner() {
-		const handler = await new Command(this.commandInteraction).init();
+		const handler = await new UserInteraction(this.commandInteraction).init();
 
 		try {
 			handler.voiceChannel;

@@ -1,7 +1,7 @@
 import { ResponseEmojis } from 'bot-config';
 import { CommandInteraction, Guild, GuildMember, InteractionReplyOptions } from 'discord.js';
 
-export default class Command {
+export default class UserInteraction {
 	protected interaction: CommandInteraction;
 	protected invoked: Date; // A Date instance representing when this command was run.
 

@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { Command, YouTubeInterface, YtdlVideoInfoResolved } from 'bot-classes';
+import { UserInteraction, YouTubeInterface, YtdlVideoInfoResolved } from 'bot-classes';
 import config, { ColourScheme, ResponseEmojis } from 'bot-config';
 import { ColorResolvable, CommandInteraction, EmbedFieldData, Message, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
@@ -23,7 +23,7 @@ export default class Queue implements BaseCommand {
 
 	async runner() {
 		const ephemeral = this.commandInteraction.options.getBoolean('hide-in-chat') || false;
-		const handler = await new Command(this.commandInteraction).init(ephemeral);
+		const handler = await new UserInteraction(this.commandInteraction).init(ephemeral);
 
 		try {
 			const youtubeInterface = YouTubeInterface.getInterfaceForGuild(handler.guild);
@@ -129,7 +129,7 @@ export default class Queue implements BaseCommand {
 	 * @param botMessage An instance returned from a bot reply.
 	 * @param handler The Command instance with a valid commandInteraction instance applied to it.
 	 */
-	async registerButtonInteractionLogic(botMessage: Message, handler: Command) {
+	async registerButtonInteractionLogic(botMessage: Message, handler: UserInteraction) {
 		const collector = botMessage.createMessageComponentCollector({
 			time: config.queueButtonExpiryMilliseconds // Expires for memory reasons.
 		});

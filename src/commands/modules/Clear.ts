@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { Command, YouTubeInterface } from 'bot-classes';
+import { UserInteraction, YouTubeInterface } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { initComponentInteractionHandler } from 'bot-functions';
 import { CommandInteraction, Message, MessageActionRow, MessageButton } from 'discord.js';
@@ -13,7 +13,7 @@ export default class Clear implements BaseCommand {
 	}
 
 	async runner() {
-		const handler = await new Command(this.commandInteraction).init();
+		const handler = await new UserInteraction(this.commandInteraction).init();
 
 		try {
 			handler.voiceChannel;
