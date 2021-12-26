@@ -56,5 +56,4 @@ export enum ResponseEmojis {
 
 export default config;
 
-export { default as commands } from './modules/commands';
 export { default as globals } from './modules/globals';

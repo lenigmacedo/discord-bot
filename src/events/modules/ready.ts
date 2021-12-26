@@ -1,7 +1,7 @@
 import config, { globals } from 'bot-config';
 import { Client } from 'discord.js';
 
-const ready = (client: Client) => {
+const ready = async (client: Client) => {
 	console.log(`Bot logged in as ${client.user?.username}!`);
 	console.log(`Environment: ${config.environment}`);
 

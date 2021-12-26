@@ -1,15 +1,24 @@
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { Command, YouTubeInterface, YtdlVideoInfoResolved } from 'bot-classes';
 import config, { ColourScheme, ResponseEmojis } from 'bot-config';
 import { ColorResolvable, CommandInteraction, EmbedFieldData, Message, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 
-export class Queue implements BaseCommand {
+export default class Queue implements BaseCommand {
 	commandInteraction: CommandInteraction;
 	page: number = 0;
 	pageCount: number = 0;
 
 	constructor(commandInteraction: CommandInteraction) {
 		this.commandInteraction = commandInteraction;
+	}
+
+	register() {
+		return new SlashCommandBuilder()
+			.setName('queue')
+			.setDescription('Get a list of all the items in the queue.')
+			.addIntegerOption(option => option.setName('page').setDescription('Page number for if your queue is really long!'))
+			.addBooleanOption(option => option.setName('hide-in-chat').setDescription('Want no one to tamper with your queue? Set this to true.'));
 	}
 
 	async runner() {

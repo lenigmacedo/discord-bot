@@ -1,13 +1,13 @@
 import { ResponseEmojis } from 'bot-config';
 import { CommandInteraction, Guild, GuildMember, InteractionReplyOptions } from 'discord.js';
 
-/**
- * A toolbox for making interactions between the bot and the user easier.
- */
 export default class Command {
 	protected interaction: CommandInteraction;
 	protected invoked: Date; // A Date instance representing when this command was run.
 
+	/**
+	 * A toolbox for making interactions between the bot and the user easier.
+	 */
 	constructor(interaction: CommandInteraction) {
 		this.interaction = interaction;
 		this.invoked = new Date();

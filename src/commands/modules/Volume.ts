@@ -1,10 +1,18 @@
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { Command, YouTubeInterface } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 
-export class Volume implements BaseCommand {
+export default class Volume implements BaseCommand {
 	constructor(public commandInteraction: CommandInteraction) {}
+
+	register() {
+		return new SlashCommandBuilder()
+			.setName('volume')
+			.setDescription('Set the volume of the bot. Affects all listeners.')
+			.addIntegerOption(option => option.setName('level').setRequired(true).setDescription('Value between 0 and 100.'));
+	}
 
 	async runner() {
 		const handler = await new Command(this.commandInteraction).init();

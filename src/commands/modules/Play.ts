@@ -1,11 +1,24 @@
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { Command, YouTubeInterface } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { getYouTubeUrls, safeJoinVoiceChannel } from 'bot-functions';
 import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 
-export class Play implements BaseCommand {
+export default class Play implements BaseCommand {
 	constructor(public commandInteraction: CommandInteraction) {}
+
+	register() {
+		return new SlashCommandBuilder()
+			.setName('play')
+			.setDescription('If the bot is not busy, you can play something. Then it will continue the queue.')
+			.addStringOption(option =>
+				option
+					.setName('url-or-query')
+					.setDescription('A search query or YouTube URL. First result from the search query will be used.')
+					.setRequired(true)
+			);
+	}
 
 	async runner() {
 		const handler = await new Command(this.commandInteraction).init();

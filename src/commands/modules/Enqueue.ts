@@ -1,10 +1,18 @@
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { Command, YouTubeInterface } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 
-export class Enqueue implements BaseCommand {
+export default class Enqueue implements BaseCommand {
 	constructor(public commandInteraction: CommandInteraction) {}
+
+	register() {
+		return new SlashCommandBuilder()
+			.setName('enqueue')
+			.setDescription('Add a YouTube video to the end of the queue.')
+			.addStringOption(option => option.setName('url').setDescription('The YouTube video URL.').setRequired(true));
+	}
 
 	async runner() {
 		const handler = await new Command(this.commandInteraction).init();

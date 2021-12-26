@@ -1,11 +1,19 @@
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { Command, YouTubeInterface, YtdlVideoInfoResolved } from 'bot-classes';
 import { globals, ResponseEmojis } from 'bot-config';
 import { getYouTubeUrls, initComponentInteractionHandler } from 'bot-functions';
 import { CommandInteraction, Message, MessageActionRow, MessageSelectMenu, MessageSelectOptionData } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 
-export class Search implements BaseCommand {
+export default class Search implements BaseCommand {
 	constructor(public commandInteraction: CommandInteraction) {}
+
+	register() {
+		return new SlashCommandBuilder()
+			.setName('search')
+			.setDescription('Search YouTube for videos and use an interactive dropdown to select a result.')
+			.addStringOption(option => option.setName('search-query').setDescription('The video you would like to search for.').setRequired(true));
+	}
 
 	async runner() {
 		const handler = await new Command(this.commandInteraction).init();

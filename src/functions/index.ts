@@ -5,4 +5,5 @@ export { default as getYouTubeUrl } from './modules/getYouTubeUrl';
 export { default as getYouTubeUrls } from './modules/getYouTubeUrls';
 export { default as getYouTubeVideoId } from './modules/getYouTubeVideoId';
 export { default as initComponentInteractionHandler } from './modules/initOneTimeUseComponentInteraction';
+export { default as registerCommands } from './modules/registerCommands';
 export { default as safeJoinVoiceChannel } from './modules/safeJoinVoiceChannel';

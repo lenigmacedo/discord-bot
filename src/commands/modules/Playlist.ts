@@ -1,3 +1,4 @@
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { Command, YouTubeInterface } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import getYoutubePlaylistUrls from 'bot-functions/modules/getPlaylistUrls';
@@ -5,8 +6,15 @@ import getYoutubePlaylistId from 'bot-functions/modules/getYouTubePlaylistId';
 import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 
-export class Playlist implements BaseCommand {
+export default class Playlist implements BaseCommand {
 	constructor(public commandInteraction: CommandInteraction) {}
+
+	register() {
+		return new SlashCommandBuilder()
+			.setName('playlist')
+			.setDescription(`Import a playlist into the queue.`)
+			.addStringOption(option => option.setName('url').setDescription('The URL containing the playlist ID.').setRequired(true));
+	}
 
 	async runner() {
 		const handler = await new Command(this.commandInteraction).init();

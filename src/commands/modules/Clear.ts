@@ -1,11 +1,16 @@
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { Command, YouTubeInterface } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { initComponentInteractionHandler } from 'bot-functions';
 import { CommandInteraction, Message, MessageActionRow, MessageButton } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 
-export class Clear implements BaseCommand {
+export default class Clear implements BaseCommand {
 	constructor(public commandInteraction: CommandInteraction) {}
+
+	register() {
+		return new SlashCommandBuilder().setName('clear').setDescription('Clear the entire queue.');
+	}
 
 	async runner() {
 		const handler = await new Command(this.commandInteraction).init();

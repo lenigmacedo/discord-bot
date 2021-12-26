@@ -1,10 +1,15 @@
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { Command, YouTubeInterface } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 
-export class Skip implements BaseCommand {
+export default class Skip implements BaseCommand {
 	constructor(public commandInteraction: CommandInteraction) {}
+
+	register() {
+		return new SlashCommandBuilder().setName('skip').setDescription('Skip the current audio.');
+	}
 
 	async runner() {
 		const handler = await new Command(this.commandInteraction).init();

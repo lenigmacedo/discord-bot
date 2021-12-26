@@ -1,10 +1,20 @@
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { Command, YouTubeInterface } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 
-export class Remove implements BaseCommand {
+export default class Remove implements BaseCommand {
 	constructor(public commandInteraction: CommandInteraction) {}
+
+	register() {
+		return new SlashCommandBuilder()
+			.setName('remove')
+			.setDescription('Remove an item from the queue with its queue number.')
+			.addIntegerOption(option =>
+				option.setName('item-number').setDescription('The item number. You can use /queue to identify this.').setRequired(true)
+			);
+	}
 
 	async runner() {
 		const handler = await new Command(this.commandInteraction).init();

@@ -18,9 +18,6 @@ import { BaseAudioInterface } from '../BaseAudioInterface';
 type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
 export type YtdlVideoInfoResolved = Awaited<ReturnType<typeof ytdl.getBasicInfo>>;
 
-/**
- * An easy toolbox for managing audio for this bot.
- */
 export default class YouTubeInterface implements BaseAudioInterface {
 	private audioPlayer: AudioPlayer;
 	private volume: number;
@@ -28,6 +25,9 @@ export default class YouTubeInterface implements BaseAudioInterface {
 	private currentResource?: AudioResource | null;
 	queue: QueueManager;
 
+	/**
+	 * An easy toolbox for managing audio for this bot.
+	 */
 	constructor(guild: Guild) {
 		this.audioPlayer = createAudioPlayer();
 		this.volume = config.audioVolume;

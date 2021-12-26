@@ -1,10 +1,15 @@
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { Command, YouTubeInterface } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 
-export class Resume implements BaseCommand {
+export default class Resume implements BaseCommand {
 	constructor(public commandInteraction: CommandInteraction) {}
+
+	register() {
+		return new SlashCommandBuilder().setName('resume').setDescription('Resume the bot if it is paused.');
+	}
 
 	async runner() {
 		const handler = await new Command(this.commandInteraction).init();

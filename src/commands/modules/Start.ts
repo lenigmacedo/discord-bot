@@ -1,11 +1,16 @@
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { Command, YouTubeInterface } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { safeJoinVoiceChannel } from 'bot-functions';
 import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 
-export class Start implements BaseCommand {
+export default class Start implements BaseCommand {
 	constructor(public commandInteraction: CommandInteraction) {}
+
+	register() {
+		return new SlashCommandBuilder().setName('start').setDescription('Start the queue if the bot is not already playing.');
+	}
 
 	async runner() {
 		const handler = await new Command(this.commandInteraction).init();

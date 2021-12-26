@@ -2,13 +2,13 @@ import config, { globals } from 'bot-config';
 import { getYouTubeUrl, getYouTubeVideoId } from 'bot-functions';
 import { Guild } from 'discord.js';
 
-/**
- * An easy toolbox for managing audio for this bot.
- */
 export default class QueueManager {
 	guild: Guild;
 	redisQueueNamespace: string;
 
+	/**
+	 * An easy toolbox for managing audio for this bot.
+	 */
 	constructor(guild: Guild, namespace: string) {
 		this.guild = guild;
 		this.redisQueueNamespace = `${config.redisNamespace}:${guild.id}:queue:${namespace}`;

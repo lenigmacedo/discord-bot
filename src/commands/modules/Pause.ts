@@ -1,10 +1,15 @@
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { Command, YouTubeInterface } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 
-export class Pause implements BaseCommand {
+export default class Pause implements BaseCommand {
 	constructor(public commandInteraction: CommandInteraction) {}
+
+	register() {
+		return new SlashCommandBuilder().setName('pause').setDescription('Pause the bot from playing audio.');
+	}
 
 	async runner() {
 		const handler = await new Command(this.commandInteraction).init();

@@ -1,10 +1,15 @@
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { Command, YouTubeInterface } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 
-export class Stop implements BaseCommand {
+export default class Stop implements BaseCommand {
 	constructor(public commandInteraction: CommandInteraction) {}
+
+	register() {
+		return new SlashCommandBuilder().setName('stop').setDescription('Stop the bot from playing.');
+	}
 
 	async runner() {
 		const handler = await new Command(this.commandInteraction).init();
