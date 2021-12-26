@@ -8,7 +8,7 @@ export interface BaseCommand {
 	commandInteraction: CommandInteraction;
 
 	/**
-	 * The JavaScript object representing a new UserInteraction.
+	 * The JavaScript object representing a new command.
 	 * This command will be sent to the Discord API as a slash command.
 	 * You MUST make sure that the name of the slash command and the filename are the same!
 	 * The filename and classname of the command MUST be uppercase as per convention, but the slash command registration can stay lowercase.
