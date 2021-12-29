@@ -44,11 +44,6 @@ export abstract class BaseAudioInterface {
 	abstract getCurrentAudioResource(): AudioResource | null;
 
 	/**
-	 * Download the audio resource
-	 */
-	abstract download(queueItemIndex: number): Promise<AudioResource | null>;
-
-	/**
 	 * Emit a fake audio finish event to be used to simulate a track finishing. Useful for skipping.
 	 */
 	abstract emitAudioFinish(): true | null;

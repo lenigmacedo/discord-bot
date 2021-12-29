@@ -1,6 +1,6 @@
 import config, { globals } from 'bot-config';
-import { getYouTubeUrl, getYouTubeVideoId } from 'bot-functions';
 import { Guild } from 'discord.js';
+import { YouTubeVideo } from '..';
 
 export default class QueueManager {
 	guild: Guild;
@@ -24,24 +24,28 @@ export default class QueueManager {
 
 	/**
 	 * Append an item to the queue.
-	 * @param key A YouTube URL or ID.
+	 * @param url A YouTube video ID.
 	 */
-	async queueAppend(key: string) {
-		const videoId = getYouTubeVideoId(key);
-		if (!videoId) return null;
-		await this.redis.RPUSH(this.redisQueueNamespace, videoId);
-		return true;
+	async queueAppend(youtubeVideo: YouTubeVideo) {
+		if (youtubeVideo.id) {
+			await this.redis.RPUSH(this.redisQueueNamespace, youtubeVideo.id);
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
 	 * Add a video id to the #1 spot in the queue.
-	 * @param key A YouTube URL or ID.
+	 * @param url A YouTube video ID.
 	 */
-	async queuePrepend(key: string) {
-		const videoId = getYouTubeVideoId(key);
-		if (!videoId) return null;
-		await this.redis.LPUSH(this.redisQueueNamespace, videoId);
-		return true;
+	async queuePrepend(youtubeVideo: YouTubeVideo) {
+		if (youtubeVideo.id) {
+			await this.redis.LPUSH(this.redisQueueNamespace, youtubeVideo.id);
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -54,7 +58,7 @@ export default class QueueManager {
 		const startIndex = pageIndex * limit;
 		const endIndex = pageIndex * limit + limit - 1;
 		const videoIds = await this.redis.LRANGE(this.redisQueueNamespace, startIndex, endIndex);
-		const urls = videoIds.map(getYouTubeUrl).filter(url => typeof url === 'string') as string[];
+		const urls = videoIds.map(videoId => YouTubeVideo.fromId(videoId));
 		return urls;
 	}
 
@@ -64,7 +68,7 @@ export default class QueueManager {
 	 */
 	async queueGetFromIndex(index: number) {
 		const results = await this.redis.LRANGE(this.redisQueueNamespace, index, index);
-		return results[0];
+		return YouTubeVideo.fromId(results[0]);
 	}
 
 	/**
@@ -73,8 +77,8 @@ export default class QueueManager {
 	async queueGetOldest() {
 		const result = await this.queueGetFromIndex(0);
 		if (!result) return null;
-		const url = getYouTubeUrl(result);
-		return url;
+
+		return result;
 	}
 
 	/**
@@ -84,7 +88,7 @@ export default class QueueManager {
 	async queueDelete(index: number) {
 		const queueItem = await this.queueGetFromIndex(index);
 		if (!queueItem) return false;
-		const result = await this.redis.LREM(this.redisQueueNamespace, 0, queueItem);
+		const result = await this.redis.LREM(this.redisQueueNamespace, 0, queueItem.id);
 		if (result) return true;
 		return false;
 	}

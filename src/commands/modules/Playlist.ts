@@ -1,8 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { UserInteraction, YouTubeInterface } from 'bot-classes';
+import { UserInteraction, YouTubeInterface, YouTubePlaylist, YouTubeVideo } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
-import getYoutubePlaylistUrls from 'bot-functions/modules/getPlaylistUrls';
-import getYoutubePlaylistId from 'bot-functions/modules/getYouTubePlaylistId';
 import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 
@@ -24,16 +22,16 @@ export default class Playlist implements BaseCommand {
 
 			const audioInterface = YouTubeInterface.getInterfaceForGuild(handler.guild);
 			const playlistUrl = handler.commandInteraction.options.getString('url', true);
-			const playlistId = getYoutubePlaylistId(playlistUrl);
+			const youtubePlaylist = YouTubePlaylist.fromUrl(playlistUrl);
 
-			if (!playlistId) {
+			if (!youtubePlaylist.id) {
 				await handler.editWithEmoji('URL provided is not valid, try again?', ResponseEmojis.Danger);
 				return;
 			}
 
 			await handler.editWithEmoji('Searching for videos in the playlist. Please wait...', ResponseEmojis.Loading);
-			const videoUrlsFromPlaylist = await getYoutubePlaylistUrls(playlistId);
-			const awaitingAppendedUrls = videoUrlsFromPlaylist.map(videoUrl => audioInterface.queue.queueAppend(videoUrl));
+			const videoUrlsFromPlaylist = await youtubePlaylist.fetchVideoUrls();
+			const awaitingAppendedUrls = videoUrlsFromPlaylist.map(videoUrl => audioInterface.queue.queueAppend(YouTubeVideo.fromUrl(videoUrl)));
 			const resolvedAppendedUrls = await Promise.all(awaitingAppendedUrls);
 			const filteredAppendedUrls = resolvedAppendedUrls.filter(Boolean);
 			const totalAppendedUrls = filteredAppendedUrls.length;

@@ -10,7 +10,6 @@ import {
 } from '@discordjs/voice';
 import { QueueManager } from 'bot-classes';
 import config, { globals } from 'bot-config';
-import { downloadYouTubeVideo, getYouTubeUrl } from 'bot-functions';
 import { Guild } from 'discord.js';
 import ytdl from 'ytdl-core-discord';
 import { BaseAudioInterface } from '../BaseAudioInterface';
@@ -47,32 +46,13 @@ export default class YouTubeInterface implements BaseAudioInterface {
 	}
 
 	/**
-	 * Download a Discord audio resource via ytdl.
-	 * @param queueItemIndex The queue item index.
-	 */
-	async download(queueItemIndex: number = 0) {
-		try {
-			const queueLength = await this.queue.queueLength();
-			if (queueItemIndex >= queueLength) return null;
-			const queueItem = await this.queue.queueGetFromIndex(queueItemIndex);
-			const queueItemUrl = getYouTubeUrl(queueItem);
-			if (!queueItemUrl) return null;
-			const audioResource = await downloadYouTubeVideo(queueItemUrl);
-			return audioResource;
-		} catch (error) {
-			console.error(error);
-			return null;
-		}
-	}
-
-	/**
 	 * Get the video info. By default it is the first item in the queue.
 	 * @param queueItemIndex The queue item index.
 	 */
 	async getItemInfo(queueItemIndex: number = 0) {
 		const queueItem = await this.queue.queueGetFromIndex(queueItemIndex);
 		if (!queueItem) return null;
-		const info = await this.getDetails(queueItem);
+		const info = await this.getDetails(queueItem.url);
 		return info;
 	}
 
@@ -101,14 +81,15 @@ export default class YouTubeInterface implements BaseAudioInterface {
 		return new Promise(async resolve => {
 			try {
 				const player = this.player;
+				const youtubeVideo = await this.queue.queueGetOldest();
 				const queueLength = await this.queue.queueLength();
 
-				if (queueLength < 1) {
+				if (!youtubeVideo || !queueLength) {
 					resolve(null);
 					return;
 				}
 
-				const audioResource = await this.download();
+				const audioResource = await youtubeVideo.download();
 
 				const onIdleCallback = async (oldState: AudioPlayerState, newState: AudioPlayerState) => {
 					if (oldState.status === 'playing' && newState.status === 'idle') {

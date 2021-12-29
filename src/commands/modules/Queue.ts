@@ -82,7 +82,7 @@ export default class Queue implements BaseCommand {
 	 */
 	async getPageEmbedFieldData(youtubeInterface: YouTubeInterface) {
 		const queue = await youtubeInterface.queue.queueGetMultiple(this.page);
-		const videoDetailPromiseArray = queue.map(url => youtubeInterface?.getDetails(url));
+		const videoDetailPromiseArray = queue.map(youtubeVideo => youtubeInterface?.getDetails(youtubeVideo.url));
 		const videoDetails = (await Promise.all(videoDetailPromiseArray)) as YtdlVideoInfoResolved[];
 
 		const embedFields: EmbedFieldData[] = videoDetails.map((videoDetails, index) => {
@@ -90,16 +90,11 @@ export default class Queue implements BaseCommand {
 			const itemNumber = index + 1 + itemNumberOffset;
 			const videoDetailsObj = videoDetails?.videoDetails;
 
-			if (!videoDetailsObj?.title || !videoDetailsObj.description) {
-				return {
-					name: `${itemNumber}) ${ResponseEmojis.Danger} FAILED`,
-					value: `Video private or age restricted or something else.`
-				};
-			}
-
 			return {
-				name: `${itemNumber}) ${videoDetailsObj.title.substring(0, 100)}`,
-				value: `By \`${videoDetailsObj.author.name}\`.\n>> ${videoDetailsObj.video_url}`
+				name: videoDetailsObj?.title ? `${itemNumber}) ${videoDetailsObj.title.substring(0, 100)}` : `${itemNumber}) ${ResponseEmojis.Danger} FAILED`,
+				value: videoDetailsObj?.description
+					? `By \`${videoDetailsObj.author.name}\`.\n>> ${videoDetailsObj.video_url}`
+					: `No description could be found.`
 			};
 		});
 

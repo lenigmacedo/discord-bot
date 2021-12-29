@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { UserInteraction, YouTubeInterface } from 'bot-classes';
+import { UserInteraction, YouTubeInterface, YouTubeVideo } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
-import { getYouTubeUrls, safeJoinVoiceChannel } from 'bot-functions';
+import { safeJoinVoiceChannel } from 'bot-functions';
 import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 
@@ -13,10 +13,7 @@ export default class Play implements BaseCommand {
 			.setName('play')
 			.setDescription('If the bot is not busy, you can play something. Then it will continue the queue.')
 			.addStringOption(option =>
-				option
-					.setName('url-or-query')
-					.setDescription('A search query or YouTube URL. First result from the search query will be used.')
-					.setRequired(true)
+				option.setName('query').setDescription('A search query. First result from the search query will be used.').setRequired(true)
 			);
 	}
 
@@ -26,7 +23,7 @@ export default class Play implements BaseCommand {
 		try {
 			handler.voiceChannel;
 
-			const queryOrUrl = handler.commandInteraction.options.getString('url-or-query', true);
+			const query = handler.commandInteraction.options.getString('query', true);
 			const youtubeInterface = YouTubeInterface.getInterfaceForGuild(handler.guild);
 
 			if (youtubeInterface.getBusyStatus()) {
@@ -34,26 +31,18 @@ export default class Play implements BaseCommand {
 				return;
 			}
 
-			let prepended = await youtubeInterface.queue.queuePrepend(queryOrUrl);
-			let url = '';
+			const [video] = await YouTubeVideo.search(query, 1);
 
-			if (!prepended) {
-				console.log('Query not URL, trying a search...');
-				const urls = await getYouTubeUrls(queryOrUrl, 1);
-				url = urls[0];
-				prepended = await youtubeInterface.queue.queuePrepend(url);
-
-				if (!prepended) {
-					await handler.editWithEmoji('I could not find a video. Try something less specific?', ResponseEmojis.Danger);
-					return;
-				}
-			} else {
-				url = queryOrUrl;
+			if (!video?.id?.videoId) {
+				await handler.editWithEmoji('I could not find a video. Try something less specific?', ResponseEmojis.Danger);
+				return;
 			}
 
+			const youtubeVideo = YouTubeVideo.fromId(video.id.videoId);
+			await youtubeInterface.queue.queuePrepend(youtubeVideo);
 			await handler.editWithEmoji('Preparing to play...', ResponseEmojis.Loading);
 			youtubeInterface.setConnection(safeJoinVoiceChannel(handler.commandInteraction));
-			const videoDetails = await youtubeInterface.getDetails(url);
+			const videoDetails = await youtubeInterface.getDetails(youtubeVideo.url);
 
 			if (videoDetails) {
 				await handler.commandInteraction.editReply(`🔊 Playing \`${videoDetails?.videoDetails.title}\`.`);

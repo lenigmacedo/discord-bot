@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { UserInteraction, YouTubeInterface } from 'bot-classes';
+import { UserInteraction, YouTubeInterface, YouTubeVideo } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
@@ -23,6 +23,7 @@ export default class Enqueue implements BaseCommand {
 			const youtubeInterface = YouTubeInterface.getInterfaceForGuild(handler.guild);
 			const youtubeUrl = handler.commandInteraction.options.getString('url', true);
 			const videoDetails = await youtubeInterface.getDetails(youtubeUrl);
+			const youtubeVideo = YouTubeVideo.fromUrl(youtubeUrl);
 
 			if (!videoDetails) {
 				await handler.editWithEmoji(
@@ -32,7 +33,7 @@ export default class Enqueue implements BaseCommand {
 				return;
 			}
 
-			const appended = await youtubeInterface.queue.queueAppend(youtubeUrl);
+			const appended = await youtubeInterface.queue.queueAppend(youtubeVideo);
 
 			if (appended) await handler.editWithEmoji(`Enqueued \`${videoDetails.videoDetails.title}\`.`, ResponseEmojis.Success);
 			else await handler.editWithEmoji('I could not add that item to the queue. Is it a valid URL?', ResponseEmojis.Danger);

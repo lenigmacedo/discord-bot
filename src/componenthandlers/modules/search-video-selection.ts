@@ -1,4 +1,4 @@
-import { YouTubeInterface } from 'bot-classes';
+import { YouTubeInterface, YouTubeVideo } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { Guild } from 'discord.js';
 import { MessageComponentHandler } from '../MessageComponentHandler.types';
@@ -15,12 +15,13 @@ const searchVideoSelection: MessageComponentHandler = async interaction => {
 
 		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
 		const value = interaction?.values[0];
+		const youtubeVideo = YouTubeVideo.fromUrl(value);
 
 		if (!value) {
 			await interaction.reply(`${ResponseEmojis.Danger} I could not find the video from the selection. Try again?`);
 		}
 
-		const appended = await audioInterface.queue.queueAppend(value);
+		const appended = await audioInterface.queue.queueAppend(youtubeVideo);
 
 		if (appended) {
 			await interaction.reply(`${ResponseEmojis.Success} I have added it to the queue!`);

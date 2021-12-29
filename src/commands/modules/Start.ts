@@ -40,7 +40,8 @@ export default class Start implements BaseCommand {
 				return;
 			}
 
-			const videoDetails = await audioInterface.getDetails((await audioInterface.queue.queueGetOldest()) as string);
+			const nextVideo = await audioInterface.queue.queueGetOldest();
+			const videoDetails = await audioInterface.getDetails(nextVideo?.url as string);
 
 			if (videoDetails) {
 				await handler.editWithEmoji(`I am now playing the queue. First up \`${videoDetails.videoDetails.title}\`!`, ResponseEmojis.Speaker);
