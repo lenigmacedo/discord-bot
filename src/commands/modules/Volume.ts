@@ -15,7 +15,7 @@ export default class Volume implements BaseCommand {
 	}
 
 	async runner() {
-		const handler = await new UserInteraction(this.commandInteraction).init();
+		const handler = await new UserInteraction(this.commandInteraction).init(false);
 
 		try {
 			handler.voiceChannel;

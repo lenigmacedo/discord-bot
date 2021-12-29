@@ -9,7 +9,7 @@ This small guide will give you the do's of contributing. I don't know so much ab
 - You must pad (adding empty line on both the top and bottom) to the following:
   - Blocks - `{}`.
   - **Multi-line** expressions - `()`.
-  - **Multi-line** chained method calls - `method1().method2().method3()` if not an array item (example of such exception is in `/src/config/modules/commands.ts`).
+  - **Multi-line** chained method calls - `method1().method2().method3()` if not an array item.
 - Everything else needs to not be spaced at all.
 - Follow the rules in the .prettierrc.yml file. If you use Prettier, this file should work automatically. If your config ignores this config, I will not merge your PR.
 - All variables EXCEPT Redis methods should be camelCased. Redis methods should be capitalised.

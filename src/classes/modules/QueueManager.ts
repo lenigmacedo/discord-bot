@@ -24,7 +24,7 @@ export default class QueueManager {
 
 	/**
 	 * Append an item to the queue.
-	 * @param url A YouTube video ID.
+	 * @param url A YouTube video URL.
 	 */
 	async queueAppend(youtubeVideo: YouTubeVideo) {
 		if (youtubeVideo.id) {
@@ -37,7 +37,7 @@ export default class QueueManager {
 
 	/**
 	 * Add a video id to the #1 spot in the queue.
-	 * @param url A YouTube video ID.
+	 * @param url A YouTube video URL.
 	 */
 	async queuePrepend(youtubeVideo: YouTubeVideo) {
 		if (youtubeVideo.id) {
