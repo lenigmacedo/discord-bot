@@ -19,8 +19,8 @@ export default class Clear implements BaseCommand {
 			handler.voiceChannel;
 
 			const guild = handler.guild;
-			const youtubeHandler = YouTubeInterface.getInterfaceForGuild(guild);
-			const queueLength = await youtubeHandler.queue.queueLength();
+			const youtubeHandler = YouTubeInterface.fromGuild(guild);
+			const queueLength = await youtubeHandler.queue.length();
 
 			if (queueLength < 1) {
 				handler.editWithEmoji('The queue is empty!', ResponseEmojis.Info);
@@ -44,8 +44,7 @@ export default class Clear implements BaseCommand {
 				initComponentInteractionHandler(botMessage, handler.commandInteraction);
 			}
 		} catch (error: any) {
-			handler.editWithEmoji(error.message, ResponseEmojis.Danger);
-			console.error(error);
+			await handler.oops(error);
 		}
 	}
 }

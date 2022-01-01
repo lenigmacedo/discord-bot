@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { UserInteraction, YouTubeInterface, YouTubeVideo, YtdlVideoInfoResolved } from 'bot-classes';
+import { UserInteraction, YouTubeVideo } from 'bot-classes';
+import { YtdlVideoInfoResolved } from 'bot-classes/modules/YouTubeVideo';
 import { globals, ResponseEmojis } from 'bot-config';
 import { initComponentInteractionHandler } from 'bot-functions';
 import { CommandInteraction, Message, MessageActionRow, MessageSelectMenu, MessageSelectOptionData } from 'discord.js';
@@ -33,8 +34,7 @@ export default class Search implements BaseCommand {
 				return;
 			}
 
-			const audioInterface = YouTubeInterface.getInterfaceForGuild(handler.guild);
-			const unresolvedVideoDetails = searchResult.map(url => audioInterface.getDetails(url));
+			const unresolvedVideoDetails = searchResult.map(url => YouTubeVideo.fromUrl(url).info());
 			const resolvedVideoDetails = await Promise.all(unresolvedVideoDetails);
 			const filteredVideoDetails = resolvedVideoDetails.filter(Boolean) as YtdlVideoInfoResolved[];
 
@@ -66,8 +66,7 @@ export default class Search implements BaseCommand {
 
 			initComponentInteractionHandler(botMessage, handler.commandInteraction);
 		} catch (error: any) {
-			handler.editWithEmoji(error.message, ResponseEmojis.Danger);
-			console.error(error);
+			await handler.oops(error);
 		}
 	}
 }

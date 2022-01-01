@@ -1,4 +1,4 @@
-import config from 'bot-config';
+import { config } from 'bot-config';
 import { interactionCreate, ready } from 'bot-events';
 import { registerCommands } from 'bot-functions';
 import { Client } from 'discord.js';

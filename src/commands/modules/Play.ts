@@ -24,9 +24,9 @@ export default class Play implements BaseCommand {
 			handler.voiceChannel;
 
 			const query = handler.commandInteraction.options.getString('query', true);
-			const youtubeInterface = YouTubeInterface.getInterfaceForGuild(handler.guild);
+			const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
 
-			if (youtubeInterface.getBusyStatus()) {
+			if (youtubeInterface.busy) {
 				await handler.editWithEmoji('I am busy!', ResponseEmojis.Danger);
 				return;
 			}
@@ -39,13 +39,13 @@ export default class Play implements BaseCommand {
 			}
 
 			const youtubeVideo = YouTubeVideo.fromId(video.id.videoId);
-			await youtubeInterface.queue.queuePrepend(youtubeVideo);
+			await youtubeInterface.queue.prepend(youtubeVideo.id);
 			await handler.editWithEmoji('Preparing to play...', ResponseEmojis.Loading);
 			youtubeInterface.setConnection(safeJoinVoiceChannel(handler.commandInteraction));
-			const videoDetails = await youtubeInterface.getDetails(youtubeVideo.url);
+			const videoDetails = await youtubeVideo.info();
 
 			if (videoDetails) {
-				await handler.commandInteraction.editReply(`🔊 Playing \`${videoDetails?.videoDetails.title}\`.`);
+				await handler.commandInteraction.editReply(`🔊 Playing \`${videoDetails?.videoDetails?.title}\`.`);
 			} else {
 				await handler.editWithEmoji(
 					'Unable to play the video. It might be private, age restricted or something else. It will be skipped.',
@@ -53,11 +53,10 @@ export default class Play implements BaseCommand {
 				);
 			}
 
-			while (await youtubeInterface.queueRunner());
+			while (await youtubeInterface.runner());
 			youtubeInterface.deleteConnection();
 		} catch (error: any) {
-			handler.editWithEmoji(error.message, ResponseEmojis.Danger);
-			console.error(error);
+			await handler.oops(error);
 		}
 	}
 }

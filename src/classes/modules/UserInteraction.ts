@@ -90,4 +90,16 @@ export default class UserInteraction {
 
 		return this.interaction.editReply(message);
 	}
+
+	/**
+	 * Respond to the user on Discord with a generic message saying something went wrong.
+	 * Will also log the error to the console.
+	 */
+	oops(error: any) {
+		console.error(error);
+		return this.editWithEmoji(
+			error?.message?.trim(1500) || 'There was a problem executing your request. The reason is unknown.',
+			ResponseEmojis.Danger
+		);
+	}
 }

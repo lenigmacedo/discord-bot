@@ -1,4 +1,4 @@
-import config from 'bot-config';
+import { config } from 'bot-config';
 import { CollectorFilter, CommandInteraction, Message, MessageComponentInteraction } from 'discord.js';
 
 type ComponentInteractionFilter = CollectorFilter<[MessageComponentInteraction]>;

@@ -17,7 +17,7 @@ export default class Skip implements BaseCommand {
 		try {
 			handler.voiceChannel;
 
-			const audioInterface = YouTubeInterface.getInterfaceForGuild(handler.guild);
+			const audioInterface = YouTubeInterface.fromGuild(handler.guild);
 			const skipped = audioInterface.emitAudioFinish();
 
 			if (skipped) {
@@ -26,8 +26,7 @@ export default class Skip implements BaseCommand {
 				await handler.editWithEmoji('I cannot skip as I am not playing anything!', ResponseEmojis.Danger);
 			}
 		} catch (error: any) {
-			handler.editWithEmoji(error.message, ResponseEmojis.Danger);
-			console.error(error);
+			await handler.oops(error);
 		}
 	}
 }

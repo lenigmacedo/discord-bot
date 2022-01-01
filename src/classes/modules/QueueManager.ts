@@ -1,81 +1,93 @@
-import config, { globals } from 'bot-config';
+import { config } from 'bot-config';
 import { Guild } from 'discord.js';
-import { YouTubeVideo } from '..';
+import { createClient } from 'redis';
 
 export default class QueueManager {
-	guild: Guild;
-	redisQueueNamespace: string;
+	static client = createClient({ url: `redis://${config.redisHost}:${config.redisPort}` });
+	namespace: string;
 
 	/**
-	 * An easy toolbox for managing audio for this bot.
+	 * An easy dependencyless queue manager for managing dynamic lists using Redis.
 	 */
-	constructor(guild: Guild, namespace: string) {
-		this.guild = guild;
-		this.redisQueueNamespace = `${config.redisNamespace}:${guild.id}:queue:${namespace}`;
+	constructor(guildId: string, namespace: string) {
+		this.namespace = `${config.redisNamespace}:${guildId}:queue:${namespace}`; // appname:guildid:queue:custom
 	}
 
 	/**
-	 * Get the redis client instance
-	 * Is getter to store method in prototype.
+	 * Open a connection to Redis.
 	 */
-	get redis() {
-		return globals.redisClient;
+	async open() {
+		if (!this.client.isOpen) await this.client.connect();
+	}
+
+	/**
+	 * Close the connection to Redis.
+	 */
+	async close() {
+		if (this.client.isOpen) await this.client.disconnect();
+	}
+
+	/**
+	 *
+	 * @param guild The Discord.js Guild instance.
+	 * @param namespace The namespace to organise multiple queues for a guild.
+	 */
+	static fromGuild(guild: Guild, namespace: string) {
+		return new this(guild.id, namespace);
+	}
+
+	/**
+	 * Get the static Redis client instance on this object.
+	 */
+	get client() {
+		return QueueManager.client;
 	}
 
 	/**
 	 * Append an item to the queue.
-	 * @param url A YouTube video URL.
+	 * @param value A value to add.
+	 * @returns A number of how many values were added.
 	 */
-	async queueAppend(youtubeVideo: YouTubeVideo) {
-		if (youtubeVideo.id) {
-			await this.redis.RPUSH(this.redisQueueNamespace, youtubeVideo.id);
-			return true;
-		}
-
-		return false;
+	add(value: string) {
+		return this.client.RPUSH(this.namespace, value);
 	}
 
 	/**
-	 * Add a video id to the #1 spot in the queue.
-	 * @param url A YouTube video URL.
+	 * Add a video id to the left side of the queue.
+	 * @param value A value to prepend.
+	 * @returns A number of how many values were added.
 	 */
-	async queuePrepend(youtubeVideo: YouTubeVideo) {
-		if (youtubeVideo.id) {
-			await this.redis.LPUSH(this.redisQueueNamespace, youtubeVideo.id);
-			return true;
-		}
-
-		return false;
+	prepend(value: string) {
+		return this.client.LPUSH(this.namespace, value);
 	}
 
 	/**
 	 * Get multiple items in the queue.
 	 * @param page The page you want to get. By default it is page 1.
 	 * @param limit How many items in the page do you want to get.
+	 * @returns An array of string values.
 	 */
-	async queueGetMultiple(page = 1, limit: number = config.paginateMaxLength) {
+	getSome(page = 1, limit: number = config.paginateMaxLength) {
 		const pageIndex = page - 1; // Redis starts from index 0
 		const startIndex = pageIndex * limit;
 		const endIndex = pageIndex * limit + limit - 1;
-		const videoIds = await this.redis.LRANGE(this.redisQueueNamespace, startIndex, endIndex);
-		const urls = videoIds.map(videoId => YouTubeVideo.fromId(videoId));
-		return urls;
+		return this.client.LRANGE(this.namespace, startIndex, endIndex);
 	}
 
 	/**
-	 * Get a queue item via its index. Returns the video ID.
+	 * Get a queue item via its index.
 	 * @param index Queue index number.
 	 */
-	async queueGetFromIndex(index: number) {
-		const results = await this.redis.LRANGE(this.redisQueueNamespace, index, index);
-		return YouTubeVideo.fromId(results[0]);
+	async get(index: number) {
+		const [value] = await this.client.LRANGE(this.namespace, index, index);
+		return value;
 	}
 
 	/**
 	 * Get the #1 item in the guild's queue.
 	 */
-	async queueGetOldest() {
-		const result = await this.queueGetFromIndex(0);
+	async first() {
+		const result = await this.get(0);
 		if (!result) return null;
 
 		return result;
@@ -85,47 +97,45 @@ export default class QueueManager {
 	 * Delete an item from the queue.
 	 * @param index The item index of the queue.
 	 */
-	async queueDelete(index: number) {
-		const queueItem = await this.queueGetFromIndex(index);
+	async delete(index: number) {
+		const queueItem = await this.get(index);
 		if (!queueItem) return false;
-		const result = await this.redis.LREM(this.redisQueueNamespace, 0, queueItem.id);
-		if (result) return true;
-		return false;
+		return this.client.LREM(this.namespace, 0, queueItem);
 	}
 
 	/**
 	 * Delete the #1 item in the queue.
 	 */
-	async queueDeleteOldest() {
-		await this.redis.LPOP(this.redisQueueNamespace);
-		return true;
+	deleteFirst() {
+		return this.client.LPOP(this.namespace);
 	}
 
 	/**
 	 * Get how long the queue is.
 	 */
-	async queueLength() {
-		const result = await this.redis.LLEN(this.redisQueueNamespace);
-		return result;
+	length() {
+		return this.client.LLEN(this.namespace);
 	}
 
 	/**
 	 * Is the queue empty?
 	 */
-	async queueIsEmpty() {
-		const queueLength = await this.queueLength();
+	async empty() {
+		const queueLength = await this.length();
 		return queueLength < 1;
 	}
 
 	/**
 	 * Delete all items in the queue for the guild.
 	 */
-	async queuePurge() {
-		const queueLength = await this.queueLength();
-		if (queueLength === 1) await this.redis.DEL(this.redisQueueNamespace);
-		else if (queueLength > 1) await this.redis.LTRIM(this.redisQueueNamespace, -1, 0);
+	async purge() {
+		const queueLength = await this.length();
+		if (queueLength === 1) await this.client.DEL(this.namespace);
+		else if (queueLength > 1) await this.client.LTRIM(this.namespace, -1, 0);
 		// LTRIM does not work if there is more than one value
 		else return false;
 		return true;
 	}
 }
+
+QueueManager.client.connect();

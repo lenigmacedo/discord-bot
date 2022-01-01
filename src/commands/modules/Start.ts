@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { UserInteraction, YouTubeInterface } from 'bot-classes';
+import { UserInteraction, YouTubeInterface, YouTubeVideo } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { safeJoinVoiceChannel } from 'bot-functions';
 import { CommandInteraction } from 'discord.js';
@@ -18,41 +18,44 @@ export default class Start implements BaseCommand {
 		try {
 			handler.voiceChannel;
 
-			const audioInterface = YouTubeInterface.getInterfaceForGuild(handler.guild);
-			const queue = await audioInterface.queue.queueGetMultiple();
+			const audioInterface = YouTubeInterface.fromGuild(handler.guild);
+			const queue = await audioInterface.queue.getSome();
 
 			if (!queue.length) {
 				await handler.editWithEmoji('The queue is empty.', ResponseEmojis.Danger);
 				return;
 			}
 
-			if (audioInterface.getBusyStatus()) {
+			if (audioInterface.busy) {
 				await handler.editWithEmoji('I am busy!', ResponseEmojis.Danger);
 				return;
 			}
 
 			await handler.editWithEmoji('Preparing to play...', ResponseEmojis.Loading);
 			audioInterface.setConnection(safeJoinVoiceChannel(handler.commandInteraction));
-			const firstItemInQueue = await audioInterface.queue.queueGetOldest();
+			const firstItemInQueue = await audioInterface.queue.first();
 
 			if (!firstItemInQueue) {
 				handler.editWithEmoji('Unable to play the track.', ResponseEmojis.Danger);
 				return;
 			}
 
-			const nextVideo = await audioInterface.queue.queueGetOldest();
-			const videoDetails = await audioInterface.getDetails(nextVideo?.url as string);
+			const nextVideo = await audioInterface.queue.first();
 
-			if (videoDetails) {
-				await handler.editWithEmoji(`I am now playing the queue. First up \`${videoDetails.videoDetails.title}\`!`, ResponseEmojis.Speaker);
-			} else {
-				await handler.editWithEmoji('I am now playing the queue.', ResponseEmojis.Speaker); // If the video is invalid, the queue should handle it and skip it.
+			if (nextVideo) {
+				const youtubeVideoInfo = await YouTubeVideo.fromId(nextVideo).info();
+
+				if (youtubeVideoInfo) {
+					await handler.editWithEmoji(`I am now playing the queue. First up \`${youtubeVideoInfo.videoDetails.title}\`!`, ResponseEmojis.Speaker);
+				} else {
+					await handler.editWithEmoji('I am now playing the queue.', ResponseEmojis.Speaker); // If the video is invalid, the queue should handle it and skip it.
+				}
 			}
 
-			while (await audioInterface.queueRunner());
+			while (await audioInterface.runner());
 			audioInterface.deleteConnection();
 		} catch (error) {
-			console.error(error);
+			await handler.oops(error);
 		}
 	}
 }

@@ -17,9 +17,9 @@ export default class Stop implements BaseCommand {
 		try {
 			handler.voiceChannel;
 
-			const audioInterface = YouTubeInterface.getInterfaceForGuild(handler.guild);
+			const audioInterface = YouTubeInterface.fromGuild(handler.guild);
 
-			if (!audioInterface.getBusyStatus()) {
+			if (!audioInterface.busy) {
 				await handler.editWithEmoji('Nothing to stop.', ResponseEmojis.Danger);
 				return;
 			}
@@ -27,8 +27,7 @@ export default class Stop implements BaseCommand {
 			audioInterface.deleteConnection();
 			await handler.editWithEmoji('I have been stopped.', ResponseEmojis.Success);
 		} catch (error: any) {
-			handler.editWithEmoji(error.message, ResponseEmojis.Danger);
-			console.error(error);
+			await handler.oops(error);
 		}
 	}
 }

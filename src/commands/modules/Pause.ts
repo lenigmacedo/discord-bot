@@ -17,7 +17,7 @@ export default class Pause implements BaseCommand {
 		try {
 			handler.voiceChannel;
 
-			const youtubeInterface = YouTubeInterface.getInterfaceForGuild(handler.guild);
+			const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
 			const paused = youtubeInterface.player.pause(true);
 
 			if (paused) {
@@ -26,8 +26,7 @@ export default class Pause implements BaseCommand {
 				await handler.editWithEmoji('Nothing to pause.', ResponseEmojis.Info);
 			}
 		} catch (error: any) {
-			handler.editWithEmoji(error.message, ResponseEmojis.Danger);
-			console.error(error);
+			await handler.oops(error);
 		}
 	}
 }

@@ -20,7 +20,7 @@ export default class Volume implements BaseCommand {
 		try {
 			handler.voiceChannel;
 
-			const audioInterface = YouTubeInterface.getInterfaceForGuild(handler.guild);
+			const audioInterface = YouTubeInterface.fromGuild(handler.guild);
 			const volumeLevel = handler.commandInteraction.options.getInteger('level', true);
 			const isSet = audioInterface.setVolume(volumeLevel);
 
@@ -30,8 +30,7 @@ export default class Volume implements BaseCommand {
 				handler.editWithEmoji('Could not set the volume! Make sure it is between 0 and 100.', ResponseEmojis.Danger);
 			}
 		} catch (error: any) {
-			handler.editWithEmoji(error.message, ResponseEmojis.Danger);
-			console.error(error);
+			await handler.oops(error);
 		}
 	}
 }

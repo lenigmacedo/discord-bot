@@ -16,40 +16,31 @@ export abstract class BaseAudioInterface {
 	/**
 	 * Is the bot busy playing something?
 	 */
-	abstract getBusyStatus(): boolean;
+	abstract get busy(): boolean;
 
 	/**
 	 * A runner method that resolves to true when the track is finished, and null when there is no more audio resources to play.
 	 */
-	abstract queueRunner(): Promise<true | null>;
+	abstract runner(): Promise<true | null>;
 
 	/**
-	 * Set the connection for this instance.
+	 * Get the voice connection.
 	 */
-	abstract setConnection(connection: VoiceConnection): void;
+	abstract get connection(): VoiceConnection | null;
 
 	/**
-	 * Delete the connection.
+	 * Set the voice connection.
+	 * Setting this value to null deletes the connection.
 	 */
-	abstract deleteConnection(): true | null;
-
-	/**
-	 * Get this instance's connection.
-	 */
-	abstract getConnection(): VoiceConnection | null;
+	abstract setConnection(voiceConnection: VoiceConnection): void;
 
 	/**
 	 * Get the current audio resource for this bot.
 	 */
-	abstract getCurrentAudioResource(): AudioResource | null;
+	abstract get currentAudioResource(): AudioResource | null;
 
 	/**
 	 * Emit a fake audio finish event to be used to simulate a track finishing. Useful for skipping.
 	 */
 	abstract emitAudioFinish(): true | null;
-
-	/**
-	 * Get the video details for this instance.
-	 */
-	abstract getDetails(url: string): Promise<any | null>;
 }

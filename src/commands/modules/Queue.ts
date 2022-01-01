@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { UserInteraction, YouTubeInterface, YtdlVideoInfoResolved } from 'bot-classes';
+import { UserInteraction, YouTubeInterface, YouTubeVideo } from 'bot-classes';
+import { YtdlVideoInfoResolved } from 'bot-classes/modules/YouTubeVideo';
 import config, { ColourScheme, ResponseEmojis } from 'bot-config';
 import { ColorResolvable, CommandInteraction, EmbedFieldData, Message, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
@@ -26,8 +27,8 @@ export default class Queue implements BaseCommand {
 		const handler = await new UserInteraction(this.commandInteraction).init(ephemeral);
 
 		try {
-			const youtubeInterface = YouTubeInterface.getInterfaceForGuild(handler.guild);
-			const queueLength = await youtubeInterface.queue.queueLength();
+			const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
+			const queueLength = await youtubeInterface.queue.length();
 
 			if (!queueLength) {
 				handler.editWithEmoji('The queue is currently empty.', ResponseEmojis.Info);
@@ -52,8 +53,7 @@ export default class Queue implements BaseCommand {
 				throw Error('Problem with button interaction. Try this command again.');
 			}
 		} catch (error: any) {
-			handler.editWithEmoji(error.message, ResponseEmojis.Danger);
-			console.error(error);
+			await handler.oops(error);
 		}
 	}
 
@@ -61,8 +61,8 @@ export default class Queue implements BaseCommand {
 	 * Create Discord message buttons. This method is useful because it shows and hides buttons dynamically depending on where they are in the queue.
 	 */
 	createButtonsComponent() {
-		const prevButton = new MessageButton().setCustomId('queue-navigate-prev').setLabel('<<').setStyle('PRIMARY');
-		const nextButton = new MessageButton().setCustomId('queue-navigate-next').setLabel('>>').setStyle('PRIMARY');
+		const prevButton = new MessageButton().setCustomId('queue-navigate-prev').setLabel('<<').setStyle('SUCCESS');
+		const nextButton = new MessageButton().setCustomId('queue-navigate-next').setLabel('>>').setStyle('SUCCESS');
 		const firstPageButton = new MessageButton().setCustomId('queue-navigate-start').setLabel('1').setStyle('PRIMARY');
 		const lastPageButton = new MessageButton().setCustomId('queue-navigate-last').setLabel(`${this.pageCount}`).setStyle('PRIMARY');
 		const buttons = new MessageActionRow();
@@ -81,8 +81,8 @@ export default class Queue implements BaseCommand {
 	 * @param youtubeInterface The YouTube interface instance.
 	 */
 	async getPageEmbedFieldData(youtubeInterface: YouTubeInterface) {
-		const queue = await youtubeInterface.queue.queueGetMultiple(this.page);
-		const videoDetailPromiseArray = queue.map(youtubeVideo => youtubeInterface?.getDetails(youtubeVideo.url));
+		const queue = await youtubeInterface.queue.getSome(this.page);
+		const videoDetailPromiseArray = queue.map(youtubeVideo => YouTubeVideo.fromId(youtubeVideo).info());
 		const videoDetails = (await Promise.all(videoDetailPromiseArray)) as YtdlVideoInfoResolved[];
 
 		const embedFields: EmbedFieldData[] = videoDetails.map((videoDetails, index) => {
@@ -135,8 +135,8 @@ export default class Queue implements BaseCommand {
 		});
 
 		collector.on('collect', async collected => {
-			const youtubeInterface = YouTubeInterface.getInterfaceForGuild(handler.guild);
-			const newQueueLength = await youtubeInterface.queue.queueLength();
+			const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
+			const newQueueLength = await youtubeInterface.queue.length();
 			this.pageCount = Math.ceil(newQueueLength / config.paginateMaxLength);
 
 			switch (collected.customId) {

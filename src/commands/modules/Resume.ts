@@ -17,7 +17,7 @@ export default class Resume implements BaseCommand {
 		try {
 			handler.voiceChannel;
 
-			const youtubeInterface = YouTubeInterface.getInterfaceForGuild(handler.guild);
+			const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
 			const unpaused = youtubeInterface.player.unpause();
 
 			if (unpaused) {
@@ -26,8 +26,7 @@ export default class Resume implements BaseCommand {
 				await handler.editWithEmoji('Nothing to resume.', ResponseEmojis.Danger);
 			}
 		} catch (error: any) {
-			handler.editWithEmoji(error.message, ResponseEmojis.Danger);
-			console.error(error);
+			await handler.oops(error);
 		}
 	}
 }

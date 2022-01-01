@@ -1,12 +1,20 @@
 import { createAudioResource } from '@discordjs/voice';
 import { youtube_v3 } from '@googleapis/youtube';
-import config, { globals } from 'bot-config';
+import { config, globals } from 'bot-config';
 import ytdl from 'ytdl-core-discord';
+import Cache from './Cache';
 import YouTubeBase from './YouTubeBase';
 
+type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
+export type YtdlVideoInfoResolved = Awaited<ReturnType<typeof ytdl.getBasicInfo>>;
+
 export default class YouTubeVideo extends YouTubeBase {
+	redisNamespace = `${config.redisNamespace}:youtubeVideoInfo`;
+	cache: Cache;
+
 	constructor(url: string) {
 		super(url);
+		this.cache = new Cache(this.id);
 	}
 
 	/**
@@ -32,6 +40,13 @@ export default class YouTubeVideo extends YouTubeBase {
 	private static validateId(id: string) {
 		const regex = /^[a-zA-Z0-9-_]{11}$/;
 		return regex.test(id);
+	}
+
+	/**
+	 * Gets the Redis namespace for queries for this instance.
+	 */
+	get namespace() {
+		return `${this.redisNamespace}:${this.id}`;
 	}
 
 	get id() {
@@ -102,6 +117,27 @@ export default class YouTubeVideo extends YouTubeBase {
 			}
 
 			return createAudioResource(bitstream, { inlineVolume: true });
+		} catch (error) {
+			console.error(error);
+			return null;
+		}
+	}
+
+	/**
+	 * Get the video details via ytdl. Does not require an API key, but might be rate limited from IP (unconfirmed).
+	 * Caches information for later retrieval using RedisJSON. Expiry set in config.
+	 * @param url The video URL.
+	 */
+	async info(): Promise<YtdlVideoInfoResolved | null> {
+		try {
+			const existsInCache = await this.cache.hasValue();
+
+			if (!existsInCache) {
+				const videoInfo = await ytdl.getBasicInfo(this.url);
+				await this.cache.set(videoInfo);
+			}
+
+			return this.cache.get<YtdlVideoInfoResolved>();
 		} catch (error) {
 			console.error(error);
 			return null;

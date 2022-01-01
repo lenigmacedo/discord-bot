@@ -13,7 +13,7 @@ const searchVideoSelection: MessageComponentHandler = async interaction => {
 			return;
 		}
 
-		const audioInterface = YouTubeInterface.getInterfaceForGuild(interaction.guild);
+		const audioInterface = YouTubeInterface.fromGuild(interaction.guild);
 		const value = interaction?.values[0];
 		const youtubeVideo = YouTubeVideo.fromUrl(value);
 
@@ -21,7 +21,7 @@ const searchVideoSelection: MessageComponentHandler = async interaction => {
 			await interaction.reply(`${ResponseEmojis.Danger} I could not find the video from the selection. Try again?`);
 		}
 
-		const appended = await audioInterface.queue.queueAppend(youtubeVideo);
+		const appended = await audioInterface.queue.add(youtubeVideo.id);
 
 		if (appended) {
 			await interaction.reply(`${ResponseEmojis.Success} I have added it to the queue!`);

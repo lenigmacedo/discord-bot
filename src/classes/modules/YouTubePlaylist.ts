@@ -1,5 +1,6 @@
 import { youtube_v3 } from '@googleapis/youtube';
-import config, { globals } from 'bot-config';
+import { config, globals } from 'bot-config';
+import { YouTubeVideo } from '..';
 import YouTubeBase from './YouTubeBase';
 
 export default class YouTubePlaylist extends YouTubeBase {
@@ -63,9 +64,9 @@ export default class YouTubePlaylist extends YouTubeBase {
 	}
 
 	/**
-	 * Fetch all the video URLs using the playlist URL within this instance.
+	 * Fetch all video URLs or IDs within this playlist.
 	 */
-	async fetchVideoUrls() {
+	async fetchVideosStr(type: 'id' | 'url' = 'id') {
 		const videos = await this.fetchVideos();
 
 		if (!videos.length) return [];
@@ -74,7 +75,12 @@ export default class YouTubePlaylist extends YouTubeBase {
 
 		for (const video of videos) {
 			const id = video.snippet?.resourceId?.videoId;
-			if (id) urls.push(`https://www.youtube.com/watch?v=${id}`);
+
+			if (id) {
+				// YouTubeVideo class has validation.
+				if (type === 'id') urls.push(YouTubeVideo.fromId(id).id);
+				else if (type === 'url') urls.push(YouTubeVideo.fromId(id).url);
+			}
 		}
 
 		return urls;

@@ -22,7 +22,7 @@ export default class Remove implements BaseCommand {
 		try {
 			handler.voiceChannel;
 
-			const youtubeInterface = YouTubeInterface.getInterfaceForGuild(handler.guild);
+			const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
 			const itemToDeleteIndex = handler.commandInteraction.options.getInteger('item-number', true);
 			const removedDetails = await youtubeInterface.getItemInfo(itemToDeleteIndex - 1);
 
@@ -31,7 +31,7 @@ export default class Remove implements BaseCommand {
 				return;
 			}
 
-			const removed = await youtubeInterface.queue.queueDelete(itemToDeleteIndex - 1);
+			const removed = await youtubeInterface.queue.delete(itemToDeleteIndex - 1);
 
 			if (removed) {
 				await handler.editWithEmoji(`Removed \`${removedDetails.videoDetails.title}\`.`, ResponseEmojis.Success);
@@ -39,8 +39,7 @@ export default class Remove implements BaseCommand {
 				await handler.editWithEmoji('🚨 There was a problem removing the item.', ResponseEmojis.Danger);
 			}
 		} catch (error: any) {
-			handler.editWithEmoji(error.message, ResponseEmojis.Danger);
-			console.error(error);
+			await handler.oops(error);
 		}
 	}
 }

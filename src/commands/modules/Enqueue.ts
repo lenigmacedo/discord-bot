@@ -20,10 +20,10 @@ export default class Enqueue implements BaseCommand {
 		try {
 			handler.voiceChannel;
 
-			const youtubeInterface = YouTubeInterface.getInterfaceForGuild(handler.guild);
+			const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
 			const youtubeUrl = handler.commandInteraction.options.getString('url', true);
-			const videoDetails = await youtubeInterface.getDetails(youtubeUrl);
 			const youtubeVideo = YouTubeVideo.fromUrl(youtubeUrl);
+			const videoDetails = await youtubeVideo.info();
 
 			if (!videoDetails) {
 				await handler.editWithEmoji(
@@ -33,13 +33,12 @@ export default class Enqueue implements BaseCommand {
 				return;
 			}
 
-			const appended = await youtubeInterface.queue.queueAppend(youtubeVideo);
+			const appended = await youtubeInterface.queue.add(youtubeVideo.id);
 
 			if (appended) await handler.editWithEmoji(`Enqueued \`${videoDetails.videoDetails.title}\`.`, ResponseEmojis.Success);
 			else await handler.editWithEmoji('I could not add that item to the queue. Is it a valid URL?', ResponseEmojis.Danger);
 		} catch (error: any) {
-			handler.editWithEmoji(error.message, ResponseEmojis.Danger);
-			console.error(error);
+			await handler.oops(error);
 		}
 	}
 }
