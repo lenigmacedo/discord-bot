@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { UserInteraction, YouTubeInterface, YouTubeVideo } from 'bot-classes';
 import { YtdlVideoInfoResolved } from 'bot-classes/modules/YouTubeVideo';
-import config, { ColourScheme, ResponseEmojis } from 'bot-config';
+import { ColourScheme, config, ResponseEmojis } from 'bot-config';
 import { ColorResolvable, CommandInteraction, EmbedFieldData, Message, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 
