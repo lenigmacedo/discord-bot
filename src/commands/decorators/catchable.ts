@@ -17,7 +17,7 @@ export function catchable(target: any, methodName: any, descriptor: any) {
 			} catch (error: any) {
 				const trimmedMessage = `${ResponseEmojis.Danger}  ${error?.message?.trim(1500)}`;
 				const message = error.message ? trimmedMessage : 'There was a problem executing your request. The reason is unknown.';
-				commandInteraction.replied ? await commandInteraction.editReply(message) : await commandInteraction.editReply(`${message}`);
+				commandInteraction.replied ? await commandInteraction.editReply(message) : await commandInteraction.reply(`${message}`);
 			}
 		} else {
 			console.error('Invalid interaction type! It should be a command interaction.');
