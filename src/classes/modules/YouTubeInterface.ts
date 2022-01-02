@@ -100,6 +100,7 @@ export default class YouTubeInterface implements BaseAudioInterface {
 
 	/**
 	 * What should this player do when the audio has finished?
+	 * By default it removes the current audio track. But if looped is set to true, it will re-add the track to the end of the queue.
 	 * @param byError Did the player encounter an error? If so, this will delete the video and ignore re-adding it if the player is looped.
 	 */
 	private async handleFinish(byError = false) {

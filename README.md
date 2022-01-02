@@ -23,6 +23,7 @@ A lot of music bots are private and proprietary (and lock features behind a payw
 | /search   | Search and pick a video to add to the queue using an interactive dropdown.                      |
 | /clear    | Purge the queue of all of its contents.                                                         |
 | /remove   | With a queue number, remove a specific item from the queue.                                     |
+| /loop     | Loop the queue.                                                                                 |
 
 TIP: Typing "/" in the Discord text channel will give you automatic suggestions of commands and will auto-complete options as you type the command!
 
