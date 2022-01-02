@@ -6,22 +6,23 @@ A lot of music bots are private and proprietary (and lock features behind a payw
 
 ## Features
 
-| Command   | What it does                                                               |
-| --------- | -------------------------------------------------------------------------- |
-| /play     | Play something straight away with a URL or search query.                   |
-| /pause    | Pause the current playing audio.                                           |
-| /resume   | Unpause the bot.                                                           |
-| /volume   | Set the audio playback volume of the bot. Affects all listeners.           |
-| /enqueue  | Add a video to the queue.                                                  |
-| /playlist | Bulk import a playlist into the queue.                                     |
-| /queue    | Get a list of items in the queue.                                          |
-| /shuffle  | Shuffle the queue.                                                         |
-| /start    | Start playing the queue whilst the bot is inactive.                        |
-| /stop     | Stop the playing of audio and disconnect the bot.                          |
-| /skip     | Skip the current item in the queue. Disconnects if the queue is empty.     |
-| /search   | Search and pick a video to add to the queue using an interactive dropdown. |
-| /clear    | Purge the queue of all of its contents.                                    |
-| /remove   | With a queue number, remove a specific item from the queue.                |
+| Command   | What it does                                                                                     |
+| --------- | ------------------------------------------------------------------------------------------------ |
+| /play     | Play something straight away with a URL or search query.                                         |
+| /pause    | Pause the current playing audio.                                                                 |
+| /resume   | Unpause the bot.                                                                                 |
+| /volume   | Set the audio playback volume of the bot. Affects all listeners.                                 |
+| /enqueue  | Add a video to the queue.                                                                        |
+| /playlist | Bulk import a playlist into the queue.                                                           |
+| /queue    | Get a list of items in the queue.                                                                |
+| /shuffle  | Shuffle the queue.                                                                               |
+| /clean    | Clean the queue by removing duplicates. The bot will tell you how many duiplicates were removed. |
+| /start    | Start playing the queue whilst the bot is inactive.                                              |
+| /stop     | Stop the playing of audio and disconnect the bot.                                                |
+| /skip     | Skip the current item in the queue. Disconnects if the queue is empty.                           |
+| /search   | Search and pick a video to add to the queue using an interactive dropdown.                       |
+| /clear    | Purge the queue of all of its contents.                                                          |
+| /remove   | With a queue number, remove a specific item from the queue.                                      |
 
 TIP: Typing "/" in the Discord text channel will give you automatic suggestions of commands and will auto-complete options as you type the command!
 
