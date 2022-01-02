@@ -4,7 +4,6 @@ services:
   redis:
     container_name: redis
     image: redislabs/rejson
-    command: redis-server
     restart: always
 
   bot:
