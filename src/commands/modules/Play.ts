@@ -1,7 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { UserInteraction, YouTubeInterface, YouTubeVideo } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
-import { safeJoinVoiceChannel } from 'bot-functions';
 import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 import { catchable } from '../decorators/catchable';
@@ -40,7 +39,7 @@ export default class Play implements BaseCommand {
 		const youtubeVideo = YouTubeVideo.fromId(video.id.videoId);
 		await youtubeInterface.queue.prepend(youtubeVideo.id);
 		await handler.editWithEmoji('Preparing to play...', ResponseEmojis.Loading);
-		youtubeInterface.setConnection(safeJoinVoiceChannel(handler.commandInteraction));
+		youtubeInterface.setConnection(handler.joinVoiceChannel());
 		const title = await youtubeVideo.info<string>('.videoDetails.title');
 
 		if (title) {

@@ -10,16 +10,13 @@ import path from 'path';
  */
 export default async function registerCommands() {
 	const { discordToken, clientId, devGuildId } = config;
-	const rest = new REST({ version: '9' }).setToken(discordToken as string);
+	const rest = new REST({ version: '9' }).setToken(discordToken!);
 
 	console.log('Started refreshing application slash commands.');
 
 	// Create an endpoint to the Discord API that has the relevant Bot ID.
 	// If not in production, the development Guild ID is added to speed up the command registration process.
-	const route =
-		config.environment === 'production'
-			? Routes.applicationCommands(clientId as string)
-			: Routes.applicationGuildCommands(clientId as string, devGuildId as string);
+	const route = config.environment === 'production' ? Routes.applicationCommands(clientId!) : Routes.applicationGuildCommands(clientId!, devGuildId!);
 
 	// This section simply finds all command classes.
 	const commandModulePath = path.resolve('src', 'commands', 'modules');
@@ -27,11 +24,12 @@ export default async function registerCommands() {
 		const module = await import(`${commandModulePath}/${moduleName}`);
 		return [moduleName, module];
 	});
+
 	const commandModules = await Promise.all(commandModuleResolvingEntries);
 
 	// Register all commands to the Discord API and add the commands to the globals commandModules Map() instance.
 	const slashCommandRegistrations = commandModules.map(module => {
-		const commandName = module[0].split('.')[0].toLowerCase();
+		const commandName = module[0].split('.')[0].toLowerCase(); // Remove the '.ts' at the end and force lowercase.
 		const commandClass = module[1].default;
 		globals.commandModules.set(commandName, commandClass);
 		return new commandClass().register().toJSON();

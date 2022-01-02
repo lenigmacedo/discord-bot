@@ -1,3 +1,4 @@
+import { DiscordGatewayAdapterCreator, joinVoiceChannel } from '@discordjs/voice';
 import { ResponseEmojis } from 'bot-config';
 import { CommandInteraction, Guild, GuildMember, InteractionReplyOptions } from 'discord.js';
 
@@ -88,6 +89,11 @@ export default class UserInteraction {
 		return this.interaction.followUp(message);
 	}
 
+	/**
+	 * Edit the message with an emoji prepended to the message.
+	 * @param message The message to send.
+	 * @param type The enum for the emoji.
+	 */
 	editWithEmoji(message: string | InteractionReplyOptions, type: ResponseEmojis) {
 		if (typeof message === 'string') {
 			return this.interaction.editReply(`${type}  ${message}`);
@@ -96,5 +102,17 @@ export default class UserInteraction {
 		message.content = `${type}  ${message.content}`;
 
 		return this.interaction.editReply(message);
+	}
+
+	joinVoiceChannel() {
+		const adapterCreator = this.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator;
+
+		const connectionOptions = {
+			guildId: this.guild.id,
+			channelId: this.voiceChannel.id,
+			adapterCreator
+		};
+
+		return joinVoiceChannel(connectionOptions);
 	}
 }

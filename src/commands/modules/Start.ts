@@ -1,7 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { UserInteraction, YouTubeInterface, YouTubeVideo } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
-import { safeJoinVoiceChannel } from 'bot-functions';
 import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 import { catchable } from '../decorators/catchable';
@@ -31,7 +30,7 @@ export default class Start implements BaseCommand {
 		}
 
 		await handler.editWithEmoji('Preparing to play...', ResponseEmojis.Loading);
-		audioInterface.setConnection(safeJoinVoiceChannel(handler.commandInteraction));
+		audioInterface.setConnection(handler.joinVoiceChannel());
 		const firstItemInQueue = await audioInterface.queue.first();
 
 		if (!firstItemInQueue) {
