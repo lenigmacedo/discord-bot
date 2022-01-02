@@ -11,7 +11,7 @@ export default class Cache {
 	 * @param name The key of this cache object.
 	 */
 	constructor(name: string) {
-		this.namespace = `${config.redisNamespace}:global:cache:${name}`;
+		this.namespace = `${config.redisNamespace}:global:cache:youtubevideo:${name}`;
 	}
 
 	/**
@@ -27,8 +27,8 @@ export default class Cache {
 	 * @param json A serialisable object to convert to JSON.
 	 * @returns Whether the operation failed or not.
 	 */
-	async set(json: unknown, path: string = '.') {
-		const result = await this.client.json.SET(this.namespace, path, JSON.stringify(json));
+	async set(json: any, path: string = '.') {
+		const result = await this.client.json.SET(this.namespace, path, json);
 		const expiry = await this.client.EXPIRE(this.namespace, config.cacheExpiryHours * 60 * 60);
 		return !!(result && expiry);
 	}
@@ -41,7 +41,7 @@ export default class Cache {
 		const response = await this.client.json.GET(this.namespace, { path });
 
 		if (response) {
-			return JSON.parse(response?.toString()) as TResponse;
+			return response as unknown as TResponse;
 		}
 
 		return null;

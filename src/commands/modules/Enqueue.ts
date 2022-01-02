@@ -23,9 +23,9 @@ export default class Enqueue implements BaseCommand {
 			const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
 			const youtubeUrl = handler.commandInteraction.options.getString('url', true);
 			const youtubeVideo = YouTubeVideo.fromUrl(youtubeUrl);
-			const videoDetails = await youtubeVideo.info();
+			const title = await youtubeVideo.info<string>('.videoDetails.title');
 
-			if (!videoDetails) {
+			if (!title) {
 				await handler.editWithEmoji(
 					'I could not add that item to the queue. Is it a valid URL? Is it age restricted or private?',
 					ResponseEmojis.Danger
@@ -35,7 +35,7 @@ export default class Enqueue implements BaseCommand {
 
 			const appended = await youtubeInterface.queue.add(youtubeVideo.id);
 
-			if (appended) await handler.editWithEmoji(`Enqueued \`${videoDetails.videoDetails.title}\`.`, ResponseEmojis.Success);
+			if (appended) await handler.editWithEmoji(`Enqueued \`${title}\`.`, ResponseEmojis.Success);
 			else await handler.editWithEmoji('I could not add that item to the queue. Is it a valid URL?', ResponseEmojis.Danger);
 		} catch (error: any) {
 			await handler.oops(error);

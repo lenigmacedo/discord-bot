@@ -6,7 +6,7 @@ export abstract class BaseAudioInterface {
 	/**
 	 * Based off of a queue index number, get an item in the queue.
 	 */
-	abstract getItemInfo(queueItemIndex: number): Promise<any | null>;
+	abstract getItemId(index: number): Promise<string | null>;
 
 	/**
 	 * Get the player instance

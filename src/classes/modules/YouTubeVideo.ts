@@ -49,6 +49,9 @@ export default class YouTubeVideo extends YouTubeBase {
 		return `${this.redisNamespace}:${this.id}`;
 	}
 
+	/**
+	 * Get the video ID.
+	 */
 	get id() {
 		const id = this.urlInstance.searchParams.get('v');
 
@@ -126,9 +129,8 @@ export default class YouTubeVideo extends YouTubeBase {
 	/**
 	 * Get the video details via ytdl. Does not require an API key, but might be rate limited from IP (unconfirmed).
 	 * Caches information for later retrieval using RedisJSON. Expiry set in config.
-	 * @param url The video URL.
 	 */
-	async info(): Promise<YtdlVideoInfoResolved | null> {
+	async info<TResponse>(path?: string): Promise<TResponse | null> {
 		try {
 			const existsInCache = await this.cache.hasValue();
 
@@ -136,8 +138,8 @@ export default class YouTubeVideo extends YouTubeBase {
 				const videoInfo = await ytdl.getBasicInfo(this.url);
 				await this.cache.set(videoInfo);
 			}
-
-			return this.cache.get<YtdlVideoInfoResolved>();
+			const resp = await this.cache.get<TResponse>(path);
+			return resp;
 		} catch (error) {
 			console.error(error);
 			return null;

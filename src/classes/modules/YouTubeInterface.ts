@@ -73,15 +73,11 @@ export default class YouTubeInterface implements BaseAudioInterface {
 	}
 
 	/**
-	 * Get the video info. By default it is the first item in the queue.
+	 * Get the video ID or String from its index.
 	 * @param queueItemIndex The queue item index.
 	 */
-	async getItemInfo(queueItemIndex: number = 0) {
-		const videoId = await this.queue.get(queueItemIndex);
-		if (!videoId) return null;
-		const youtubeVideo = YouTubeVideo.fromId(videoId);
-
-		return await youtubeVideo.info();
+	getItemId(index: number = 0) {
+		return this.queue.get(index);
 	}
 
 	/**

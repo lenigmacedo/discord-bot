@@ -42,10 +42,10 @@ export default class Play implements BaseCommand {
 			await youtubeInterface.queue.prepend(youtubeVideo.id);
 			await handler.editWithEmoji('Preparing to play...', ResponseEmojis.Loading);
 			youtubeInterface.setConnection(safeJoinVoiceChannel(handler.commandInteraction));
-			const videoDetails = await youtubeVideo.info();
+			const title = await youtubeVideo.info<string>('.videoDetails.title');
 
-			if (videoDetails) {
-				await handler.commandInteraction.editReply(`🔊 Playing \`${videoDetails?.videoDetails?.title}\`.`);
+			if (title) {
+				await handler.commandInteraction.editReply(`🔊 Playing \`${title}\`.`);
 			} else {
 				await handler.editWithEmoji(
 					'Unable to play the video. It might be private, age restricted or something else. It will be skipped.',

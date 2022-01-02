@@ -33,6 +33,9 @@ export default class YouTubePlaylist extends YouTubeBase {
 		return regex.test(id);
 	}
 
+	/**
+	 * Get the playlist ID.
+	 */
 	get id() {
 		const id = this.urlInstance.searchParams.get('list');
 

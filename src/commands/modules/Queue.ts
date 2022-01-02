@@ -82,19 +82,18 @@ export default class Queue implements BaseCommand {
 	 */
 	async getPageEmbedFieldData(youtubeInterface: YouTubeInterface) {
 		const queue = await youtubeInterface.queue.getSome(this.page);
-		const videoDetailPromiseArray = queue.map(youtubeVideo => YouTubeVideo.fromId(youtubeVideo).info());
-		const videoDetails = (await Promise.all(videoDetailPromiseArray)) as YtdlVideoInfoResolved[];
+		const videoDetailPromiseArray = queue.map(youtubeVideo =>
+			YouTubeVideo.fromId(youtubeVideo).info<YtdlVideoInfoResolved['videoDetails']>('.videoDetails')
+		);
+		const videoDetails = await Promise.all(videoDetailPromiseArray);
 
 		const embedFields: EmbedFieldData[] = videoDetails.map((videoDetails, index) => {
 			const itemNumberOffset = (this.page - 1) * config.paginateMaxLength;
 			const itemNumber = index + 1 + itemNumberOffset;
-			const videoDetailsObj = videoDetails?.videoDetails;
 
 			return {
-				name: videoDetailsObj?.title ? `${itemNumber}) ${videoDetailsObj.title.substring(0, 100)}` : `${itemNumber}) ${ResponseEmojis.Danger} FAILED`,
-				value: videoDetailsObj?.description
-					? `By \`${videoDetailsObj.author.name}\`.\n>> ${videoDetailsObj.video_url}`
-					: `No description could be found.`
+				name: videoDetails?.title ? `${itemNumber}) ${videoDetails.title.substring(0, 100)}` : `${itemNumber}) ${ResponseEmojis.Danger} FAILED`,
+				value: videoDetails?.description ? `By \`${videoDetails.author.name}\`.\n>> ${videoDetails.video_url}` : `No description could be found.`
 			};
 		});
 
