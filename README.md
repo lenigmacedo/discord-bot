@@ -15,6 +15,7 @@ A lot of music bots are private and proprietary (and lock features behind a payw
 | /enqueue  | Add a video to the queue.                                                  |
 | /playlist | Bulk import a playlist into the queue.                                     |
 | /queue    | Get a list of items in the queue.                                          |
+| /shuffle  | Shuffle the queue.                                                         |
 | /start    | Start playing the queue whilst the bot is inactive.                        |
 | /stop     | Stop the playing of audio and disconnect the bot.                          |
 | /skip     | Skip the current item in the queue. Disconnects if the queue is empty.     |

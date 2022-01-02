@@ -75,6 +75,16 @@ export default class QueueManager {
 	}
 
 	/**
+	 * Get multiple items in the queue. By default it gets the first page.
+	 * @param page The page you want to get. By default it is page 1.
+	 * @param limit How many items in the page do you want to get.
+	 * @returns An array of string values.
+	 */
+	getAll() {
+		return this.client.LRANGE(this.namespace, 0, -1);
+	}
+
+	/**
 	 * Get a queue item via its index.
 	 * @param index Queue index number.
 	 */

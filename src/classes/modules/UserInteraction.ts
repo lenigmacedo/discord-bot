@@ -133,7 +133,7 @@ export default class UserInteraction {
 	 * @param msgWithComponents The bot's reply, i.e., the message you want to handle.
 	 */
 	componentInteractionHandler(msgWithComponents: Awaited<ReturnType<CommandInteraction['editReply']>>) {
-		if (!(msgWithComponents instanceof Message)) return;
+		if (!(msgWithComponents instanceof Message) || !msgWithComponents.components.length) return;
 
 		// This filter checks that the person who is interacting with the message is the one who sent the original message.
 		const filter: CollectorFilter<[MessageComponentInteraction]> = messageComponentInteraction => {
