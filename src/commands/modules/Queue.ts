@@ -4,15 +4,11 @@ import { YtdlVideoInfoResolved } from 'bot-classes/modules/YouTubeVideo';
 import { ColourScheme, config, ResponseEmojis } from 'bot-config';
 import { ColorResolvable, CommandInteraction, EmbedFieldData, Message, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
+import { catchable } from '../decorators/catchable';
 
 export default class Queue implements BaseCommand {
-	commandInteraction: CommandInteraction;
 	page: number = 0;
 	pageCount: number = 0;
-
-	constructor(commandInteraction: CommandInteraction) {
-		this.commandInteraction = commandInteraction;
-	}
 
 	register() {
 		return new SlashCommandBuilder()
@@ -22,38 +18,34 @@ export default class Queue implements BaseCommand {
 			.addBooleanOption(option => option.setName('hide-in-chat').setDescription('Want no one to tamper with your queue? Set this to true.'));
 	}
 
-	async runner() {
-		const ephemeral = this.commandInteraction.options.getBoolean('hide-in-chat') || false;
-		const handler = await new UserInteraction(this.commandInteraction).init(ephemeral);
+	@catchable
+	async runner(commandInteraction: CommandInteraction) {
+		const ephemeral = commandInteraction.options.getBoolean('hide-in-chat') || false;
+		const handler = await new UserInteraction(commandInteraction).init(ephemeral);
+		const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
+		const queueLength = await youtubeInterface.queue.length();
 
-		try {
-			const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
-			const queueLength = await youtubeInterface.queue.length();
+		if (!queueLength) {
+			handler.editWithEmoji('The queue is currently empty.', ResponseEmojis.Info);
+			return;
+		}
 
-			if (!queueLength) {
-				handler.editWithEmoji('The queue is currently empty.', ResponseEmojis.Info);
-				return;
-			}
+		this.page = commandInteraction.options.getInteger('page') || 1;
+		this.pageCount = Math.ceil(queueLength / config.paginateMaxLength);
 
-			this.page = this.commandInteraction.options.getInteger('page') || 1;
-			this.pageCount = Math.ceil(queueLength / config.paginateMaxLength);
+		// Clamp user's defined page argument
+		if (this.page > this.pageCount) this.page = this.pageCount;
+		else if (this.page < 1) this.page = 1;
 
-			// Clamp user's defined page argument
-			if (this.page > this.pageCount) this.page = this.pageCount;
-			else if (this.page < 1) this.page = 1;
+		const components = this.createButtonsComponent();
+		const embedFields = await this.getPageEmbedFieldData(youtubeInterface);
+		const embeds = await this.getPageMessageEmbed(embedFields, queueLength);
+		const botMessage = await handler.commandInteraction.editReply({ embeds: [embeds], components });
 
-			const components = this.createButtonsComponent();
-			const embedFields = await this.getPageEmbedFieldData(youtubeInterface);
-			const embeds = await this.getPageMessageEmbed(embedFields, queueLength);
-			const botMessage = await handler.commandInteraction.editReply({ embeds: [embeds], components });
-
-			if (botMessage instanceof Message) {
-				this.registerButtonInteractionLogic(botMessage, handler);
-			} else {
-				throw Error('Problem with button interaction. Try this command again.');
-			}
-		} catch (error: any) {
-			await handler.oops(error);
+		if (botMessage instanceof Message) {
+			this.registerButtonInteractionLogic(botMessage, handler);
+		} else {
+			throw Error('Problem with button interaction. Try this command again.');
 		}
 	}
 

@@ -7,6 +7,10 @@ export default class UserInteraction {
 
 	/**
 	 * A toolbox for making interactions between the bot and the user easier.
+	 *
+	 * TIPS:
+	 * - The methods in this class will throw if there is any problem. This is a way of halting the execution of the command.
+	 * - Use the "oops" method in a catch block to inform the user of the error message and
 	 */
 	constructor(interaction: CommandInteraction) {
 		this.interaction = interaction;
@@ -39,6 +43,9 @@ export default class UserInteraction {
 		throw Error('This command can only be run in a Guild.');
 	}
 
+	/**
+	 * Get the author of the slash command.
+	 */
 	get author() {
 		if (this.interaction.member instanceof GuildMember) {
 			return this.interaction.member;
@@ -89,17 +96,5 @@ export default class UserInteraction {
 		message.content = `${type}  ${message.content}`;
 
 		return this.interaction.editReply(message);
-	}
-
-	/**
-	 * Respond to the user on Discord with a generic message saying something went wrong.
-	 * Will also log the error to the console.
-	 */
-	oops(error: any) {
-		console.error(error);
-		return this.editWithEmoji(
-			error?.message?.trim(1500) || 'There was a problem executing your request. The reason is unknown.',
-			ResponseEmojis.Danger
-		);
 	}
 }

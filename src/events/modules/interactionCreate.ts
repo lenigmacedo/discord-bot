@@ -8,7 +8,7 @@ const interactionCreate = async (interaction: Interaction) => {
 
 			if (globals.commandModules.has(commandName)) {
 				const commandClass = globals.commandModules.get(commandName); // Any is unavoidable here... as far as I am aware.
-				new commandClass(interaction).runner();
+				new commandClass().runner(interaction);
 			}
 		}
 	} catch (error) {

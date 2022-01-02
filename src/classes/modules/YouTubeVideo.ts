@@ -5,7 +5,6 @@ import ytdl from 'ytdl-core-discord';
 import Cache from './Cache';
 import YouTubeBase from './YouTubeBase';
 
-type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
 export type YtdlVideoInfoResolved = Awaited<ReturnType<typeof ytdl.getBasicInfo>>;
 
 export default class YouTubeVideo extends YouTubeBase {
@@ -138,8 +137,8 @@ export default class YouTubeVideo extends YouTubeBase {
 				const videoInfo = await ytdl.getBasicInfo(this.url);
 				await this.cache.set(videoInfo);
 			}
-			const resp = await this.cache.get<TResponse>(path);
-			return resp;
+
+			return await this.cache.get<TResponse>(path);
 		} catch (error) {
 			console.error(error);
 			return null;

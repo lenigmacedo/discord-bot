@@ -7,6 +7,7 @@ export default class Cache {
 
 	/**
 	 * A convenient way to store temporary data into cache.
+	 *
 	 * Persists on server reboots, and items can expire as defined times.
 	 * @param name The key of this cache object.
 	 */
@@ -23,7 +24,9 @@ export default class Cache {
 
 	/**
 	 * Write a serialised JSON object to this cache. By default it overwrites the whole value in the key.
+	 *
 	 * Will also assign an expiry defined in the config.
+	 *
 	 * @param json A serialisable object to convert to JSON.
 	 * @returns Whether the operation failed or not.
 	 */
@@ -35,6 +38,7 @@ export default class Cache {
 
 	/**
 	 * Get a value using a path. If a path is not specified then all is returned if any.
+	 *
 	 * @param path The path to the desired value. May or may not exist.
 	 */
 	async get<TResponse>(path: string = '.') {

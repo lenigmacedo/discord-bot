@@ -3,30 +3,26 @@ import { UserInteraction, YouTubeInterface } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
+import { catchable } from '../decorators/catchable';
 
 export default class Resume implements BaseCommand {
-	constructor(public commandInteraction: CommandInteraction) {}
-
 	register() {
 		return new SlashCommandBuilder().setName('resume').setDescription('Resume the bot if it is paused.');
 	}
 
-	async runner() {
-		const handler = await new UserInteraction(this.commandInteraction).init(false);
+	@catchable
+	async runner(commandInteraction: CommandInteraction) {
+		const handler = await new UserInteraction(commandInteraction).init(false);
 
-		try {
-			handler.voiceChannel;
+		handler.voiceChannel;
 
-			const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
-			const unpaused = youtubeInterface.player.unpause();
+		const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
+		const unpaused = youtubeInterface.player.unpause();
 
-			if (unpaused) {
-				await handler.editWithEmoji('The audio has been resumed.', ResponseEmojis.Success);
-			} else {
-				await handler.editWithEmoji('Nothing to resume.', ResponseEmojis.Danger);
-			}
-		} catch (error: any) {
-			await handler.oops(error);
+		if (unpaused) {
+			await handler.editWithEmoji('The audio has been resumed.', ResponseEmojis.Success);
+		} else {
+			await handler.editWithEmoji('Nothing to resume.', ResponseEmojis.Danger);
 		}
 	}
 }
