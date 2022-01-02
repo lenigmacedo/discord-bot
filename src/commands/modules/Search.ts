@@ -2,8 +2,7 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import { UserInteraction, YouTubeVideo } from 'bot-classes';
 import { YtdlVideoInfoResolved } from 'bot-classes/modules/YouTubeVideo';
 import { globals, ResponseEmojis } from 'bot-config';
-import { initComponentInteractionHandler } from 'bot-functions';
-import { CommandInteraction, Message, MessageActionRow, MessageSelectMenu, MessageSelectOptionData } from 'discord.js';
+import { CommandInteraction, MessageActionRow, MessageSelectMenu, MessageSelectOptionData } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 import { catchable } from '../decorators/catchable';
 
@@ -61,8 +60,6 @@ export default class Search implements BaseCommand {
 
 		const botMessage = await handler.editWithEmoji({ content: 'I found some results!', components: [actionRow] }, ResponseEmojis.Success);
 
-		if (!(botMessage instanceof Message)) return;
-
-		initComponentInteractionHandler(botMessage, handler.commandInteraction);
+		handler.componentInteractionHandler(botMessage);
 	}
 }

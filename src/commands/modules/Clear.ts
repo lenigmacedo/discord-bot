@@ -1,8 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { UserInteraction, YouTubeInterface } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
-import { initComponentInteractionHandler } from 'bot-functions';
-import { CommandInteraction, Message, MessageActionRow, MessageButton } from 'discord.js';
+import { CommandInteraction, MessageActionRow, MessageButton } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 import { catchable } from '../decorators/catchable';
 
@@ -39,8 +38,6 @@ export default class Clear implements BaseCommand {
 			ResponseEmojis.Info
 		);
 
-		if (botMessage instanceof Message) {
-			initComponentInteractionHandler(botMessage, handler.commandInteraction);
-		}
+		handler.componentInteractionHandler(botMessage);
 	}
 }

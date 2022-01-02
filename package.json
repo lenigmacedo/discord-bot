@@ -12,8 +12,7 @@
 		"src/commands",
 		"src/events",
 		"src/functions",
-		"src/classes",
-		"src/componenthandlers"
+		"src/classes"
 	],
 	"repository": {
 		"type": "git",
