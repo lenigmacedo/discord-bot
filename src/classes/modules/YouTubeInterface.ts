@@ -19,6 +19,7 @@ export default class YouTubeInterface implements BaseAudioInterface {
 	private audioVolume: number;
 	private voiceConnection?: VoiceConnection;
 	private currentResource?: AudioResource | null;
+	private looped: boolean = false;
 	queue: QueueManager;
 
 	/**
@@ -98,6 +99,23 @@ export default class YouTubeInterface implements BaseAudioInterface {
 	}
 
 	/**
+	 * What should this player do when the audio has finished?
+	 * @param byError Did the player encounter an error? If so, this will delete the video and ignore re-adding it if the player is looped.
+	 */
+	private async handleFinish(byError = false) {
+		if (this.looped && !byError) {
+			const currentVideo = await this.queue.first();
+
+			if (!currentVideo) return;
+
+			await this.queue.add(currentVideo);
+		} else {
+		}
+
+		await this.queue.deleteFirst();
+	}
+
+	/**
 	 * Start the execution of the queue by joining the bot and playing audio.
 	 * To use this, await this method in a while loop. Will resolve true to indicate finish, and null to stop.
 	 */
@@ -119,7 +137,7 @@ export default class YouTubeInterface implements BaseAudioInterface {
 				const onIdleCallback = async (oldState: AudioPlayerState, newState: AudioPlayerState) => {
 					if (oldState.status === 'playing' && newState.status === 'idle') {
 						player.removeListener('stateChange', onIdleCallback);
-						await this.queue.deleteFirst();
+						await this.handleFinish();
 						resolve(true);
 					}
 				};
@@ -129,7 +147,7 @@ export default class YouTubeInterface implements BaseAudioInterface {
 				if (!audioResource) {
 					console.error('Audio playback skipped due to no audio resource being detected.');
 					player.removeListener('stateChange', onIdleCallback);
-					await this.queue.deleteFirst();
+					await this.handleFinish(true);
 					resolve(true);
 					return;
 				}
@@ -141,16 +159,31 @@ export default class YouTubeInterface implements BaseAudioInterface {
 				// Ytdl core sometimes does not reliably download the audio data, so this handles the error.
 				player.once('error', async () => {
 					console.error('Audio playback skipped due to invalid stream data!');
-					await this.queue.deleteFirst();
+					await this.handleFinish(true);
 					player.removeListener('stateChange', onIdleCallback);
 					resolve(true);
 				});
 			} catch (error) {
 				console.error(error);
-				await this.queue.deleteFirst();
+				await this.handleFinish(true);
 				resolve(true);
 			}
 		});
+	}
+
+	/**
+	 * Set if this player should loop the playlist.
+	 * All this does is let the runner know that instead of deleting the video after play, just re-add it to the end of the queue.
+	 */
+	set loop(option: boolean) {
+		this.looped = option;
+	}
+
+	/**
+	 * Is the player looping the playlist?
+	 */
+	get isLooped() {
+		return this.looped;
 	}
 
 	/**
