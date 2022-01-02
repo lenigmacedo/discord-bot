@@ -52,7 +52,8 @@ export default class YouTubeVideo extends YouTubeBase {
 	 * Get the video ID.
 	 */
 	get id() {
-		const id = this.urlInstance.searchParams.get('v');
+		// The former is the traditional youtube.com/?v=id and the latter is the youtu.be/id URL format.
+		const id = this.urlInstance.searchParams.get('v') || this.urlInstance.pathname.substring(1); // pathname always starts with a '/'
 
 		if (id && YouTubeVideo.validateId(id)) {
 			return id;
