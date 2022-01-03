@@ -4,7 +4,7 @@ import { YtdlVideoInfoResolved } from 'bot-classes/modules/YouTubeVideo';
 import { ColourScheme, config, ResponseEmojis } from 'bot-config';
 import { ColorResolvable, CommandInteraction, EmbedFieldData, Message, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
-import { catchable } from '../decorators/catchable';
+import { command } from '../decorators/command';
 
 export default class Queue implements BaseCommand {
 	page: number = 0;
@@ -18,7 +18,7 @@ export default class Queue implements BaseCommand {
 			.addBooleanOption(option => option.setName('hide-in-chat').setDescription('Want no one to tamper with your queue? Set this to true.'));
 	}
 
-	@catchable
+	@command()
 	async runner(commandInteraction: CommandInteraction) {
 		const ephemeral = commandInteraction.options.getBoolean('hide-in-chat') || false;
 		const handler = await new UserInteraction(commandInteraction).init(ephemeral);

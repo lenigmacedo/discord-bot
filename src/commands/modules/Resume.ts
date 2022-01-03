@@ -3,14 +3,14 @@ import { UserInteraction, YouTubeInterface } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
-import { catchable } from '../decorators/catchable';
+import { command } from '../decorators/command';
 
 export default class Resume implements BaseCommand {
 	register() {
 		return new SlashCommandBuilder().setName('resume').setDescription('Resume the bot if it is paused.');
 	}
 
-	@catchable
+	@command()
 	async runner(commandInteraction: CommandInteraction) {
 		const handler = await new UserInteraction(commandInteraction).init(false);
 

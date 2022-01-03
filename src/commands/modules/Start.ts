@@ -3,14 +3,14 @@ import { UserInteraction, YouTubeInterface, YouTubeVideo } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
-import { catchable } from '../decorators/catchable';
+import { command } from '../decorators/command';
 
 export default class Start implements BaseCommand {
 	register() {
 		return new SlashCommandBuilder().setName('start').setDescription('Start the queue if the bot is not already playing.');
 	}
 
-	@catchable
+	@command()
 	async runner(commandInteraction: CommandInteraction) {
 		const handler = await new UserInteraction(commandInteraction).init(false);
 

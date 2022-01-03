@@ -3,12 +3,14 @@ import { QueueManager, UserInteraction } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
+import { command } from '../decorators/command';
 
 export default class Clean implements BaseCommand {
 	register() {
 		return new SlashCommandBuilder().setName('clean').setDescription('Remove all duplicates from the queue.');
 	}
 
+	@command()
 	async runner(commandInteraction: CommandInteraction) {
 		const handler = await new UserInteraction(commandInteraction).init(false);
 		const queue = new QueueManager(handler.guild.id, 'youtube');

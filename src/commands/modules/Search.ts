@@ -4,7 +4,7 @@ import { YtdlVideoInfoResolved } from 'bot-classes/modules/YouTubeVideo';
 import { globals, ResponseEmojis } from 'bot-config';
 import { CommandInteraction, MessageActionRow, MessageSelectMenu, MessageSelectOptionData } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
-import { catchable } from '../decorators/catchable';
+import { command } from '../decorators/command';
 
 export default class Search implements BaseCommand {
 	register() {
@@ -14,7 +14,7 @@ export default class Search implements BaseCommand {
 			.addStringOption(option => option.setName('search-query').setDescription('The video you would like to search for.').setRequired(true));
 	}
 
-	@catchable
+	@command()
 	async runner(commandInteraction: CommandInteraction) {
 		const handler = await new UserInteraction(commandInteraction).init();
 

@@ -4,14 +4,14 @@ import { ResponseEmojis } from 'bot-config';
 import { shuffleArr } from 'bot-functions';
 import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
-import { catchable } from '../decorators/catchable';
+import { command } from '../decorators/command';
 
 export default class Shuffle implements BaseCommand {
 	register() {
 		return new SlashCommandBuilder().setName('shuffle').setDescription('Shuffle the queue! This operation cannot be undone.');
 	}
 
-	@catchable
+	@command()
 	async runner(commandInteraction: CommandInteraction) {
 		const handler = await new UserInteraction(commandInteraction).init(false);
 		const queue = new QueueManager(handler.guild.id, 'youtube');

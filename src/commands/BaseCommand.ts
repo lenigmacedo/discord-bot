@@ -21,7 +21,7 @@ export interface BaseCommand {
 	 * TIPS:
 	 * - There are various classes you can import from 'bot-classes' that can help you compose the logic.
 	 * - One example is UserInteraction, which will help you interact with the author of the command.
-	 * - Catch all errors with the @catchable decorator! This will automatically wrap the runner method in a try and catch block and handle the error gracefully.
+	 * - Catch all errors with the @command() decorator! This will automatically wrap the runner method in a try and catch block and handle the error gracefully.
 	 */
 	runner(commandInteraction: CommandInteraction): void;
 }

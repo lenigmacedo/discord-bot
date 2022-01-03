@@ -3,7 +3,7 @@ import { UserInteraction, YouTubeInterface, YouTubePlaylist } from 'bot-classes'
 import { ResponseEmojis } from 'bot-config';
 import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
-import { catchable } from '../decorators/catchable';
+import { command } from '../decorators/command';
 
 export default class Playlist implements BaseCommand {
 	register() {
@@ -13,7 +13,7 @@ export default class Playlist implements BaseCommand {
 			.addStringOption(option => option.setName('url').setDescription('The URL containing the playlist ID.').setRequired(true));
 	}
 
-	@catchable
+	@command()
 	async runner(commandInteraction: CommandInteraction) {
 		const handler = await new UserInteraction(commandInteraction).init(false);
 

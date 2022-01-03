@@ -3,7 +3,7 @@ import { UserInteraction, YouTubeInterface } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
-import { catchable } from '../decorators/catchable';
+import { command } from '../decorators/command';
 
 export default class Volume implements BaseCommand {
 	register() {
@@ -13,7 +13,7 @@ export default class Volume implements BaseCommand {
 			.addIntegerOption(option => option.setName('level').setRequired(true).setDescription('Value between 0 and 100.'));
 	}
 
-	@catchable
+	@command()
 	async runner(commandInteraction: CommandInteraction) {
 		const handler = await new UserInteraction(commandInteraction).init(false);
 

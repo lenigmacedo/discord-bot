@@ -3,14 +3,16 @@ import { UserInteraction, YouTubeInterface } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { CommandInteraction, MessageActionRow, MessageButton } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
-import { catchable } from '../decorators/catchable';
+import { command } from '../decorators/command';
 
 export default class Clear implements BaseCommand {
 	register() {
 		return new SlashCommandBuilder().setName('clear').setDescription('Clear the entire queue.');
 	}
 
-	@catchable
+	@command({
+		requires: ['ADMINISTRATOR']
+	})
 	async runner(commandInteraction: CommandInteraction) {
 		const handler = await new UserInteraction(commandInteraction).init();
 
