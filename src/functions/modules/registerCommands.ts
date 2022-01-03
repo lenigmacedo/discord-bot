@@ -10,13 +10,16 @@ import path from 'path';
  */
 export default async function registerCommands() {
 	const { discordToken, clientId, devGuildId } = config;
-	const rest = new REST({ version: '9' }).setToken(discordToken!);
+	const rest = new REST({ version: '9' }).setToken(discordToken as string);
 
 	console.log('Started refreshing application slash commands.');
 
 	// Create an endpoint to the Discord API that has the relevant Bot ID.
 	// If not in production, the development Guild ID is added to speed up the command registration process.
-	const route = config.environment === 'production' ? Routes.applicationCommands(clientId!) : Routes.applicationGuildCommands(clientId!, devGuildId!);
+	const route =
+		config.environment === 'production'
+			? Routes.applicationCommands(clientId as string)
+			: Routes.applicationGuildCommands(clientId as string, devGuildId as string);
 
 	// This section simply finds all command classes.
 	const commandModulePath = path.resolve('src', 'commands', 'modules');

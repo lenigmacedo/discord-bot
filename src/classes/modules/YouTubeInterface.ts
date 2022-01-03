@@ -120,6 +120,8 @@ export default class YouTubeInterface implements BaseAudioInterface {
 	 * To use this, await this method in a while loop. Will resolve true to indicate finish, and null to stop.
 	 */
 	runner(): Promise<true | null> {
+		// The async promise executor is warranted, because the resolving of this promise is a big delayed task and the code will look very ugly without async.
+		/* eslint-disable no-async-promise-executor */
 		return new Promise(async resolve => {
 			try {
 				const player = this.player;
@@ -169,6 +171,7 @@ export default class YouTubeInterface implements BaseAudioInterface {
 				resolve(true);
 			}
 		});
+		/* eslint-enable no-async-promise-executor */
 	}
 
 	/**
