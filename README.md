@@ -16,6 +16,7 @@ A lot of music bots are private and proprietary (and lock features behind a payw
 | /playlist | Bulk import a playlist into the queue.                                                          |
 | /queue    | Get a list of items in the queue.                                                               |
 | /shuffle  | Shuffle the queue.                                                                              |
+| /move     | Move an item in the queue from its current position to a new one.                               |
 | /clean    | Clean the queue by removing duplicates. The bot will tell you how many duplicates were removed. |
 | /start    | Start playing the queue whilst the bot is inactive.                                             |
 | /stop     | Stop the playing of audio and disconnect the bot.                                               |
