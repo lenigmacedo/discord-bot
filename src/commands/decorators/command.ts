@@ -1,48 +1,61 @@
+import { UserInteraction } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { CommandInteraction, GuildMember, PermissionString } from 'discord.js';
 
 /**
  * This decorator wraps the command in a try/catch block to prevent most errors from crashing the process and sorts out permissions.
  * By default a user must have speak and read message history permissions to interact with the bot.
- *
- * @param target The class itself.
- * @param propertyName The string representaion of the method name.
- * @param descriptor Properties that relate to the method this decorator is attached to.
  */
 export function command(options: CommandOptions = {}) {
-	return function (target: any, methodName: any, descriptor: any) {
+	// target = The class itself.
+	// propertyName = The string representaion of the method name.
+	// descriptor = Properties that relate to the method this decorator is attached to.
+	return function (target: any, propertyName: any, descriptor: any) {
 		const method: Function = descriptor.value;
 
 		descriptor.value = async (commandInteraction: CommandInteraction) => {
 			if (commandInteraction instanceof CommandInteraction && commandInteraction.member instanceof GuildMember) {
+				const { requires = ['SPEAK', 'READ_MESSAGE_HISTORY'], ephemeral = true, enforceVoiceConnection = false } = options;
+				const handler = await new UserInteraction(commandInteraction).init(ephemeral);
+
 				try {
-					const { requires = ['SPEAK', 'READ_MESSAGE_HISTORY'] } = options;
 					const permissions = commandInteraction.member.permissions.toArray();
 					const foundPermissions = requires.filter(required => permissions.includes(required));
 
-					if (foundPermissions.length === requires.length) {
-						return await method.call(target, commandInteraction);
-					} else {
-						await messageResponder(`${ResponseEmojis.Danger}  You are not permitted to run this command.`);
+					if (enforceVoiceConnection && !handler.voiceChannel) {
+						handler.editWithEmoji('This command requires you to be connected to a voice channel.', ResponseEmojis.Danger);
+						return;
 					}
+
+					if (foundPermissions.length === requires.length) return await method.call(target, handler);
+
+					await handler.editWithEmoji('You are not permitted to run this command.', ResponseEmojis.Danger);
 				} catch (error: any) {
-					const trimmedMessage = `${ResponseEmojis.Danger}  ${error?.message?.trim(1500)}`;
-					await messageResponder(error.message ? trimmedMessage : 'There was a problem executing your request. The reason is unknown.');
+					const trimmedMessage = error?.message?.trim(1500);
+					const message = error.message ? trimmedMessage : 'There was a problem executing your request. The reason is unknown.';
+
+					await handler.editWithEmoji(message, ResponseEmojis.Danger);
 				}
 			} else {
 				console.error('Invalid interaction type! It should be a command interaction in a guild.');
-			}
-
-			// A simple function that responds to messages. This is not part of a decorator signature!
-			async function messageResponder(message: string) {
-				commandInteraction.replied || commandInteraction.deferred
-					? await commandInteraction.editReply(message)
-					: await commandInteraction.reply(`${message}`);
 			}
 		};
 	};
 }
 
 interface CommandOptions {
+	/**
+	 * Which Discord permissions must the user have to run this command? All permissions must be satisfied.
+	 */
 	requires?: PermissionString[];
+
+	/**
+	 * If true the command will only be shown to the command author and will self-delete after a certain period of time.
+	 */
+	ephemeral?: boolean;
+
+	/**
+	 * If true, the user must be connected to a voice channel to run the command.
+	 */
+	enforceVoiceConnection?: boolean;
 }

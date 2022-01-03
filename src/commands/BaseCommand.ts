@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteraction } from 'discord.js';
+import { UserInteraction } from 'bot-classes';
 
 export interface BaseCommand {
 	/**
@@ -18,10 +18,8 @@ export interface BaseCommand {
 	/**
 	 * This method holds the logic of the slash command and runs when someone invokes the command.
 	 *
-	 * TIPS:
-	 * - There are various classes you can import from 'bot-classes' that can help you compose the logic.
-	 * - One example is UserInteraction, which will help you interact with the author of the command.
-	 * - Catch all errors with the @command() decorator! This will automatically wrap the runner method in a try and catch block and handle the error gracefully.
+	 * TIP:
+	 * Add the @command() decorator to your runner method. This will handle some things behind the scenes for you, like permissions, error handling and more.
 	 */
-	runner(commandInteraction: CommandInteraction): void;
+	runner(handler: UserInteraction): void;
 }

@@ -1,7 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { UserInteraction, YouTubeInterface, YouTubeVideo } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
-import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
 
@@ -10,12 +9,11 @@ export default class Start implements BaseCommand {
 		return new SlashCommandBuilder().setName('start').setDescription('Start the queue if the bot is not already playing.');
 	}
 
-	@command()
-	async runner(commandInteraction: CommandInteraction) {
-		const handler = await new UserInteraction(commandInteraction).init(false);
-
-		handler.voiceChannel;
-
+	@command({
+		ephemeral: false,
+		enforceVoiceConnection: true
+	})
+	async runner(handler: UserInteraction) {
 		const audioInterface = YouTubeInterface.fromGuild(handler.guild);
 		const queue = await audioInterface.queue.getSome();
 

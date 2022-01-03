@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { UserInteraction, YouTubeInterface } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
-import { CommandInteraction, MessageActionRow, MessageButton } from 'discord.js';
+import { MessageActionRow, MessageButton } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
 
@@ -11,13 +11,10 @@ export default class Clear implements BaseCommand {
 	}
 
 	@command({
-		requires: ['ADMINISTRATOR']
+		requires: ['ADMINISTRATOR'],
+		enforceVoiceConnection: true
 	})
-	async runner(commandInteraction: CommandInteraction) {
-		const handler = await new UserInteraction(commandInteraction).init();
-
-		handler.voiceChannel;
-
+	async runner(handler: UserInteraction) {
 		const guild = handler.guild;
 		const youtubeHandler = YouTubeInterface.fromGuild(guild);
 		const queueLength = await youtubeHandler.queue.length();

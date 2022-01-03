@@ -2,7 +2,6 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import { QueueManager, UserInteraction } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { moveArrItem } from 'bot-functions';
-import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
 
@@ -15,13 +14,12 @@ export default class Move implements BaseCommand {
 			.addIntegerOption(option => option.setName('to').setDescription("The item's new position.").setRequired(false));
 	}
 
-	@command()
-	async runner(commandInteraction: CommandInteraction) {
-		const handler = await new UserInteraction(commandInteraction).init(false);
+	@command({
+		ephemeral: false,
+		enforceVoiceConnection: true
+	})
+	async runner(handler: UserInteraction) {
 		const queue = new QueueManager(handler.guild.id, 'youtube');
-
-		handler.voiceChannel;
-
 		const queueLength = await queue.length();
 
 		// It is assumed users will start from index 1, not 0 like us programmers!
@@ -38,12 +36,9 @@ export default class Move implements BaseCommand {
 
 		const currentItems = await queue.getAll();
 		const alteredQueue = moveArrItem(currentItems, fromPosition - 1, toPosition - 1);
-		const queuePurged = await queue.purge(); // Redis does not support moving items in a list. We'll let JS do it.
-
-		if (queuePurged) {
-			const awaitingReAdded = alteredQueue.map(item => queue.add(item));
-			await Promise.all(awaitingReAdded);
-			handler.editWithEmoji('Queue item moved!', ResponseEmojis.Info);
-		}
+		await queue.purge(); // Redis does not support moving items in a list. We'll let JS do it.
+		const awaitingReAdded = alteredQueue.map(item => queue.add(item));
+		await Promise.all(awaitingReAdded);
+		handler.editWithEmoji('Queue item moved!', ResponseEmojis.Info);
 	}
 }

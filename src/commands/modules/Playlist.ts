@@ -1,7 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { UserInteraction, YouTubeInterface, YouTubePlaylist } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
-import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
 
@@ -13,12 +12,11 @@ export default class Playlist implements BaseCommand {
 			.addStringOption(option => option.setName('url').setDescription('The URL containing the playlist ID.').setRequired(true));
 	}
 
-	@command()
-	async runner(commandInteraction: CommandInteraction) {
-		const handler = await new UserInteraction(commandInteraction).init(false);
-
-		handler.voiceChannel;
-
+	@command({
+		ephemeral: false,
+		enforceVoiceConnection: true
+	})
+	async runner(handler: UserInteraction) {
 		const audioInterface = YouTubeInterface.fromGuild(handler.guild);
 		const playlistUrl = handler.commandInteraction.options.getString('url', true);
 		const youtubePlaylist = YouTubePlaylist.fromUrl(playlistUrl);

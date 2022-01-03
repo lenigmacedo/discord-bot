@@ -2,7 +2,7 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import { UserInteraction, YouTubeVideo } from 'bot-classes';
 import { YtdlVideoInfoResolved } from 'bot-classes/modules/YouTubeVideo';
 import { globals, ResponseEmojis } from 'bot-config';
-import { CommandInteraction, MessageActionRow, MessageSelectMenu, MessageSelectOptionData } from 'discord.js';
+import { MessageActionRow, MessageSelectMenu, MessageSelectOptionData } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
 
@@ -14,12 +14,10 @@ export default class Search implements BaseCommand {
 			.addStringOption(option => option.setName('search-query').setDescription('The video you would like to search for.').setRequired(true));
 	}
 
-	@command()
-	async runner(commandInteraction: CommandInteraction) {
-		const handler = await new UserInteraction(commandInteraction).init();
-
-		handler.voiceChannel;
-
+	@command({
+		enforceVoiceConnection: true
+	})
+	async runner(handler: UserInteraction) {
 		await handler.editWithEmoji('Searching YouTube. Please wait...', ResponseEmojis.Loading);
 		const searchQuery = handler.commandInteraction.options.getString('search-query', true);
 		const searchResult = await YouTubeVideo.searchForUrls(searchQuery);

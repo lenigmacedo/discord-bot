@@ -2,6 +2,10 @@
 
 This folder contains the bot's config along with other variables that need accessing globally throughout the bot.
 
-By default, 'config.ts' is exported. This file contains constants that must not change.
+## Config.ts
 
-In config/modules you can find "commands.ts" and "globals.ts". Commands is where new slash commands are registered, and globals is where you can find variables that need global access and can be modified anytime at runtime (unlike config).
+Lots of options to customise!
+
+## Globals.ts
+
+This file contains global instances. An example is the YouTube API client. What would be the point in constructing this object every time a command is called when we can do it once?

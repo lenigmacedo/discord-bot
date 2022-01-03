@@ -65,14 +65,10 @@ export default class UserInteraction {
 	}
 
 	/**
-	 * Get the voice channel instance. Will throw an error if it does not exist.
+	 * Get the voice channel instance.
 	 */
 	get voiceChannel() {
-		if (this.author.voice?.channel) {
-			return this.author.voice.channel;
-		}
-
-		throw Error('Must be connected to a voice channel to continue!');
+		return this.author.voice.channel;
 	}
 
 	/**
@@ -112,6 +108,10 @@ export default class UserInteraction {
 	 */
 	joinVoiceChannel(id?: string) {
 		const adapterCreator = this.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator;
+
+		if (!this.voiceChannel?.id) {
+			throw Error('Voice channel ID could not be found!');
+		}
 
 		const connectionOptions = {
 			guildId: this.guild.id,

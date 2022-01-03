@@ -1,7 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { UserInteraction, YouTubeInterface, YouTubeVideo } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
-import { CommandInteraction } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
 
@@ -15,12 +14,11 @@ export default class Play implements BaseCommand {
 			);
 	}
 
-	@command()
-	async runner(commandInteraction: CommandInteraction) {
-		const handler = await new UserInteraction(commandInteraction).init(false);
-
-		handler.voiceChannel;
-
+	@command({
+		ephemeral: false,
+		enforceVoiceConnection: true
+	})
+	async runner(handler: UserInteraction) {
 		const query = handler.commandInteraction.options.getString('query', true);
 		const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
 
