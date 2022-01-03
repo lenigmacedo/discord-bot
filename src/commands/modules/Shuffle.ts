@@ -25,7 +25,7 @@ export default class Shuffle implements BaseCommand {
 		if (queuePurged) {
 			const awaitingReAdded = shuffledItems.map(item => queue.add(item));
 			await Promise.all(awaitingReAdded);
-			handler.editWithEmoji('The queue has been shuffled!', ResponseEmojis.Info);
+			handler.editWithEmoji('The queue has been shuffled!', ResponseEmojis.Success);
 		}
 	}
 }

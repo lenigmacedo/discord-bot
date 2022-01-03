@@ -24,7 +24,7 @@ export default class Clean implements BaseCommand {
 		if (queuePurged) {
 			const awaitingReAdded = dedupedItems.map(item => queue.add(item));
 			await Promise.all(awaitingReAdded);
-			handler.editWithEmoji(`The queue has been cleaned!\nRemoved: \`${oldLen - newLen}\`.`, ResponseEmojis.Info);
+			handler.editWithEmoji(`The queue has been cleaned!\nRemoved: \`${oldLen - newLen}\`.`, ResponseEmojis.Success);
 		}
 	}
 }
