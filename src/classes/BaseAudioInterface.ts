@@ -1,8 +1,6 @@
 import { AudioPlayer, AudioResource, VoiceConnection } from '@discordjs/voice';
 
 export abstract class BaseAudioInterface {
-	constructor() {}
-
 	/**
 	 * Based off of a queue index number, get an item in the queue.
 	 */

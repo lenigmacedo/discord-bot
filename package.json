@@ -46,6 +46,9 @@
 		"@types/jest": "^27.0.2",
 		"@types/lodash": "^4.14.175",
 		"@types/redis": "^2.8.32",
+		"@typescript-eslint/eslint-plugin": "^5.9.0",
+		"@typescript-eslint/parser": "^5.9.0",
+		"eslint": "^8.6.0",
 		"jest": "^27.3.1",
 		"nodemon": "^2.0.14",
 		"ts-jest": "^27.0.7"

@@ -30,7 +30,7 @@ export default class Cache {
 	 * @param json A serialisable object to convert to JSON.
 	 * @returns Whether the operation failed or not.
 	 */
-	async set(json: any, path: string = '.') {
+	async set(json: any, path = '.') {
 		const result = await this.client.json.SET(this.namespace, path, json);
 		const expiry = await this.client.EXPIRE(this.namespace, config.cacheExpiryHours * 60 * 60);
 		return !!(result && expiry);
@@ -41,7 +41,7 @@ export default class Cache {
 	 *
 	 * @param path The path to the desired value. May or may not exist.
 	 */
-	async get<TResponse>(path: string = '.') {
+	async get<TResponse>(path = '.') {
 		const response = await this.client.json.GET(this.namespace, { path });
 
 		if (response) {

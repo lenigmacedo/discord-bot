@@ -7,8 +7,8 @@ import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
 
 export default class Queue implements BaseCommand {
-	page: number = 0;
-	pageCount: number = 0;
+	page = 0;
+	pageCount = 0;
 
 	register() {
 		return new SlashCommandBuilder()
@@ -78,7 +78,7 @@ export default class Queue implements BaseCommand {
 
 			return {
 				name: videoDetails?.title ? `${itemNumber}) ${videoDetails.title.substring(0, 100)}` : `${itemNumber}) ${ResponseEmojis.Danger} FAILED`,
-				value: videoDetails?.description ? `By \`${videoDetails.author.name}\`.\n>> ${videoDetails.video_url}` : `Video not available.`
+				value: videoDetails?.description ? `By \`${videoDetails.author.name}\`.\n>> ${videoDetails.video_url}` : 'Video not available.'
 			};
 		});
 

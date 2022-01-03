@@ -58,46 +58,48 @@ export default class YouTubePlaylist extends YouTubeBase {
 				pageToken: undefined
 			};
 
-			// This function will run recursively to fetch ALL items from a playlist.
-			// Due to the paginated nature of the YouTube API, this essentially loops through each page accumulating items as it goes.
-			// For each iteration, it will pass in modified params for the next API call, the previous accumulated values, and retain reference to the original promise resolver function.
-			// If the API response is good, it will append the new values to the previous accumulated values and re-invoke itself doing what was described on the line above.
-			// When the API has been exhausted, it will invoke the original resolver function resolving the promise.
-			async function recursiveVideoFetcher(
-				resolver: (value: youtube_v3.Schema$PlaylistItem[]) => void,
-				accumulator: youtube_v3.Schema$PlaylistItem[] = [],
-				nextParams = params
-			) {
-				// Fetch the next max results value to keep the amount of items retrieved matching the config.
-				// The newMaxResults value is later checked to ensure it is larger than 0 otherwise we have all we need.
-				// YouTube API limit is 50 anyway, so it doesn't matter if it is a big number.
-				const newMaxResults = config.playlistImportMaxSize - accumulator.length;
-				nextParams.maxResults = newMaxResults;
-
-				// The YouTube API does not paginate with numbers, it instead calculates a token that you must fetch by the response.
-				// It uses the token and somehow knows what page to fetch.
-				const response = await globals.youtubeApi.playlistItems.list(nextParams);
-				const nextPageToken = response?.data?.nextPageToken;
-				const items = response?.data?.items;
-
-				if (items && nextPageToken && newMaxResults > 0) {
-					nextParams.pageToken = nextPageToken;
-					recursiveVideoFetcher(resolver, [...accumulator, ...items], nextParams);
-				} else {
-					resolver(accumulator);
-				}
-			}
-
-			function runVideoFetcher(): Promise<youtube_v3.Schema$PlaylistItem[]> {
-				return new Promise(resolve => recursiveVideoFetcher(resolve));
-			}
-
-			const items = await runVideoFetcher();
+			const items = await this.runVideoFetcher(params);
 
 			return items || [];
 		} catch (error) {
 			console.error(error);
 			return [];
+		}
+	}
+
+	private runVideoFetcher(params: youtube_v3.Params$Resource$Playlistitems$List): Promise<youtube_v3.Schema$PlaylistItem[]> {
+		return new Promise(resolve => this.recursiveVideoFetcher(resolve, params));
+	}
+
+	/**
+	 * This function will run recursively to fetch ALL items from a playlist.
+	 * Due to the paginated nature of the YouTube API, this essentially loops through each page accumulating items as it goes.
+	 * For each iteration, it will pass in modified params for the next API call, the previous accumulated values, and retain reference to the original promise resolver function.
+	 * If the API response is good, it will append the new values to the previous accumulated values and re-invoke itself doing what was described on the line above.
+	 * When the API has been exhausted, it will invoke the original resolver function resolving the promise.
+	 */
+	private async recursiveVideoFetcher(
+		resolver: (value: youtube_v3.Schema$PlaylistItem[]) => void,
+		nextParams: youtube_v3.Params$Resource$Playlistitems$List,
+		accumulator: youtube_v3.Schema$PlaylistItem[] = []
+	) {
+		// Fetch the next max results value to keep the amount of items retrieved matching the config.
+		// The newMaxResults value is later checked to ensure it is larger than 0 otherwise we have all we need.
+		// YouTube API limit is 50 anyway, so it doesn't matter if it is a big number.
+		const newMaxResults = config.playlistImportMaxSize - accumulator.length;
+		nextParams.maxResults = newMaxResults;
+
+		// The YouTube API does not paginate with numbers, it instead calculates a token that you must fetch by the response.
+		// It uses the token and somehow knows what page to fetch.
+		const response = await globals.youtubeApi.playlistItems.list(nextParams);
+		const nextPageToken = response?.data?.nextPageToken;
+		const items = response?.data?.items;
+
+		if (items && nextPageToken && newMaxResults > 0) {
+			nextParams.pageToken = nextPageToken;
+			this.recursiveVideoFetcher(resolver, nextParams, [...accumulator, ...items]);
+		} else {
+			resolver(accumulator);
 		}
 	}
 

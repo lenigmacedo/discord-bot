@@ -19,7 +19,7 @@ export default class YouTubeInterface implements BaseAudioInterface {
 	private audioVolume: number;
 	private voiceConnection?: VoiceConnection;
 	private currentResource?: AudioResource | null;
-	private looped: boolean = false;
+	private looped = false;
 	queue: QueueManager;
 
 	/**
@@ -77,7 +77,7 @@ export default class YouTubeInterface implements BaseAudioInterface {
 	 * Get the video ID or String from its index.
 	 * @param queueItemIndex The queue item index.
 	 */
-	getItemId(index: number = 0) {
+	getItemId(index = 0) {
 		return this.queue.get(index);
 	}
 
@@ -110,7 +110,6 @@ export default class YouTubeInterface implements BaseAudioInterface {
 			if (!currentVideo) return;
 
 			await this.queue.add(currentVideo);
-		} else {
 		}
 
 		await this.queue.deleteFirst();

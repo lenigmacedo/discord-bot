@@ -6,3 +6,4 @@ bracketSpacing: true
 printWidth: 150
 trailingComma: 'none'
 arrowParens: 'avoid'
+endOfLine: 'lf'

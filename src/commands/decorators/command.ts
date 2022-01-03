@@ -11,7 +11,7 @@ export function command(options: CommandOptions = {}) {
 	// propertyName = The string representaion of the method name.
 	// descriptor = Properties that relate to the method this decorator is attached to.
 	return function (target: any, propertyName: any, descriptor: any) {
-		const method: Function = descriptor.value;
+		const method = descriptor.value;
 
 		descriptor.value = async (commandInteraction: CommandInteraction) => {
 			if (commandInteraction instanceof CommandInteraction && commandInteraction.member instanceof GuildMember) {
