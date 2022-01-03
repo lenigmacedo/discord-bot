@@ -72,9 +72,7 @@ Advantages of v13:
 
 ## Plans
 
-This bot is in continuous development, and is only in its beginning phase. It currently does not have any additional features over the previous bot so my first plan is to make that so.
-
-Then I will continue to make the bot more versatile and powerful! Not yet sure what those features may be!
+This bot is in continuous development, and is only in its beginning phase. Then I will continue to make the bot more versatile and powerful! Not yet sure what those features may be!
 
 ## Licensed under the GNU GPL v3
 
