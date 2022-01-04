@@ -1,6 +1,6 @@
-import { UserInteraction } from 'bot-classes';
-import { ResponseEmojis } from 'bot-config';
-import { CommandInteraction, GuildMember, PermissionString } from 'discord.js';
+import { CommandInteractionHelper } from 'bot-classes';
+import { config, ResponseEmojis } from 'bot-config';
+import { CommandInteraction, PermissionString } from 'discord.js';
 
 /**
  * This decorator wraps the command in a try/catch block to prevent most errors from crashing the process and sorts out permissions.
@@ -14,30 +14,26 @@ export function command(options: CommandOptions = {}) {
 		const method = descriptor.value;
 
 		descriptor.value = async (commandInteraction: CommandInteraction) => {
-			if (commandInteraction instanceof CommandInteraction && commandInteraction.member instanceof GuildMember) {
-				const { requires = ['SPEAK', 'READ_MESSAGE_HISTORY'], ephemeral = true, enforceVoiceConnection = false } = options;
-				const handler = await new UserInteraction(commandInteraction).init(ephemeral);
+			const {
+				requires = config.minimumDefaultPermissions as PermissionString[],
+				ephemeral = true,
+				enforceVoiceConnection = false,
+				enforceGuild = true
+			} = options;
+			const handler = await new CommandInteractionHelper(commandInteraction).init(ephemeral);
 
-				try {
-					const permissions = commandInteraction.member.permissions.toArray();
-					const foundPermissions = requires.filter(required => permissions.includes(required));
+			try {
+				// All checks below will throw if criteria is not met.
+				if (enforceVoiceConnection) handler.enforceVoiceChannel();
+				if (enforceGuild) handler.guild;
+				if (requires) handler.enforcePermissions(requires);
 
-					if (enforceVoiceConnection && !handler.voiceChannel) {
-						handler.editWithEmoji('This command requires you to be connected to a voice channel.', ResponseEmojis.Danger);
-						return;
-					}
+				return await method.call(target, handler);
+			} catch (error: any) {
+				const trimmedMessage = error?.message?.trim(1500);
+				const message = error.message ? trimmedMessage : 'There was a problem executing your request. The reason is unknown.';
 
-					if (foundPermissions.length === requires.length) return await method.call(target, handler);
-
-					await handler.editWithEmoji('You are not permitted to run this command.', ResponseEmojis.Danger);
-				} catch (error: any) {
-					const trimmedMessage = error?.message?.trim(1500);
-					const message = error.message ? trimmedMessage : 'There was a problem executing your request. The reason is unknown.';
-
-					await handler.editWithEmoji(message, ResponseEmojis.Danger);
-				}
-			} else {
-				console.error('Invalid interaction type! It should be a command interaction in a guild.');
+				await handler.editWithEmoji(message, ResponseEmojis.Danger);
 			}
 		};
 	};
@@ -53,6 +49,11 @@ interface CommandOptions {
 	 * If true the command will only be shown to the command author and will self-delete after a certain period of time.
 	 */
 	ephemeral?: boolean;
+
+	/**
+	 * Is this command only run in a guild?
+	 */
+	enforceGuild?: boolean;
 
 	/**
 	 * If true, the user must be connected to a voice channel to run the command.

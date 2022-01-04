@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { UserInteraction, YouTubeInterface, YouTubeVideo } from 'bot-classes';
+import { CommandInteractionHelper, YouTubeInterface, YouTubeVideo } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
@@ -13,7 +13,7 @@ export default class Start implements BaseCommand {
 		ephemeral: false,
 		enforceVoiceConnection: true
 	})
-	async runner(handler: UserInteraction) {
+	async runner(handler: CommandInteractionHelper) {
 		const audioInterface = YouTubeInterface.fromGuild(handler.guild);
 		const queue = await audioInterface.queue.getSome();
 

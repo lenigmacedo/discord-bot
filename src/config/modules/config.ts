@@ -32,6 +32,7 @@ const config = {
 	queueButtonExpiryMilliseconds: 600 * 1000,
 	cacheExpiryHours: 24,
 	audioVolume: 0.8,
+	minimumDefaultPermissions: ['SPEAK'], // By default, the user should have these privileges unless the command has been overridden.
 
 	numberFormat: 'en-GB'
 };

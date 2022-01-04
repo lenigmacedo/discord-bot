@@ -1,9 +1,17 @@
 import { DiscordGatewayAdapterCreator, joinVoiceChannel } from '@discordjs/voice';
 import { config, ResponseEmojis } from 'bot-config';
-import { CollectorFilter, CommandInteraction, Guild, GuildMember, InteractionReplyOptions, Message, MessageComponentInteraction } from 'discord.js';
+import {
+	CollectorFilter,
+	CommandInteraction,
+	GuildMember,
+	InteractionReplyOptions,
+	Message,
+	MessageComponentInteraction,
+	PermissionString
+} from 'discord.js';
 import path from 'path';
 
-export class UserInteraction {
+export class CommandInteractionHelper {
 	protected interaction: CommandInteraction;
 	protected invoked: Date; // A Date instance representing when this command was run.
 
@@ -37,18 +45,22 @@ export class UserInteraction {
 		return this.interaction;
 	}
 
+	/**
+	 * Get the Discord server this command was run in.
+	 * This method will throw if a guild cannot be found.
+	 */
 	get guild() {
-		if (this.interaction.guild instanceof Guild) {
+		if (this.interaction.guild) {
 			return this.interaction.guild;
 		}
 
-		throw Error('This command can only be run in a Guild.');
+		throw Error('This command can only be run in a server.');
 	}
 
 	/**
 	 * Get the author of the slash command.
 	 */
-	get author() {
+	get guildMember() {
 		if (this.interaction.member instanceof GuildMember) {
 			return this.interaction.member;
 		}
@@ -68,7 +80,16 @@ export class UserInteraction {
 	 * Get the voice channel instance.
 	 */
 	get voiceChannel() {
-		return this.author.voice.channel;
+		return this.guildMember.voice.channel;
+	}
+
+	/**
+	 * Get the voice channel instance.
+	 *
+	 * WARNING: This method will throw an error if the requirements are not met. Otherwise, use voiceChannel instead!
+	 */
+	enforceVoiceChannel() {
+		if (!this.voiceChannel) throw Error('You must be connected to a voice channel to continue.');
 	}
 
 	/**
@@ -110,7 +131,7 @@ export class UserInteraction {
 		const adapterCreator = this.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator;
 
 		if (!this.voiceChannel?.id) {
-			throw Error('Voice channel ID could not be found!');
+			throw Error('Voice channel ID could not be found.');
 		}
 
 		const connectionOptions = {
@@ -120,6 +141,31 @@ export class UserInteraction {
 		};
 
 		return joinVoiceChannel(connectionOptions);
+	}
+
+	/**
+	 * Take an array of permissions, and find out if the user is authorised.
+	 * @param requiredPermissions An array of Discord standard permissions.
+	 */
+	checkPermissions(requiredPermissions: PermissionString[]) {
+		if (!(this.commandInteraction.member instanceof GuildMember)) return false;
+
+		const permissions = this.commandInteraction.member.permissions.toArray();
+		const foundPermissions = requiredPermissions.filter(required => permissions.includes(required));
+
+		return foundPermissions.length === requiredPermissions.length;
+	}
+
+	/**
+	 * Take an array of permissions, and find out if the user is authorised.
+	 *
+	 * WARNING: This method throws an error if the user is not authorised! Otherwise, use checkPermissions() instead.
+	 * @param requiredPermissions An array of Discord standard permissions.
+	 */
+	enforcePermissions(requiredPermissions: PermissionString[]) {
+		if (!this.checkPermissions(requiredPermissions)) {
+			throw Error('You do not have permission to execute this command.');
+		}
 	}
 
 	/**

@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { UserInteraction, YouTubeInterface, YouTubeVideo } from 'bot-classes';
+import { CommandInteractionHelper, YouTubeInterface, YouTubeVideo } from 'bot-classes';
 import { YtdlVideoInfoResolved } from 'bot-classes/modules/YouTubeVideo';
 import { ColourScheme, config, ResponseEmojis } from 'bot-config';
 import { ColorResolvable, EmbedFieldData, Message, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
@@ -18,7 +18,7 @@ export default class Queue implements BaseCommand {
 	}
 
 	@command()
-	async runner(handler: UserInteraction) {
+	async runner(handler: CommandInteractionHelper) {
 		const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
 		const queueLength = await youtubeInterface.queue.length();
 
@@ -108,7 +108,7 @@ export default class Queue implements BaseCommand {
 	 * @param botMessage An instance returned from a bot reply.
 	 * @param handler The Command instance with a valid commandInteraction instance applied to it.
 	 */
-	async registerButtonInteractionLogic(botMessage: Message, handler: UserInteraction) {
+	async registerButtonInteractionLogic(botMessage: Message, handler: CommandInteractionHelper) {
 		const collector = botMessage.createMessageComponentCollector({
 			time: config.queueButtonExpiryMilliseconds // Expires for memory reasons.
 		});

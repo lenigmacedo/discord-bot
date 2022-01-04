@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { UserInteraction, YouTubeInterface, YouTubeVideo } from 'bot-classes';
+import { CommandInteractionHelper, YouTubeInterface, YouTubeVideo } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
@@ -16,7 +16,7 @@ export default class Enqueue implements BaseCommand {
 		ephemeral: false,
 		enforceVoiceConnection: true
 	})
-	async runner(handler: UserInteraction) {
+	async runner(handler: CommandInteractionHelper) {
 		const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
 		const youtubeUrl = handler.commandInteraction.options.getString('url', true);
 		const youtubeVideo = YouTubeVideo.fromUrl(youtubeUrl);

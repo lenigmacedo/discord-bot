@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { UserInteraction, YouTubeInterface } from 'bot-classes';
+import { CommandInteractionHelper, YouTubeInterface } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { MessageActionRow, MessageButton } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
@@ -14,7 +14,7 @@ export default class Clear implements BaseCommand {
 		requires: ['ADMINISTRATOR'],
 		enforceVoiceConnection: true
 	})
-	async runner(handler: UserInteraction) {
+	async runner(handler: CommandInteractionHelper) {
 		const guild = handler.guild;
 		const youtubeHandler = YouTubeInterface.fromGuild(guild);
 		const queueLength = await youtubeHandler.queue.length();

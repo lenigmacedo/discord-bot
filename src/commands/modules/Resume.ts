@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { UserInteraction, YouTubeInterface } from 'bot-classes';
+import { CommandInteractionHelper, YouTubeInterface } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
@@ -13,7 +13,7 @@ export default class Resume implements BaseCommand {
 		ephemeral: false,
 		enforceVoiceConnection: true
 	})
-	async runner(handler: UserInteraction) {
+	async runner(handler: CommandInteractionHelper) {
 		const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
 		const unpaused = youtubeInterface.player.unpause();
 

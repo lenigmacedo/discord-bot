@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { QueueManager, UserInteraction } from 'bot-classes';
+import { CommandInteractionHelper, QueueManager } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { moveArrItem } from 'bot-functions';
 import { BaseCommand } from '../BaseCommand';
@@ -18,7 +18,7 @@ export default class Move implements BaseCommand {
 		ephemeral: false,
 		enforceVoiceConnection: true
 	})
-	async runner(handler: UserInteraction) {
+	async runner(handler: CommandInteractionHelper) {
 		const queue = new QueueManager(handler.guild.id, 'youtube');
 		const queueLength = await queue.length();
 

@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { UserInteraction } from 'bot-classes';
+import { CommandInteractionHelper } from 'bot-classes';
 
 export interface BaseCommand {
 	/**
@@ -21,5 +21,5 @@ export interface BaseCommand {
 	 * TIP:
 	 * Add the @command() decorator to your runner method. This will handle some things behind the scenes for you, like permissions, error handling and more.
 	 */
-	runner(handler: UserInteraction): void;
+	runner(handler: CommandInteractionHelper): void;
 }

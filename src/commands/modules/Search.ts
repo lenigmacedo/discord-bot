@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { UserInteraction, YouTubeVideo } from 'bot-classes';
+import { CommandInteractionHelper, YouTubeVideo } from 'bot-classes';
 import { YtdlVideoInfoResolved } from 'bot-classes/modules/YouTubeVideo';
 import { globals, ResponseEmojis } from 'bot-config';
 import { MessageActionRow, MessageSelectMenu, MessageSelectOptionData } from 'discord.js';
@@ -17,7 +17,7 @@ export default class Search implements BaseCommand {
 	@command({
 		enforceVoiceConnection: true
 	})
-	async runner(handler: UserInteraction) {
+	async runner(handler: CommandInteractionHelper) {
 		await handler.editWithEmoji('Searching YouTube. Please wait...', ResponseEmojis.Loading);
 		const searchQuery = handler.commandInteraction.options.getString('search-query', true);
 		const searchResult = await YouTubeVideo.searchForUrls(searchQuery);

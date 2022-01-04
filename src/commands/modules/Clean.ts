@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { QueueManager, UserInteraction } from 'bot-classes';
+import { CommandInteractionHelper, QueueManager } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
@@ -13,7 +13,7 @@ export default class Clean implements BaseCommand {
 		ephemeral: false,
 		enforceVoiceConnection: true
 	})
-	async runner(handler: UserInteraction) {
+	async runner(handler: CommandInteractionHelper) {
 		const queue = new QueueManager(handler.guild.id, 'youtube');
 		const currentItems = await queue.getAll();
 		const oldLen = currentItems.length;
