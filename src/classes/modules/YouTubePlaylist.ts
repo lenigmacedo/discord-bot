@@ -1,9 +1,9 @@
 import { youtube_v3 } from '@googleapis/youtube';
+import { YouTubeVideo } from 'bot-classes';
 import { config, globals } from 'bot-config';
-import { YouTubeVideo } from '..';
-import YouTubeBase from './YouTubeBase';
+import { YouTubeBase } from './YouTubeBase';
 
-export default class YouTubePlaylist extends YouTubeBase {
+export class YouTubePlaylist extends YouTubeBase {
 	constructor(url: string) {
 		super(url);
 	}

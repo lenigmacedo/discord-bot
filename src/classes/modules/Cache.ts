@@ -1,7 +1,7 @@
 import { config } from 'bot-config';
 import { createClient } from 'redis';
 
-export default class Cache {
+export class Cache {
 	static client = createClient({ url: `redis://${config.redisHost}:${config.redisPort}` });
 	private namespace: string;
 

@@ -1,13 +1,13 @@
 import { createAudioResource } from '@discordjs/voice';
 import { youtube_v3 } from '@googleapis/youtube';
+import { Cache } from 'bot-classes';
 import { config, globals } from 'bot-config';
 import ytdl from 'ytdl-core-discord';
-import Cache from './Cache';
-import YouTubeBase from './YouTubeBase';
+import { YouTubeBase } from './YouTubeBase';
 
 export type YtdlVideoInfoResolved = Awaited<ReturnType<typeof ytdl.getBasicInfo>>;
 
-export default class YouTubeVideo extends YouTubeBase {
+export class YouTubeVideo extends YouTubeBase {
 	redisNamespace = `${config.redisNamespace}:youtubeVideoInfo`;
 	cache: Cache;
 

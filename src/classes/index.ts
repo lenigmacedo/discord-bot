@@ -1,5 +1,6 @@
-export { default as QueueManager } from './modules/QueueManager';
-export { default as UserInteraction } from './modules/UserInteraction';
-export { default as YouTubeInterface } from './modules/YouTubeInterface';
-export { default as YouTubePlaylist } from './modules/YouTubePlaylist';
-export { default as YouTubeVideo } from './modules/YouTubeVideo';
+export { Cache } from './modules/Cache';
+export { QueueManager } from './modules/QueueManager';
+export { UserInteraction } from './modules/UserInteraction';
+export { YouTubeInterface } from './modules/YouTubeInterface';
+export { YouTubePlaylist } from './modules/YouTubePlaylist';
+export { YouTubeVideo } from './modules/YouTubeVideo';

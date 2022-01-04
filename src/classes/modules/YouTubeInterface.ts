@@ -8,13 +8,12 @@ import {
 	createAudioPlayer,
 	VoiceConnection
 } from '@discordjs/voice';
-import { QueueManager } from 'bot-classes';
+import { QueueManager, YouTubeVideo } from 'bot-classes';
 import { config, globals } from 'bot-config';
 import { Guild } from 'discord.js';
 import { BaseAudioInterface } from '../BaseAudioInterface';
-import YouTubeVideo from './YouTubeVideo';
 
-export default class YouTubeInterface implements BaseAudioInterface {
+export class YouTubeInterface implements BaseAudioInterface {
 	private audioPlayer: AudioPlayer;
 	private audioVolume: number;
 	private voiceConnection?: VoiceConnection;

@@ -1,4 +1,4 @@
-export default abstract class YouTubeBase {
+export abstract class YouTubeBase {
 	private uri: URL;
 
 	/**

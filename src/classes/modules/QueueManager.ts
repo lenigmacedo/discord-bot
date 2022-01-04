@@ -2,7 +2,7 @@ import { config } from 'bot-config';
 import { Guild } from 'discord.js';
 import { createClient } from 'redis';
 
-export default class QueueManager {
+export class QueueManager {
 	static client = createClient({ url: `redis://${config.redisHost}:${config.redisPort}` });
 	namespace: string;
 

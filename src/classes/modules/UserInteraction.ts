@@ -3,7 +3,7 @@ import { config, ResponseEmojis } from 'bot-config';
 import { CollectorFilter, CommandInteraction, Guild, GuildMember, InteractionReplyOptions, Message, MessageComponentInteraction } from 'discord.js';
 import path from 'path';
 
-export default class UserInteraction {
+export class UserInteraction {
 	protected interaction: CommandInteraction;
 	protected invoked: Date; // A Date instance representing when this command was run.
 
