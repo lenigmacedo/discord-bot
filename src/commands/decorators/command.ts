@@ -3,14 +3,21 @@ import { config, ResponseEmojis } from 'bot-config';
 import { CommandInteraction, PermissionString } from 'discord.js';
 
 /**
- * This decorator wraps the command in a try/catch block to prevent most errors from crashing the process and sorts out permissions.
- * By default a user must have speak and read message history permissions to interact with the bot.
+ * This decorator does some very handy things, it:
+ *
+ * - Wraps the command in a try/catch block to prevent most errors from crashing the process
+ * - Sorts out permissions.
+ * - Lets you define "must-haves" before the command is even run.
+ * - Will automatically invoke subcommands if found in this object. The name of the subcommand must match the name of the method in this object.
+ * 	- Of course, reserved JavaScript keywords cannot be used. :( You might need to get creative.
+ * - Can help you out with permissions.
+ * By default a user must have speak permissions to interact with the bot but that can be overridden.
  */
 export function command(options: CommandOptions = {}) {
 	// target = The class itself.
 	// propertyName = The string representaion of the method name.
 	// descriptor = Properties that relate to the method this decorator is attached to.
-	return function (target: any, propertyName: any, descriptor: any) {
+	return function (target: any, propertyName: string, descriptor: PropertyDescriptor) {
 		const method = descriptor.value;
 
 		descriptor.value = async (commandInteraction: CommandInteraction) => {
@@ -18,7 +25,8 @@ export function command(options: CommandOptions = {}) {
 				requires = config.minimumDefaultPermissions as PermissionString[],
 				ephemeral = true,
 				enforceVoiceConnection = false,
-				enforceGuild = true
+				enforceGuild = true,
+				runnerSubcommandName = ''
 			} = options;
 			const handler = await new CommandInteractionHelper(commandInteraction).init(ephemeral);
 
@@ -28,11 +36,16 @@ export function command(options: CommandOptions = {}) {
 				if (enforceGuild) handler.guild;
 				if (requires) handler.enforcePermissions(requires);
 
+				const subcommand = handler.commandInteraction.options.getSubcommand(false);
+				if (subcommand && runnerSubcommandName !== subcommand) {
+					return await target[subcommand].call(target, handler);
+				}
+
 				return await method.call(target, handler);
 			} catch (error: any) {
 				const trimmedMessage = error?.message?.trim(1500);
 				const message = error.message ? trimmedMessage : 'There was a problem executing your request. The reason is unknown.';
-
+				console.error(error);
 				await handler.editWithEmoji(message, ResponseEmojis.Danger);
 			}
 		};
@@ -59,4 +72,17 @@ interface CommandOptions {
 	 * If true, the user must be connected to a voice channel to run the command.
 	 */
 	enforceVoiceConnection?: boolean;
+
+	/**
+	 * In Discord, you can either have subcommands or not.
+	 *
+	 * This means that if your command implements subcommands, this option lets you specify the subcommand
+	 * to take place of this runner.
+	 *
+	 * With the way the commands system works, which is auto-invoke the method in this class via subcommand name,
+	 * it would mean that the runner will never run because it doesn't represent a subcommand, only a normal command.
+	 * Once a subcommand has been implemented, the root command is not an option for users.
+	 * This is because the methods of the command class are automatically executed by subcommand name.
+	 */
+	runnerSubcommandName?: string;
 }

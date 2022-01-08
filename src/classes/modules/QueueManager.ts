@@ -31,9 +31,10 @@ export class QueueManager {
 	 *
 	 * @param guild The Discord.js Guild instance.
 	 * @param namespace The namespace to organise multiple queues for a guild.
+	 * As this takes an array, it will be joined with a ':' during construction.
 	 */
-	static fromGuild(guild: Guild, namespace: string) {
-		return new this(guild.id, namespace);
+	static fromGuild(guild: Guild, namespace: string[]) {
+		return new this(guild.id, namespace.join(':'));
 	}
 
 	/**

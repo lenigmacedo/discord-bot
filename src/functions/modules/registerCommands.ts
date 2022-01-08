@@ -8,7 +8,7 @@ import path from 'path';
  * This function registers all slash commands to the Discord API.
  * It also stores all command classes in the globals object to be used later.
  */
-export default async function registerCommands() {
+export async function registerCommands() {
 	const { discordToken, clientId, devGuildId } = config;
 	const rest = new REST({ version: '9' }).setToken(discordToken as string);
 

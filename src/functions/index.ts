@@ -1,3 +1,4 @@
-export { default as moveArrItem } from './modules/moveArrItem';
-export { default as registerCommands } from './modules/registerCommands';
-export { default as shuffleArr } from './modules/shuffleArr';
+export { moveArrItem } from './modules/moveArrItem';
+export { numClamp } from './modules/numClamp';
+export { registerCommands } from './modules/registerCommands';
+export { shuffleArr } from './modules/shuffleArr';

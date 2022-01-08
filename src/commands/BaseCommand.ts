@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
+import { SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from '@discordjs/builders';
 import { CommandInteractionHelper } from 'bot-classes';
 
 export interface BaseCommand {
@@ -13,7 +13,7 @@ export interface BaseCommand {
 	 * Remarks:
 	 * - Please see https://discordjs.guide/interactions/registering-slash-commands.html#guild-commands for more info about slash commands.
 	 */
-	register(): SlashCommandBuilder | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>;
+	register(): SlashCommandBuilder | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'> | SlashCommandSubcommandsOnlyBuilder;
 
 	/**
 	 * This method holds the logic of the slash command and runs when someone invokes the command.

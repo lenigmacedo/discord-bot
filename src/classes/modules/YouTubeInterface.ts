@@ -10,7 +10,7 @@ import {
 } from '@discordjs/voice';
 import { QueueManager, YouTubeVideo } from 'bot-classes';
 import { config, globals } from 'bot-config';
-import { Guild } from 'discord.js';
+import { Guild, GuildMember } from 'discord.js';
 import { BaseAudioInterface } from '../BaseAudioInterface';
 
 export class YouTubeInterface implements BaseAudioInterface {
@@ -24,22 +24,31 @@ export class YouTubeInterface implements BaseAudioInterface {
 	/**
 	 * An easy toolbox for managing YouTube audio for this bot.
 	 */
-	constructor(guild: Guild) {
+	constructor(guild: Guild, queueName = 'global') {
 		this.audioPlayer = createAudioPlayer();
 		this.audioVolume = config.audioVolume;
-		this.queue = QueueManager.fromGuild(guild, 'youtube');
+		this.queue = QueueManager.fromGuild(guild, ['youtube', queueName]);
 	}
 
 	/**
 	 * Get the YouTube-based queue instance for a given guild. Will try to get one that already exists, but will create a new one if not.
 	 * @param guild The guild to get the instance for.
 	 */
-	static fromGuild(guild: Guild) {
+	static fromGuild(guild: Guild, queueName?: string) {
 		if (!globals.youtubePlayers.has(guild.id)) {
-			globals.youtubePlayers.set(guild.id, new YouTubeInterface(guild));
+			globals.youtubePlayers.set(guild.id, new YouTubeInterface(guild, queueName));
 		}
 
 		return globals.youtubePlayers.get(guild.id) as YouTubeInterface;
+	}
+
+	/**
+	 * This returns a queue with the scope being the user
+	 * @param member
+	 * @returns
+	 */
+	static fromGuildMember(member: GuildMember) {
+		return this.fromGuild(member.guild, member.id);
 	}
 
 	/**

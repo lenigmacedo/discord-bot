@@ -92,8 +92,8 @@ export class YouTubePlaylist extends YouTubeBase {
 		}
 
 		nextParams.pageToken = response?.data?.nextPageToken || undefined;
-		nextParams.maxResults = config.playlistImportMaxSize - accumulator.length;
-		const accumulated = accumulator.concat(items); // Spread syntax ([...x, ...y]) is 3x slower than concat()
+		const accumulated = accumulator.concat(items); // Spread syntax ([...x, ...y]) is 3x slower than concat().
+		nextParams.maxResults = config.playlistImportMaxSize - accumulated.length;
 
 		if (nextParams.pageToken && nextParams.maxResults > 0) {
 			this.videoAccumulator(resolver, nextParams, accumulated);
