@@ -14,7 +14,7 @@ export default class Clean implements BaseCommand {
 		enforceVoiceConnection: true
 	})
 	async runner(handler: CommandInteractionHelper) {
-		const queue = new QueueManager(handler.guild.id, 'youtube');
+		const queue = QueueManager.fromGuild(handler.guild, ['youtube', 'global']);
 		const currentItems = await queue.getAll();
 		const oldLen = currentItems.length;
 		const dedupedItems = Array.from(new Set(currentItems));

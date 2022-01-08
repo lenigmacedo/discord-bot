@@ -82,23 +82,31 @@ export class YouTubePlaylist extends YouTubeBase {
 		nextParams: youtube_v3.Params$Resource$Playlistitems$List,
 		accumulator: youtube_v3.Schema$PlaylistItem[] = []
 	) {
-		// The YouTube API does not paginate with numbers, it instead calculates a token that you must fetch by the response.
-		const response = await globals.youtubeApi.playlistItems.list(nextParams);
-		const items = response?.data?.items;
+		try {
+			// The YouTube API does not paginate with numbers, it instead calculates a token that you must fetch by the response.
+			const response = await globals.youtubeApi.playlistItems.list(nextParams);
+			const items = response?.data?.items;
 
-		if (!items) {
-			resolver(accumulator);
-			return;
-		}
+			if (!items) {
+				resolver(accumulator);
+				return;
+			}
 
-		nextParams.pageToken = response?.data?.nextPageToken || undefined;
-		const accumulated = accumulator.concat(items); // Spread syntax ([...x, ...y]) is 3x slower than concat().
-		nextParams.maxResults = config.playlistImportMaxSize - accumulated.length;
+			nextParams.pageToken = response?.data?.nextPageToken || undefined;
+			const accumulated = accumulator.concat(items); // Spread syntax ([...x, ...y]) is 3x slower than concat().
+			nextParams.maxResults = config.playlistImportMaxSize - accumulated.length;
 
-		if (nextParams.pageToken && nextParams.maxResults > 0) {
-			this.videoAccumulator(resolver, nextParams, accumulated);
-		} else {
-			resolver(accumulated);
+			if (nextParams.pageToken && nextParams.maxResults > 0) {
+				this.videoAccumulator(resolver, nextParams, accumulated);
+			} else {
+				resolver(accumulated);
+			}
+		} catch (error: any) {
+			console.error(
+				'Could not contact YouTube data API. Ensure you have a valid API key, which you can manage at https://console.cloud.google.com/apis/credentials'
+			);
+			console.error(error);
+			resolver([]);
 		}
 	}
 

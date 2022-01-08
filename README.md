@@ -59,8 +59,7 @@ Advantages of v13:
 
    1. `DISCORD_TOKEN` & `CLIENT_ID` - Which you can create/find https://discord.com/developers. This bot also requires the `applications.commands` permission otherwise you will not be able to use slash commands.
    2. `DEV_GUILD_ID` - For developers only. You do not need to fill this in if you are not a developer.
-   3. `GOOGLE_API_TOKEN` - Which you can create in the Google Cloud platform https://console.cloud.google.com/apis/credentials.
-      1. You also need to enable **YouTube Data API v3** in the Google Cloud platform.
+   3. `GOOGLE_API_TOKEN` - Which you can create in the Google Cloud platform https://console.cloud.google.com/apis/api/youtube.googleapis.com/credentials.
 
 6. Run `docker-compose up --build --detach`. This will build the bot, and run it.
 

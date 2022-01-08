@@ -9,8 +9,8 @@ export class QueueManager {
 	/**
 	 * An easy dependencyless queue manager for managing dynamic lists using Redis.
 	 */
-	constructor(guildId: string, namespace: string) {
-		this.namespace = `${config.redisNamespace}:${guildId}:queue:${namespace}`; // appname:guildid:queue:custom
+	constructor(guildId: string, namespaces: string[]) {
+		this.namespace = `${config.redisNamespace}:${guildId}:queue:${namespaces.join(':')}`; // appname:guildid:queue:custom
 	}
 
 	/**
@@ -33,8 +33,8 @@ export class QueueManager {
 	 * @param namespace The namespace to organise multiple queues for a guild.
 	 * As this takes an array, it will be joined with a ':' during construction.
 	 */
-	static fromGuild(guild: Guild, namespace: string[]) {
-		return new this(guild.id, namespace.join(':'));
+	static fromGuild(guild: Guild, namespaces: string[]) {
+		return new this(guild.id, namespaces);
 	}
 
 	/**

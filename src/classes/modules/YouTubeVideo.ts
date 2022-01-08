@@ -88,7 +88,10 @@ export class YouTubeVideo extends YouTubeBase {
 			const response = await globals.youtubeApi.search.list(params);
 
 			return response.data.items || [];
-		} catch (error) {
+		} catch (error: any) {
+			console.error(
+				'Could not contact YouTube data API. Ensure you have a valid API key, which you can manage at https://console.cloud.google.com/apis/credentials'
+			);
 			console.error(error);
 			return [];
 		}
@@ -128,7 +131,7 @@ export class YouTubeVideo extends YouTubeBase {
 			}
 
 			return createAudioResource(bitstream, { inlineVolume: true });
-		} catch (error) {
+		} catch (error: any) {
 			console.error(error);
 			return null;
 		}

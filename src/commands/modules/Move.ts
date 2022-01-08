@@ -19,7 +19,7 @@ export default class Move implements BaseCommand {
 		enforceVoiceConnection: true
 	})
 	async runner(handler: CommandInteractionHelper) {
-		const queue = new QueueManager(handler.guild.id, 'youtube');
+		const queue = QueueManager.fromGuild(handler.guild, ['youtube', 'global']);
 		const queueLength = await queue.length();
 
 		// It is assumed users will start from index 1, not 0 like us programmers!
