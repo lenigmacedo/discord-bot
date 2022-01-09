@@ -29,7 +29,7 @@ export class YouTubePlaylist extends YouTubeBase {
 	 * @param id The video ID.
 	 */
 	private static validateId(id: string) {
-		const regex = /^[a-zA-Z0-9-_]{34}$/;
+		const regex = /^([a-zA-Z0-9-_]{34}|[a-zA-Z0-9-_]{13})$/;
 		return regex.test(id);
 	}
 
