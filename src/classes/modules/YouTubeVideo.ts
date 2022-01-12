@@ -11,30 +11,26 @@ export class YouTubeVideo extends YouTubeBase {
 	redisNamespace = `${config.redisNamespace}:youtubeVideoInfo`;
 	cache: Cache;
 
-	/**
-	 * This class is a toolbox for everything to do with YouTube videos.
-	 * It sorts out info gathering, url resolving, validation, search queries, downloading audio etc just by an id or URL.
-	 *
-	 * TIP: If you have a video ID, which is not supported as a constructor argument, please use the static 'fromId' method.
-	 * That will return a new instance of this class without worrying about concatenating a URL.
-	 */
-	constructor(url: string) {
+	private constructor(url: string) {
 		super(url);
 		this.cache = new Cache(this.id);
 	}
 
 	/**
-	 * Get a new instance of this class using the resource ID.
-	 * @param id The resource ID
+	 * This class is a toolbox for everything to do with YouTube videos.
+	 * It sorts out info gathering, url resolving, validation, search queries, downloading audio etc just by an id or URL.
+	 *
+	 * @param id The video ID.
 	 */
 	static fromId(id: string) {
 		return new this(`https://www.youtube.com/watch?v=${id}`);
 	}
 
 	/**
-	 * Get a new instance of this class using a video URL.
-	 * Included this just because it can look cleaner and more consistent with this bot's codebase.
-	 * @param url The video URL
+	 * This class is a toolbox for everything to do with YouTube videos.
+	 * It sorts out info gathering, url resolving, validation, search queries, downloading audio etc just by an id or URL.
+	 *
+	 * @param url The video URL.
 	 */
 	static fromUrl(url: string) {
 		return new this(url);

@@ -28,6 +28,7 @@ export function command(options: CommandOptions = {}) {
 				enforceGuild = true,
 				runnerSubcommandName = ''
 			} = options;
+
 			const handler = await new CommandInteractionHelper(commandInteraction).init(ephemeral);
 
 			try {
@@ -60,6 +61,8 @@ interface CommandOptions {
 
 	/**
 	 * If true the command will only be shown to the command author and will self-delete after a certain period of time.
+	 *
+	 * Default value is `true`.
 	 */
 	ephemeral?: boolean;
 

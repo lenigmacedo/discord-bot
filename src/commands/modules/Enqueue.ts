@@ -22,13 +22,7 @@ export default class Enqueue implements BaseCommand {
 		const youtubeVideo = YouTubeVideo.fromUrl(youtubeUrl);
 		const title = await youtubeVideo.info<string>('.videoDetails.title');
 
-		if (!title) {
-			await handler.editWithEmoji(
-				'I could not add that item to the queue. Is it a valid URL? Is it age restricted or private?',
-				ResponseEmojis.Danger
-			);
-			return;
-		}
+		if (!title) throw Error('I could not add that item to the queue. Is it a valid URL? Is it age restricted or private?');
 
 		const appended = await youtubeInterface.queue.add(youtubeVideo.id);
 

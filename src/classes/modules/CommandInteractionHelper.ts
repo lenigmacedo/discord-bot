@@ -84,9 +84,9 @@ export class CommandInteractionHelper {
 	}
 
 	/**
-	 * Get the voice channel instance.
+	 * Enforce a voice channel. Does not return anything. If you want a voice channel, use voiceChannel().
 	 *
-	 * WARNING: This method will throw an error if the requirements are not met. Otherwise, use voiceChannel instead!
+	 * WARNING: This method will throw an error if the requirements are not met.
 	 */
 	enforceVoiceChannel() {
 		if (!this.voiceChannel) throw Error('You must be connected to a voice channel to continue.');

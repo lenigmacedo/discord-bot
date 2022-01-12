@@ -36,16 +36,12 @@ export default class Start implements BaseCommand {
 			return;
 		}
 
-		const nextVideo = await audioInterface.queue.first();
+		const title = await YouTubeVideo.fromId(firstItemInQueue).info<string>('.videoDetails.title');
 
-		if (nextVideo) {
-			const title = await YouTubeVideo.fromId(nextVideo).info<string>('.videoDetails.title');
-
-			if (title) {
-				await handler.editWithEmoji(`I am now playing the queue. First up \`${title}\`!`, ResponseEmojis.Speaker);
-			} else {
-				await handler.editWithEmoji('I am now playing the queue.', ResponseEmojis.Speaker); // If the video is invalid, the queue should handle it and skip it.
-			}
+		if (title) {
+			await handler.editWithEmoji(`I am now playing the queue. First up \`${title}\`!`, ResponseEmojis.Speaker);
+		} else {
+			await handler.editWithEmoji('I am now playing the queue.', ResponseEmojis.Speaker); // If the video is invalid, the queue should handle it and skip it.
 		}
 
 		while (await audioInterface.runner());

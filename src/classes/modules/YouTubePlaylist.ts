@@ -4,7 +4,7 @@ import { config, globals } from 'bot-config';
 import { YouTubeBase } from './YouTubeBase';
 
 export class YouTubePlaylist extends YouTubeBase {
-	constructor(url: string) {
+	private constructor(url: string) {
 		super(url);
 	}
 
@@ -18,7 +18,7 @@ export class YouTubePlaylist extends YouTubeBase {
 
 	/**
 	 * Get a new instance of this class using a video URL.
-	 * @param url The video URL
+	 * @param url The playlist URL.
 	 */
 	static fromUrl(url: string) {
 		return new this(url);
@@ -26,10 +26,10 @@ export class YouTubePlaylist extends YouTubeBase {
 
 	/**
 	 * Validate a given ID.
-	 * @param id The video ID.
+	 * @param id The playlist ID.
 	 */
 	private static validateId(id: string) {
-		const regex = /^([a-zA-Z0-9-_]{34}|[a-zA-Z0-9-_]{13})$/;
+		const regex = /^([a-zA-Z0-9-_]{34}|[a-zA-Z0-9-_]{13}|[a-zA-Z0-9-_]{18})$/;
 		return regex.test(id);
 	}
 

@@ -11,6 +11,8 @@ import {
 import { QueueManager, YouTubeVideo } from 'bot-classes';
 import { config, globals } from 'bot-config';
 import { Guild, GuildMember } from 'discord.js';
+import { EventEmitter } from 'events';
+import { TypedEmitter } from 'tiny-typed-emitter';
 import { BaseAudioInterface } from '../BaseAudioInterface';
 
 export class YouTubeInterface implements BaseAudioInterface {
@@ -18,16 +20,15 @@ export class YouTubeInterface implements BaseAudioInterface {
 	private audioVolume: number;
 	private voiceConnection?: VoiceConnection;
 	private currentResource?: AudioResource | null;
+	private eventEmitter: YouTubeInterfaceEvents;
 	private looped = false;
 	queue: QueueManager;
 
-	/**
-	 * An easy toolbox for managing YouTube audio for this bot.
-	 */
-	constructor(guild: Guild, queueName = 'global') {
+	private constructor(guild: Guild, queueName = 'global') {
 		this.audioPlayer = createAudioPlayer();
 		this.audioVolume = config.audioVolume;
 		this.queue = QueueManager.fromGuild(guild, ['youtube', queueName]);
+		this.eventEmitter = new EventEmitter() as YouTubeInterfaceEvents;
 	}
 
 	/**
@@ -72,6 +73,13 @@ export class YouTubeInterface implements BaseAudioInterface {
 	 */
 	async close() {
 		this.queue.close();
+	}
+
+	/**
+	 * Trigger actions when events are fired.
+	 */
+	get events() {
+		return this.eventEmitter;
 	}
 
 	/**
@@ -121,6 +129,7 @@ export class YouTubeInterface implements BaseAudioInterface {
 		}
 
 		await this.queue.deleteFirst();
+		this.events.emit('next');
 	}
 
 	/**
@@ -183,6 +192,36 @@ export class YouTubeInterface implements BaseAudioInterface {
 	}
 
 	/**
+	 * Pause the player.
+	 *
+	 * @returns true if the player was successfully paused, otherwise false.
+	 */
+	pause() {
+		const paused = this.player.pause(true);
+
+		if (paused && this.player.state.status === 'paused') {
+			this.events.emit('pause');
+		}
+
+		return paused;
+	}
+
+	/**
+	 * Resume the player
+	 *
+	 * @returns true if the player was successfully unpaused, otherwise false.
+	 */
+	resume() {
+		const resumed = this.player.unpause();
+
+		if (resumed && this.player.state.status === 'playing') {
+			this.events.emit('resume');
+		}
+
+		return resumed;
+	}
+
+	/**
 	 * Set if this player should loop the playlist.
 	 * All this does is let the runner know that instead of deleting the video after play, just re-add it to the end of the queue.
 	 */
@@ -207,6 +246,7 @@ export class YouTubeInterface implements BaseAudioInterface {
 		if (this.connection instanceof VoiceConnection && !destroyed) {
 			this.connection.disconnect();
 			this.connection.destroy();
+			this.events.emit('stop');
 			return true;
 		}
 
@@ -236,6 +276,8 @@ export class YouTubeInterface implements BaseAudioInterface {
 			if (currentAudioResource) {
 				currentAudioResource.volume?.setVolume(this.audioVolume);
 			}
+
+			this.events.emit('volumechange');
 
 			return true;
 		} catch (error) {
@@ -271,6 +313,15 @@ export class YouTubeInterface implements BaseAudioInterface {
 		};
 
 		player.emit('stateChange', oldState, newState);
+
 		return true;
 	}
 }
+
+type YouTubeInterfaceEvents = TypedEmitter<{
+	next: () => void;
+	stop: () => void;
+	pause: () => void;
+	resume: () => void;
+	volumechange: () => void;
+}>;
