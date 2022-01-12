@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteractionHelper, YouTubeInterface } from 'bot-classes';
+import { CmdRequirementError, CommandInteractionHelper, YouTubeInterface } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
@@ -22,6 +22,6 @@ export default class Volume implements BaseCommand {
 		const isSet = audioInterface.setVolume(volumeLevel);
 
 		if (isSet) handler.editWithEmoji(`Set volume to \`${volumeLevel}%\``, ResponseEmojis.Speaker);
-		else handler.editWithEmoji('Could not set the volume! Make sure it is between 0 and 100.', ResponseEmojis.Danger);
+		else throw new CmdRequirementError('Could not set the volume! Make sure it is between 0 and 100.');
 	}
 }

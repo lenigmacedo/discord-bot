@@ -19,9 +19,13 @@ export default class Clean implements BaseCommand {
 		const oldLen = currentItems.length;
 		const dedupedItems = Array.from(new Set(currentItems));
 		const newLen = dedupedItems.length;
+
 		await queue.purge(); // Delete the queue, Redis does not have functionality to dedupe. We'll let JS do that.
+
 		const awaitingReAdded = dedupedItems.map(item => queue.add(item));
+
 		await Promise.all(awaitingReAdded);
+
 		handler.editWithEmoji(`The queue has been cleaned!\nRemoved: \`${oldLen - newLen}\`.`, ResponseEmojis.Success);
 	}
 }

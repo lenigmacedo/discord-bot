@@ -10,6 +10,7 @@ import {
 	PermissionString
 } from 'discord.js';
 import path from 'path';
+import { CmdRequirementError } from '..';
 
 export class CommandInteractionHelper {
 	protected interaction: CommandInteraction;
@@ -54,7 +55,7 @@ export class CommandInteractionHelper {
 			return this.interaction.guild;
 		}
 
-		throw Error('This command can only be run in a server.');
+		throw new CmdRequirementError('This command can only be run in a server.');
 	}
 
 	/**
@@ -65,7 +66,7 @@ export class CommandInteractionHelper {
 			return this.interaction.member;
 		}
 
-		throw Error('Unable to retrieve guild member.');
+		throw new CmdRequirementError('Unable to retrieve guild member.');
 	}
 
 	get commandName() {
@@ -73,7 +74,7 @@ export class CommandInteractionHelper {
 			return this.interaction.commandName;
 		}
 
-		throw Error('Unable to fetch command name.');
+		throw new CmdRequirementError('Unable to fetch command name.');
 	}
 
 	/**
@@ -89,7 +90,7 @@ export class CommandInteractionHelper {
 	 * WARNING: This method will throw an error if the requirements are not met.
 	 */
 	enforceVoiceChannel() {
-		if (!this.voiceChannel) throw Error('You must be connected to a voice channel to continue.');
+		if (!this.voiceChannel) throw new CmdRequirementError('You must be connected to a voice channel to continue.');
 	}
 
 	/**
@@ -131,7 +132,7 @@ export class CommandInteractionHelper {
 		const adapterCreator = this.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator;
 
 		if (!this.voiceChannel?.id) {
-			throw Error('Voice channel ID could not be found.');
+			throw new CmdRequirementError('Voice channel ID could not be found.');
 		}
 
 		const connectionOptions = {
@@ -164,7 +165,7 @@ export class CommandInteractionHelper {
 	 */
 	enforcePermissions(requiredPermissions: PermissionString[]) {
 		if (!this.checkPermissions(requiredPermissions)) {
-			throw Error('You do not have permission to execute this command.');
+			throw new CmdRequirementError('You do not have permission to execute this command.');
 		}
 	}
 

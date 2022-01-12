@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteractionHelper, YouTubeInterface, YouTubePlaylist } from 'bot-classes';
+import { CmdRequirementError, CommandInteractionHelper, YouTubeInterface, YouTubePlaylist } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
@@ -21,12 +21,10 @@ export default class Playlist implements BaseCommand {
 		const playlistUrl = handler.commandInteraction.options.getString('url', true);
 		const youtubePlaylist = YouTubePlaylist.fromUrl(playlistUrl);
 
-		if (!youtubePlaylist.id) {
-			await handler.editWithEmoji('URL provided is not valid, try again?', ResponseEmojis.Danger);
-			return;
-		}
+		if (!youtubePlaylist.id) throw new CmdRequirementError('URL provided is not valid, try again?');
 
 		await handler.editWithEmoji('Searching for videos in the playlist. Please wait...', ResponseEmojis.Loading);
+
 		const videoIdsFromPlaylist = await youtubePlaylist.fetchVideosStr('id');
 		const awaitingAppendedIds = videoIdsFromPlaylist.map(id => audioInterface.queue.add(id)); // .map(audioInterface.queue.add) won't work.
 		const resolvedAppendedIds = await Promise.all(awaitingAppendedIds);
@@ -36,7 +34,7 @@ export default class Playlist implements BaseCommand {
 		if (totalAppendedIds > 0) {
 			await handler.editWithEmoji(`Added ${totalAppendedIds} video${totalAppendedIds > 1 ? 's' : ''} to the queue.`, ResponseEmojis.Success);
 		} else {
-			await handler.editWithEmoji('Failed to add playlist items to the queue. Is the URL valid?', ResponseEmojis.Danger);
+			throw new CmdRequirementError('Failed to add playlist items to the queue. Is the URL valid?');
 		}
 	}
 }

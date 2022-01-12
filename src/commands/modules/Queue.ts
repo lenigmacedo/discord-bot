@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteractionHelper, QueueReader, YouTubeInterface, YouTubeVideo } from 'bot-classes';
+import { CmdRequirementError, CommandInteractionHelper, QueueReader, YouTubeInterface, YouTubeVideo } from 'bot-classes';
 import { YtdlVideoInfoResolved } from 'bot-classes/modules/YouTubeVideo';
 import { config, ResponseEmojis } from 'bot-config';
 import { BaseCommand } from '../BaseCommand';
@@ -18,10 +18,7 @@ export default class Queue implements BaseCommand {
 		const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
 		const queueLength = await youtubeInterface.queue.length();
 
-		if (!queueLength) {
-			handler.editWithEmoji('The queue is currently empty.', ResponseEmojis.Info);
-			return;
-		}
+		if (!queueLength) throw new CmdRequirementError('The queue is currently empty.');
 
 		const page = handler.commandInteraction.options.getInteger('page') || 1;
 
@@ -59,7 +56,7 @@ export default class Queue implements BaseCommand {
 			};
 		});
 
-		if (!videoDetailsList) throw Error('Unable to retrieve video details!');
+		if (!videoDetailsList) throw new CmdRequirementError('Unable to retrieve video details!');
 
 		return videoDetailsList;
 	}

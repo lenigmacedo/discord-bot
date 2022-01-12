@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteractionHelper, YouTubeVideo } from 'bot-classes';
+import { CmdRequirementError, CommandInteractionHelper, YouTubeVideo } from 'bot-classes';
 import { YtdlVideoInfoResolved } from 'bot-classes/modules/YouTubeVideo';
 import { globals, ResponseEmojis } from 'bot-config';
 import { MessageActionRow, MessageSelectMenu, MessageSelectOptionData } from 'discord.js';
@@ -19,34 +19,33 @@ export default class Search implements BaseCommand {
 	})
 	async runner(handler: CommandInteractionHelper) {
 		await handler.editWithEmoji('Searching YouTube. Please wait...', ResponseEmojis.Loading);
+
 		const searchQuery = handler.commandInteraction.options.getString('search-query', true);
 		const searchResult = await YouTubeVideo.searchForUrls(searchQuery);
 
-		if (!searchResult.length) {
-			await handler.editWithEmoji(
-				'I could not find any results for that search query. Try searching for something less specific?',
-				ResponseEmojis.Info
-			);
-			return;
-		}
+		if (!searchResult.length) throw new CmdRequirementError('I could not find any results for that search query.');
 
 		const unresolvedVideoDetails = searchResult.map(url => YouTubeVideo.fromUrl(url).info());
 		const resolvedVideoDetails = await Promise.all(unresolvedVideoDetails);
 		const filteredVideoDetails = resolvedVideoDetails.filter(Boolean) as YtdlVideoInfoResolved[];
 
 		const selectOptions = filteredVideoDetails.map((details, index) => {
+			const label = () => {
+				const position = index + 1;
+				const { title } = details.videoDetails;
+				const reply = `${position}) ${title}`;
+				return reply.substring(0, 100);
+			};
+
+			const description = () => {
+				const { author, viewCount } = details.videoDetails;
+				const reply = `By ${author.name} | ${globals.numberToLocale.format(+viewCount)} views.`;
+				return reply.substring(0, 100);
+			};
+
 			const option: MessageSelectOptionData = {
-				label: (() => {
-					const position = index + 1;
-					const { title } = details.videoDetails;
-					const reply = `${position}) ${title}`;
-					return reply.substring(0, 100);
-				})(),
-				description: (() => {
-					const { author, viewCount } = details.videoDetails;
-					const reply = `By ${author.name} | ${globals.numberToLocale.format(+viewCount)} views.`;
-					return reply.substring(0, 100);
-				})(),
+				label: label(),
+				description: description(),
 				value: details.videoDetails.video_url
 			};
 			return option;

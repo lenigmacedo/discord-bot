@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteractionHelper, MediaControls, YouTubeInterface } from 'bot-classes';
+import { CmdRequirementError, CommandInteractionHelper, MediaControls, YouTubeInterface } from 'bot-classes';
 import { YouTubeVideo, YtdlVideoInfoResolved } from 'bot-classes/modules/YouTubeVideo';
 import { ResponseEmojis } from 'bot-config';
 import { BaseCommand } from '../BaseCommand';
@@ -19,10 +19,11 @@ export default class Controls implements BaseCommand {
 		const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
 		const queueLength = await youtubeInterface.queue.length();
 
-		if (!queueLength) throw Error('There is nothing in the queue.');
-		if (!youtubeInterface.busy) throw Error('Please start the bot with `/start` or `/play` to make use of this command.');
+		if (!queueLength) throw new CmdRequirementError('There is nothing in the queue.');
+		if (!youtubeInterface.busy) throw new CmdRequirementError('Please start the bot with `/start` or `/play` to make use of this command.');
 
 		const mediaControls = MediaControls.fromGuild(handler.guild, handler);
+
 		mediaControls.clearEvents();
 
 		mediaControls.events

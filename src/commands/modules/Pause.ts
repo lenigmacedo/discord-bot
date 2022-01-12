@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteractionHelper, YouTubeInterface } from 'bot-classes';
+import { CmdRequirementError, CommandInteractionHelper, YouTubeInterface } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
@@ -18,6 +18,6 @@ export default class Pause implements BaseCommand {
 		const paused = youtubeInterface.pause();
 
 		if (paused) await handler.editWithEmoji('The audio has been paused.', ResponseEmojis.Success);
-		else await handler.editWithEmoji('Nothing to pause.', ResponseEmojis.Info);
+		else throw new CmdRequirementError('Nothing to pause.');
 	}
 }

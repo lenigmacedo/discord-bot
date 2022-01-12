@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteractionHelper, YouTubeInterface, YouTubeVideo } from 'bot-classes';
+import { CmdRequirementError, CommandInteractionHelper, YouTubeInterface, YouTubeVideo } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
@@ -24,17 +24,11 @@ export default class Remove implements BaseCommand {
 		const removedVideoId = await youtubeInterface.getItemId(itemToDeleteIndex - 1);
 		const removedTitle = await YouTubeVideo.fromId(removedVideoId).info<string>('.videoDetails.title');
 
-		if (!removedTitle) {
-			handler.editWithEmoji('Unable to identify the queue item. Did you specify the right number?', ResponseEmojis.Danger);
-			return;
-		}
+		if (!removedTitle) throw new CmdRequirementError('Unable to identify the queue item. Did you specify the right number?');
 
 		const removed = await youtubeInterface.queue.delete(itemToDeleteIndex - 1);
 
-		if (removed) {
-			await handler.editWithEmoji(`Removed \`${removedTitle}\`.`, ResponseEmojis.Success);
-		} else {
-			await handler.editWithEmoji('🚨 There was a problem removing the item.', ResponseEmojis.Danger);
-		}
+		if (removed) await handler.editWithEmoji(`Removed \`${removedTitle}\`.`, ResponseEmojis.Success);
+		else throw new CmdRequirementError('🚨 There was a problem removing the item.');
 	}
 }

@@ -18,9 +18,13 @@ export default class Shuffle implements BaseCommand {
 		const queue = QueueManager.fromGuild(handler.guild, ['youtube', 'global']);
 		const currentItems = await queue.getAll();
 		const shuffledItems = shuffleArr(currentItems);
+
 		await queue.purge(); // Delete the queue, Redis does not have functionality to shuffle. We'll let JS do that.
+
 		const awaitingReAdded = shuffledItems.map(item => queue.add(item));
+
 		await Promise.all(awaitingReAdded);
+
 		handler.editWithEmoji('The queue has been shuffled!', ResponseEmojis.Success);
 	}
 }

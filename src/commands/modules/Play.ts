@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteractionHelper, YouTubeInterface, YouTubeVideo } from 'bot-classes';
+import { CmdRequirementError, CommandInteractionHelper, YouTubeInterface, YouTubeVideo } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
@@ -22,31 +22,26 @@ export default class Play implements BaseCommand {
 		const query = handler.commandInteraction.options.getString('query', true);
 		const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
 
-		if (youtubeInterface.busy) throw Error('I am busy!');
+		if (youtubeInterface.busy) throw new CmdRequirementError('I am busy!');
 
 		const [video] = await YouTubeVideo.search(query, 1);
 
-		if (!video?.id?.videoId) {
-			await handler.editWithEmoji('I could not find a video. Try something less specific?', ResponseEmojis.Danger);
-			return;
-		}
+		if (!video?.id?.videoId) throw new CmdRequirementError('I could not find a video. Try something less specific?');
 
 		const youtubeVideo = YouTubeVideo.fromId(video.id.videoId);
+
 		await youtubeInterface.queue.prepend(youtubeVideo.id);
 		await handler.editWithEmoji('Preparing to play...', ResponseEmojis.Loading);
+
 		youtubeInterface.setConnection(handler.joinVoiceChannel());
+
 		const title = await youtubeVideo.info<string>('.videoDetails.title');
 
-		if (title) {
-			await handler.commandInteraction.editReply(`🔊 Playing \`${title}\`.`);
-		} else {
-			await handler.editWithEmoji(
-				'Unable to play the video. It might be private, age restricted or something else. It will be skipped.',
-				ResponseEmojis.Danger
-			);
-		}
+		if (title) await handler.commandInteraction.editReply(`🔊 Playing \`${title}\`.`);
+		else throw new CmdRequirementError('Unable to play the video. It might be private, age restricted or something else. It will be skipped.');
 
 		while (await youtubeInterface.runner());
+
 		youtubeInterface.deleteConnection();
 	}
 }

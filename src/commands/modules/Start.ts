@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteractionHelper, YouTubeInterface, YouTubeVideo } from 'bot-classes';
+import { CmdRequirementError, CommandInteractionHelper, YouTubeInterface, YouTubeVideo } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
@@ -17,27 +17,24 @@ export default class Start implements BaseCommand {
 		const audioInterface = YouTubeInterface.fromGuild(handler.guild);
 		const queue = await audioInterface.queue.getSome();
 
-		if (!queue.length) throw Error('The queue is empty.');
-		if (audioInterface.busy) throw Error('I am busy!');
+		if (!queue.length) throw new CmdRequirementError('The queue is empty.');
+		if (audioInterface.busy) throw new CmdRequirementError('I am busy!');
 
 		await handler.editWithEmoji('Preparing to play...', ResponseEmojis.Loading);
+
 		audioInterface.setConnection(handler.joinVoiceChannel());
+
 		const firstItemInQueue = await audioInterface.queue.first();
 
-		if (!firstItemInQueue) {
-			handler.editWithEmoji('Unable to play the track.', ResponseEmojis.Danger);
-			return;
-		}
+		if (!firstItemInQueue) throw new CmdRequirementError('Unable to play the track.');
 
 		const title = await YouTubeVideo.fromId(firstItemInQueue).info<string>('.videoDetails.title');
 
-		if (title) {
-			await handler.editWithEmoji(`I am now playing the queue. First up \`${title}\`!`, ResponseEmojis.Speaker);
-		} else {
-			await handler.editWithEmoji('I am now playing the queue.', ResponseEmojis.Speaker); // If the video is invalid, the queue should handle it and skip it.
-		}
+		if (title) await handler.editWithEmoji(`I am now playing the queue. First up \`${title}\`!`, ResponseEmojis.Speaker);
+		else await handler.editWithEmoji('I am now playing the queue.', ResponseEmojis.Speaker); // If the video is invalid, the queue should handle it and skip it.
 
 		while (await audioInterface.runner());
+
 		audioInterface.deleteConnection();
 	}
 }

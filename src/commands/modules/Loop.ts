@@ -18,6 +18,7 @@ export default class Loop implements BaseCommand {
 	async runner(handler: CommandInteractionHelper) {
 		const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
 		const looped = handler.commandInteraction.options.getBoolean('enabled', true);
+
 		youtubeInterface.loop = looped;
 		handler.editWithEmoji(`Playlist loop set to ${looped}.`, ResponseEmojis.Success);
 	}

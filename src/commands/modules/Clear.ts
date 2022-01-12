@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteractionHelper, YouTubeInterface } from 'bot-classes';
+import { CmdRequirementError, CommandInteractionHelper, YouTubeInterface } from 'bot-classes';
 import { ResponseEmojis } from 'bot-config';
 import { MessageActionRow, MessageButton } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
@@ -19,10 +19,7 @@ export default class Clear implements BaseCommand {
 		const youtubeHandler = YouTubeInterface.fromGuild(guild);
 		const queueLength = await youtubeHandler.queue.length();
 
-		if (queueLength < 1) {
-			handler.editWithEmoji('The queue is empty!', ResponseEmojis.Info);
-			return;
-		}
+		if (queueLength < 1) throw new CmdRequirementError('The queue is empty!');
 
 		const actionRow = new MessageActionRow().addComponents(
 			new MessageButton().setCustomId('queue-clear-accept').setLabel('Delete!').setStyle('DANGER'),
