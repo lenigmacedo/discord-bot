@@ -6,7 +6,8 @@ import {
 	AudioPlayerStatus,
 	AudioResource,
 	createAudioPlayer,
-	VoiceConnection
+	VoiceConnection,
+	VoiceConnectionStatus
 } from '@discordjs/voice';
 import { QueueManager, YouTubeVideo } from 'bot-classes';
 import { config, globals } from 'bot-config';
@@ -19,7 +20,7 @@ export class YouTubeInterface implements BaseAudioInterface {
 	private audioPlayer: AudioPlayer;
 	private audioVolume: number;
 	private voiceConnection?: VoiceConnection;
-	private currentResource?: AudioResource | null;
+	private currentResource?: AudioResource;
 	private eventEmitter: YouTubeInterfaceEvents;
 	private looped = false;
 	queue: QueueManager;
@@ -108,10 +109,10 @@ export class YouTubeInterface implements BaseAudioInterface {
 	 * Is the bot playing audio in thie guild?
 	 */
 	get busy() {
-		const connection = this.connection;
-		if (!connection?.state.status) return false;
-		if (connection?.state.status !== 'destroyed') return true;
-		return false;
+		const status = this.voiceConnection?.state.status;
+		const { Destroyed } = VoiceConnectionStatus;
+
+		return !!status && status !== Destroyed;
 	}
 
 	/**
@@ -182,6 +183,11 @@ export class YouTubeInterface implements BaseAudioInterface {
 					player.removeListener('stateChange', onIdleCallback);
 					resolve(true);
 				});
+
+				this.events.on('stop', () => {
+					player.removeAllListeners();
+					this.events.removeAllListeners();
+				});
 			} catch (error) {
 				console.error(error);
 				await this.handleFinish(true);
@@ -240,7 +246,7 @@ export class YouTubeInterface implements BaseAudioInterface {
 	 * Destroy the connection instance associated with this guild
 	 */
 	deleteConnection() {
-		this.currentResource = null;
+		this.currentResource = undefined;
 		const destroyed = this.connection?.state.status === 'destroyed';
 
 		if (this.connection instanceof VoiceConnection && !destroyed) {

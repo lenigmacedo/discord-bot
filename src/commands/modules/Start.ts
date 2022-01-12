@@ -17,15 +17,8 @@ export default class Start implements BaseCommand {
 		const audioInterface = YouTubeInterface.fromGuild(handler.guild);
 		const queue = await audioInterface.queue.getSome();
 
-		if (!queue.length) {
-			await handler.editWithEmoji('The queue is empty.', ResponseEmojis.Danger);
-			return;
-		}
-
-		if (audioInterface.busy) {
-			await handler.editWithEmoji('I am busy!', ResponseEmojis.Danger);
-			return;
-		}
+		if (!queue.length) throw Error('The queue is empty.');
+		if (audioInterface.busy) throw Error('I am busy!');
 
 		await handler.editWithEmoji('Preparing to play...', ResponseEmojis.Loading);
 		audioInterface.setConnection(handler.joinVoiceChannel());

@@ -22,10 +22,7 @@ export default class Play implements BaseCommand {
 		const query = handler.commandInteraction.options.getString('query', true);
 		const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
 
-		if (youtubeInterface.busy) {
-			await handler.editWithEmoji('I am busy!', ResponseEmojis.Danger);
-			return;
-		}
+		if (youtubeInterface.busy) throw Error('I am busy!');
 
 		const [video] = await YouTubeVideo.search(query, 1);
 

@@ -100,7 +100,7 @@ export class MediaControls {
 			})
 			.on('collect', async collected => {
 				switch (collected.customId) {
-					case 'start':
+					case 'resume':
 						this.events.emit('resume', this);
 						await this.refreshContent();
 						break;
@@ -156,7 +156,7 @@ export class MediaControls {
 
 	private createMediaControls() {
 		return new MessageActionRow().addComponents(
-			new MessageButton().setCustomId('start').setLabel('>').setStyle('SUCCESS'),
+			new MessageButton().setCustomId('resume').setLabel('>').setStyle('SUCCESS'),
 			new MessageButton().setCustomId('pause').setLabel('||').setStyle('SECONDARY'),
 			new MessageButton().setCustomId('skip').setLabel('>>').setStyle('PRIMARY'),
 			new MessageButton().setCustomId('stop').setLabel('[]').setStyle('DANGER')
