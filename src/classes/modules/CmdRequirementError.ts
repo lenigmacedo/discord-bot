@@ -1,12 +1,12 @@
 export class CmdRequirementError extends Error {
 	/**
-	 * This error is for when a user is trying to use a command when there is a reason they should not.
+	 * Throw an error related to a problem processing a command.
 	 *
-	 * This error is best used with a method covered under the @command decorator.
+	 * Notes:
+	 * - When thrown under the @command decorator, the error message will be relayed to the user and there will be no console log.
+	 * - When a normal error is thrown under the @command decorator, a generic pre-written message will be relayed to the user and there will be a console log.
 	 *
-	 * E.g: User must be connected to a voice channel.
-	 *
-	 * @param message
+	 * @param message The problem with the user's command.
 	 */
 	constructor(message: string) {
 		super(message);

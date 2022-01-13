@@ -26,7 +26,7 @@ export default class Clear implements BaseCommand {
 			new MessageButton().setCustomId('queue-clear-decline').setLabel('Leave it!').setStyle('SUCCESS')
 		);
 
-		const botMessage = await handler.editWithEmoji(
+		const botMessage = await handler.respondWithEmoji(
 			{
 				content: `Are you sure you want to delete the ENTIRE queue?\n${queueLength} item${queueLength > 1 ? 's' : ''} will be removed.`,
 				components: [actionRow]

@@ -17,7 +17,7 @@ export default class Resume implements BaseCommand {
 		const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
 		const unpaused = youtubeInterface.resume();
 
-		if (unpaused) await handler.editWithEmoji('The audio has been resumed.', ResponseEmojis.Success);
-		else await handler.editWithEmoji('Nothing to resume.', ResponseEmojis.Danger);
+		if (unpaused) await handler.respondWithEmoji('The audio has been resumed.', ResponseEmojis.Success);
+		else await handler.respondWithEmoji('Nothing to resume.', ResponseEmojis.Danger);
 	}
 }

@@ -27,7 +27,7 @@ export default class Controls implements BaseCommand {
 				.on('next', async () => await mediaControls.refreshContent())
 				.on('stop', async () => {
 					const latestHandler = getCurrentHandler();
-					await latestHandler.editWithEmoji({ content: 'The audio has been stopped.', embeds: [], components: [] }, ResponseEmojis.Info);
+					await latestHandler.respondWithEmoji({ content: 'The audio has been stopped.', embeds: [], components: [] }, ResponseEmojis.Info);
 				});
 		});
 

@@ -5,19 +5,18 @@ import { config, globals } from 'bot-config';
 import ytdl from 'ytdl-core-discord';
 import { YouTubeBase } from './YouTubeBase';
 
-export type YtdlVideoInfoResolved = Awaited<ReturnType<typeof ytdl.getBasicInfo>>;
-
 export class YouTubeVideo extends YouTubeBase {
 	redisNamespace = `${config.redisNamespace}:youtubeVideoInfo`;
 	cache: Cache;
 
 	private constructor(url: string) {
 		super(url);
-		this.cache = new Cache(this.id);
+		this.cache = new Cache(['youtubevideo', this.id]);
 	}
 
 	/**
 	 * This class is a toolbox for everything to do with YouTube videos.
+	 *
 	 * It sorts out info gathering, url resolving, validation, search queries, downloading audio etc just by an id or URL.
 	 *
 	 * @param id The video ID.
@@ -28,6 +27,7 @@ export class YouTubeVideo extends YouTubeBase {
 
 	/**
 	 * This class is a toolbox for everything to do with YouTube videos.
+	 *
 	 * It sorts out info gathering, url resolving, validation, search queries, downloading audio etc just by an id or URL.
 	 *
 	 * @param url The video URL.
@@ -38,7 +38,9 @@ export class YouTubeVideo extends YouTubeBase {
 
 	/**
 	 * Validate a given ID. Does not rely on ytdl-core.
+	 *
 	 * @param id The video ID.
+	 * @returns boolean true indicates valid, false indicates not valid.
 	 */
 	private static validateId(id: string) {
 		const regex = /^[a-zA-Z0-9-_]{11}$/;
@@ -47,6 +49,8 @@ export class YouTubeVideo extends YouTubeBase {
 
 	/**
 	 * Gets the Redis namespace for queries for this instance.
+	 *
+	 * @returns string
 	 */
 	get namespace() {
 		return `${this.redisNamespace}:${this.id}`;
@@ -54,6 +58,8 @@ export class YouTubeVideo extends YouTubeBase {
 
 	/**
 	 * Get the video ID.
+	 *
+	 * @returns string
 	 */
 	get id() {
 		// The former is the traditional youtube.com/?v=id and the latter is the youtu.be/id URL format.
@@ -68,7 +74,9 @@ export class YouTubeVideo extends YouTubeBase {
 
 	/**
 	 * Search like you're using the YouTube search bar! Input a string, get a list of video resources back.
+	 *
 	 * Each item will contain a big amount of information.
+	 *
 	 * @param query The search query.
 	 * @param limit The maximum allowed quantity of videos to search for.
 	 */
@@ -95,8 +103,10 @@ export class YouTubeVideo extends YouTubeBase {
 
 	/**
 	 * Search like you're using the search bar! Input a string, get a list of video URLs back.
+	 *
 	 * @param search The search query.
 	 * @param limit The maximum allowed quantity of videos to search for.
+	 * @returns Promise<string[]> A list of URLs.
 	 */
 	static async searchForUrls(query: string, limit?: number) {
 		const videos = await this.search(query, limit);
@@ -117,6 +127,8 @@ export class YouTubeVideo extends YouTubeBase {
 
 	/**
 	 * Download the video's audio, and make it a Discord.js audio resource.
+	 *
+	 * @returns Promise<AudioResource | null>
 	 */
 	async download() {
 		try {
@@ -135,6 +147,7 @@ export class YouTubeVideo extends YouTubeBase {
 
 	/**
 	 * Get the video details via ytdl. Does not require an API key, but might be rate limited from IP (unconfirmed).
+	 *
 	 * Caches information for later retrieval using RedisJSON. Expiry set in config.
 	 */
 	async info<TResponse>(path?: string): Promise<TResponse | null> {
@@ -153,3 +166,5 @@ export class YouTubeVideo extends YouTubeBase {
 		}
 	}
 }
+
+export type YtdlVideoInfoResolved = Awaited<ReturnType<typeof ytdl.getBasicInfo>>;

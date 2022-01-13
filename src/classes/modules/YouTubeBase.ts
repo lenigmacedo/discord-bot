@@ -1,22 +1,32 @@
+import { CmdRequirementError } from '..';
+
 export abstract class YouTubeBase {
 	private uri: URL;
 
 	/**
-	 * This half-abstract class aids the implementation of new YouTube features for code consistency.
-	 * @param url The resource URL. Can be a playlist, video, or something else.
+	 * A base class to help with the implementation of YouTube feature classes.
+	 *
+	 * @param url The YouTube resource URL related to the context of the derived class.
 	 */
 	constructor(url: string) {
-		this.uri = new URL(url);
+		try {
+			this.uri = new URL(url);
+		} catch (error) {
+			throw new CmdRequirementError('The URL for the YouTube resource is invalid.');
+		}
 	}
 
 	/**
-	 * Gets the ID of the resource.
-	 * Should throw if one cannot be found or that the ID is invalid.
+	 * Get the ID of the resource.
+	 *
+	 * @returns string
 	 */
 	abstract get id(): string;
 
 	/**
 	 * Gets the resource URL.
+	 *
+	 * @returns string
 	 */
 	get url() {
 		return this.uri.toString();
@@ -24,6 +34,8 @@ export abstract class YouTubeBase {
 
 	/**
 	 * Returns the URL instance, containing useful methods to work with URLs.
+	 *
+	 * @returns URL
 	 */
 	get urlInstance() {
 		return this.uri;

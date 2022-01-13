@@ -20,6 +20,6 @@ export default class Loop implements BaseCommand {
 		const looped = handler.commandInteraction.options.getBoolean('enabled', true);
 
 		youtubeInterface.loop = looped;
-		handler.editWithEmoji(`Playlist loop set to ${looped}.`, ResponseEmojis.Success);
+		handler.respondWithEmoji(`Playlist loop set to ${looped}.`, ResponseEmojis.Success);
 	}
 }

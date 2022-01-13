@@ -38,6 +38,6 @@ export default class Move implements BaseCommand {
 
 		await Promise.all(awaitingReAdded);
 
-		handler.editWithEmoji('Queue item moved!', ResponseEmojis.Info);
+		handler.respondWithEmoji('Queue item moved!', ResponseEmojis.Info);
 	}
 }

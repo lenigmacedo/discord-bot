@@ -26,6 +26,6 @@ export default class Clean implements BaseCommand {
 
 		await Promise.all(awaitingReAdded);
 
-		handler.editWithEmoji(`The queue has been cleaned!\nRemoved: \`${oldLen - newLen}\`.`, ResponseEmojis.Success);
+		handler.respondWithEmoji(`The queue has been cleaned!\nRemoved: \`${oldLen - newLen}\`.`, ResponseEmojis.Success);
 	}
 }

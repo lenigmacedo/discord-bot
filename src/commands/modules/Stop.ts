@@ -20,6 +20,6 @@ export default class Stop implements BaseCommand {
 
 		audioInterface.deleteConnection();
 
-		await handler.editWithEmoji('I have been stopped.', ResponseEmojis.Success);
+		await handler.respondWithEmoji('I have been stopped.', ResponseEmojis.Success);
 	}
 }

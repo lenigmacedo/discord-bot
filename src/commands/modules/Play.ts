@@ -31,7 +31,7 @@ export default class Play implements BaseCommand {
 		const youtubeVideo = YouTubeVideo.fromId(video.id.videoId);
 
 		await youtubeInterface.queue.prepend(youtubeVideo.id);
-		await handler.editWithEmoji('Preparing to play...', ResponseEmojis.Loading);
+		await handler.respondWithEmoji('Preparing to play...', ResponseEmojis.Loading);
 
 		const title = await youtubeVideo.info<string>('.videoDetails.title');
 

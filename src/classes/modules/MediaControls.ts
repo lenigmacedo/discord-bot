@@ -16,6 +16,7 @@ import { TypedEmitter } from 'tiny-typed-emitter';
 
 export class MediaControls {
 	private static instances = new Map<string, MediaControls>(); // One instance per guild.
+
 	private handler: CommandInteractionHelper;
 	private components?: MessageActionRow;
 	private embeds: MessageEmbed | null = null;
@@ -32,7 +33,10 @@ export class MediaControls {
 	 * This class powers an interactive media control center through a message.
 	 * This method will return an existing instance if one already exists.
 	 *
-	 * @param externalEvents This is a function that will be assigned ONCE to this instance, to prevent event leaks.
+	 * @param guild The guild to create an instance for. Returns an existing instance if one already exists.
+	 * @param handler The CommandInteractionHelper instance.
+	 * @param externalEvents A function that you may use to register any long-term events. This function will run ONCE when this instance is constructed for the first time.
+	 * @returns MediaControls
 	 */
 	static fromGuild(guild: Guild, handler: CommandInteractionHelper, externalEvents?: (getCurrentHandler: () => CommandInteractionHelper) => void) {
 		if (!MediaControls.instances.has(guild.id)) {
@@ -64,6 +68,8 @@ export class MediaControls {
 
 	/**
 	 * This is an important function that will be invoked to generate new pages as events happen.
+	 *
+	 * @returns null
 	 */
 	addContentFunction(contentFunction: ContentFunction) {
 		this.contentFunction = async () => {
@@ -80,7 +86,7 @@ export class MediaControls {
 		this.embeds = await this.createMessageEmbed();
 
 		if (!this.embeds) {
-			await this.handler.editWithEmoji('There is nothing in the queue!', ResponseEmojis.Info);
+			await this.handler.respondWithEmoji('There is nothing in the queue!', ResponseEmojis.Info);
 			return;
 		}
 
@@ -130,21 +136,36 @@ export class MediaControls {
 		const embeds = this.embeds ? [this.embeds] : undefined;
 
 		if (!embeds) {
-			await this.handler.editWithEmoji({ content: 'The queue is now empty.', components: [], embeds: [] }, ResponseEmojis.Info);
+			await this.handler.respondWithEmoji({ content: 'The queue is now empty.', components: [], embeds: [] }, ResponseEmojis.Info);
 			return;
 		}
 
 		await this.handler.commandInteraction.editReply({ embeds });
 	}
 
+	/**
+	 * Reassign a new CommandInteractionHelper instance to this instance.
+	 *
+	 * @param handler The instance of CommandInteractionHelper.
+	 */
 	private updateHandler(handler: CommandInteractionHelper) {
 		this.handler = handler;
 	}
 
+	/**
+	 * Get the CommandInteractionHelper instance from this instance.
+	 *
+	 * @returns CommandInteractionHelper
+	 */
 	private getHandler() {
 		return this.handler;
 	}
 
+	/**
+	 * Create a message embed preset from the result of the contentFunction.
+	 *
+	 * @returns Promise<MessageEmbed | null>
+	 */
 	private async createMessageEmbed() {
 		const content = await this.contentFunction?.();
 

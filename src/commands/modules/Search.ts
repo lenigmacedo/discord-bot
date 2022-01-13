@@ -18,7 +18,7 @@ export default class Search implements BaseCommand {
 		enforceVoiceConnection: true
 	})
 	async runner(handler: CommandInteractionHelper) {
-		await handler.editWithEmoji('Searching YouTube. Please wait...', ResponseEmojis.Loading);
+		await handler.respondWithEmoji('Searching YouTube. Please wait...', ResponseEmojis.Loading);
 
 		const searchQuery = handler.commandInteraction.options.getString('search-query', true);
 		const searchResult = await YouTubeVideo.searchForUrls(searchQuery);
@@ -55,7 +55,7 @@ export default class Search implements BaseCommand {
 			new MessageSelectMenu().setCustomId('search-video-selection').setPlaceholder('Select a video').addOptions(selectOptions)
 		);
 
-		const botMessage = await handler.editWithEmoji({ content: 'I found some results!', components: [actionRow] }, ResponseEmojis.Success);
+		const botMessage = await handler.respondWithEmoji({ content: 'I found some results!', components: [actionRow] }, ResponseEmojis.Success);
 
 		handler.componentInteractionHandler(botMessage);
 	}

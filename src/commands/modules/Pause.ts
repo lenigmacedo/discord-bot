@@ -17,7 +17,7 @@ export default class Pause implements BaseCommand {
 		const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
 		const paused = youtubeInterface.pause();
 
-		if (paused) await handler.editWithEmoji('The audio has been paused.', ResponseEmojis.Success);
+		if (paused) await handler.respondWithEmoji('The audio has been paused.', ResponseEmojis.Success);
 		else throw new CmdRequirementError('Nothing to pause.');
 	}
 }

@@ -6,29 +6,27 @@ export class Cache {
 	private namespace: string;
 
 	/**
-	 * A convenient way to store temporary data into cache.
+	 * A simple cache store abstraction using Redis JSON.
 	 *
-	 * Persists on server reboots, and items can expire as defined times.
-	 * @param name The key of this cache object.
+	 * @param namespaces Uniqely identify your cache set.
 	 */
-	constructor(name: string) {
-		this.namespace = `${config.redisNamespace}:global:cache:youtubevideo:${name}`;
+	constructor(namespaces: string[]) {
+		this.namespace = `${config.redisNamespace}:global:cache:${namespaces.join(':')}`;
 	}
 
 	/**
-	 * Get the static client instance shared between all instances.
+	 * The Redis client is stored outside of the prototype. This is a helper method to retrieve when in instance context.
 	 */
 	get client() {
 		return Cache.client;
 	}
 
 	/**
-	 * Write a serialised JSON object to this cache. By default it overwrites the whole value in the key.
+	 * Set a cache object. Auto-expires after a certain period of time.
 	 *
-	 * Will also assign an expiry defined in the config.
-	 *
-	 * @param json A serialisable object to convert to JSON.
-	 * @returns Whether the operation failed or not.
+	 * @param json A serialisable object.
+	 * @param path Set subdata using a path. By default it will reassign the cache if a value already exists.
+	 * @returns Promise<boolean> true if value set and expiry set, false otherwise.
 	 */
 	async set(json: any, path = '.') {
 		const result = await this.client.json.SET(this.namespace, path, json);
@@ -37,22 +35,23 @@ export class Cache {
 	}
 
 	/**
-	 * Get a value using a path. If a path is not specified then all is returned if any.
+	 * Get data from the cache.
 	 *
-	 * @param path The path to the desired value. May or may not exist.
+	 * @param path Retrieve subdata with a path.
+	 * @returns Promise<TResponse | null> TResponse if a value exists, null otherwise.
 	 */
 	async get<TResponse>(path = '.') {
 		const response = await this.client.json.GET(this.namespace, { path });
 
-		if (response) {
-			return response as unknown as TResponse;
-		}
+		if (response) return response as unknown as TResponse;
 
 		return null;
 	}
 
 	/**
-	 * Does this cache object have data stored in the cache?
+	 * Identify if a value already belongs in the cache.
+	 *
+	 * @returns Promise<boolean> true if value exists, false otherwise.
 	 */
 	hasValue() {
 		return this.client.EXISTS(this.namespace);

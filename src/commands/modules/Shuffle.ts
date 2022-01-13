@@ -25,6 +25,6 @@ export default class Shuffle implements BaseCommand {
 
 		await Promise.all(awaitingReAdded);
 
-		handler.editWithEmoji('The queue has been shuffled!', ResponseEmojis.Success);
+		handler.respondWithEmoji('The queue has been shuffled!', ResponseEmojis.Success);
 	}
 }

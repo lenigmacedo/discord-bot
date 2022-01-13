@@ -1,13 +1,16 @@
 import { DiscordGatewayAdapterCreator, joinVoiceChannel } from '@discordjs/voice';
-import { config, ResponseEmojis } from 'bot-config';
+import { ColourScheme, config, ResponseEmojis } from 'bot-config';
 import {
 	CollectorFilter,
 	CommandInteraction,
+	Guild,
 	GuildMember,
 	InteractionReplyOptions,
 	Message,
 	MessageComponentInteraction,
-	PermissionString
+	MessageEmbed,
+	PermissionString,
+	VoiceChannel
 } from 'discord.js';
 import path from 'path';
 import { CmdRequirementError } from '..';
@@ -17,11 +20,9 @@ export class CommandInteractionHelper {
 	protected invoked: Date; // A Date instance representing when this command was run.
 
 	/**
-	 * A toolbox for making interactions between the bot and the user easier.
+	 * A helper class to make utilising the CommandInteraction instance a little easier.
 	 *
-	 * TIPS:
-	 * - The methods in this class will throw if there is any problem. This is a way of halting the execution of the command.
-	 * - Use the "oops" method in a catch block to inform the user of the error message and
+	 * @param interaction The discord.js CommandInteraction instance.
 	 */
 	constructor(interaction: CommandInteraction) {
 		this.interaction = interaction;
@@ -30,28 +31,36 @@ export class CommandInteractionHelper {
 
 	/**
 	 * Initialise this instance by gathering the command handler and telling the Discord API the response has been received.
+	 *
 	 * @param ephemeral Hide the interactions and self-hide after a period of time.
+	 * @returns Promise<CommandInteractionHelper>
 	 */
 	async init(ephemeral = true) {
 		if (this.commandName) {
 			await this.interaction.deferReply({ ephemeral });
-
 			return this;
 		}
 
-		throw new Error('Unable to retrieve command name.');
+		throw new CmdRequirementError('Unable to retrieve command name.');
 	}
 
+	/**
+	 * Get the original command interaction instance associated with this helper.
+	 *
+	 * @returns CommandInteraction
+	 */
 	get commandInteraction() {
 		return this.interaction;
 	}
 
 	/**
-	 * Get the Discord server this command was run in.
-	 * This method will throw if a guild cannot be found.
+	 * Get the guild instance.
+	 *
+	 * @throws CmdRequirementError if a guild cannot be found.
+	 * @returns Guild
 	 */
 	get guild() {
-		if (this.interaction.guild) {
+		if (this.interaction.guild instanceof Guild) {
 			return this.interaction.guild;
 		}
 
@@ -59,7 +68,10 @@ export class CommandInteractionHelper {
 	}
 
 	/**
-	 * Get the author of the slash command.
+	 * Get the guild member.
+	 *
+	 * @throws CmdRequirementError if a guild member cannot be found.
+	 * @returns GuildMember
 	 */
 	get guildMember() {
 		if (this.interaction.member instanceof GuildMember) {
@@ -69,8 +81,13 @@ export class CommandInteractionHelper {
 		throw new CmdRequirementError('Unable to retrieve guild member.');
 	}
 
+	/**
+	 * Get the command name.
+	 *
+	 * @returns string A string representation of the command name.
+	 */
 	get commandName() {
-		if (this.interaction.isCommand()) {
+		if (this.interaction.isCommand() && typeof this.interaction?.commandName === 'string') {
 			return this.interaction.commandName;
 		}
 
@@ -78,62 +95,52 @@ export class CommandInteractionHelper {
 	}
 
 	/**
-	 * Get the voice channel instance.
+	 * Get the voice channel.
+	 *
+	 * @returns VoiceChannel
 	 */
 	get voiceChannel() {
-		return this.guildMember.voice.channel;
+		if (this.guildMember.voice.channel instanceof VoiceChannel) {
+			return this.guildMember.voice.channel;
+		}
+
+		throw new CmdRequirementError('Unable to retrieve voice channel.');
 	}
 
 	/**
-	 * Enforce a voice channel. Does not return anything. If you want a voice channel, use voiceChannel().
+	 * A standard response embed message that looks nicer than a normal text message.
 	 *
-	 * WARNING: This method will throw an error if the requirements are not met.
-	 */
-	enforceVoiceChannel() {
-		if (!this.voiceChannel) throw new CmdRequirementError('You must be connected to a voice channel to continue.');
-	}
-
-	/**
-	 * Prepend an emoji to the message.
+	 * Will remove any embeds with its own.
+	 *
 	 * @param message The message to send.
 	 * @param type The enum for the emoji.
+	 * @returns Promise<APIMessage | Message<boolean>>
 	 */
-	followUpEmoji(message: string | InteractionReplyOptions, type?: ResponseEmojis) {
-		if (typeof message === 'string') {
-			return this.interaction.followUp(`${type}  ${message}`);
-		}
+	respondWithEmoji(message: string | InteractionReplyOptions, emoji: ResponseEmojis, type: 'followUp' | 'editReply' = 'editReply') {
+		const messageObject: InteractionReplyOptions = typeof message === 'string' ? { content: message } : message;
+		const { Danger, Success } = ColourScheme;
+		const colour = emoji === ResponseEmojis.Danger ? Danger : Success;
 
-		message.content = `${type}  ${message.content}`;
+		messageObject.embeds = [
+			new MessageEmbed()
+				.setTitle(emoji)
+				.setDescription(messageObject.content || '')
+				.setColor(colour)
+		];
 
-		return this.interaction.followUp(message);
+		messageObject.content = undefined; // Content is now in the above embed.
+
+		return this.interaction[type]({ ...messageObject });
 	}
 
 	/**
-	 * Edit the message with an emoji prepended to the message.
-	 * @param message The message to send.
-	 * @param type The enum for the emoji.
-	 */
-	editWithEmoji(message: string | InteractionReplyOptions, type: ResponseEmojis) {
-		if (typeof message === 'string') {
-			return this.interaction.editReply(`${type}  ${message}`);
-		}
-
-		message.content = `${type}  ${message.content}`;
-
-		return this.interaction.editReply(message);
-	}
-
-	/**
-	 * Join a Discord voice channel. Will throw if a user is not connected to one.
-	 * @param id The channel ID (optional, connects to the one the user is connected to by default).
-	 * @returns New voice connection instance.
+	 * Join a Discord voice channel.
+	 *
+	 * @param id The channel ID (optional, auto-detects otherwise).
+	 * @returns VoiceConnection
 	 */
 	joinVoiceChannel(id?: string) {
 		const adapterCreator = this.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator;
-
-		if (!this.voiceChannel?.id) {
-			throw new CmdRequirementError('Voice channel ID could not be found.');
-		}
 
 		const connectionOptions = {
 			guildId: this.guild.id,
@@ -146,27 +153,18 @@ export class CommandInteractionHelper {
 
 	/**
 	 * Take an array of permissions, and find out if the user is authorised.
+	 *
 	 * @param requiredPermissions An array of Discord standard permissions.
+	 * @throws CmdRequirementError if the user is not permitted.
 	 */
 	checkPermissions(requiredPermissions: PermissionString[]) {
-		if (!(this.commandInteraction.member instanceof GuildMember)) return false;
-
-		const permissions = this.commandInteraction.member.permissions.toArray();
+		const permissions = this.guildMember.permissions.toArray();
 		const foundPermissions = requiredPermissions.filter(required => permissions.includes(required));
+		const permitted = foundPermissions.length === requiredPermissions.length;
 
-		return foundPermissions.length === requiredPermissions.length;
-	}
+		if (permitted) return true;
 
-	/**
-	 * Take an array of permissions, and find out if the user is authorised.
-	 *
-	 * WARNING: This method throws an error if the user is not authorised! Otherwise, use checkPermissions() instead.
-	 * @param requiredPermissions An array of Discord standard permissions.
-	 */
-	enforcePermissions(requiredPermissions: PermissionString[]) {
-		if (!this.checkPermissions(requiredPermissions)) {
-			throw new CmdRequirementError('You do not have permission to execute this command.');
-		}
+		throw new CmdRequirementError('You do not have permission to execute this command.');
 	}
 
 	/**
@@ -178,6 +176,7 @@ export class CommandInteractionHelper {
 	 * - Runs the function exported in the 'componenthandlers' folder named the same as the component ID if the above criteria is met.
 	 *
 	 * @param msgWithComponents The bot's reply, i.e., the message you want to handle.
+	 * @todo This method is prone to event listener leaks. Needs fixing.
 	 */
 	componentInteractionHandler(msgWithComponents: Awaited<ReturnType<CommandInteraction['editReply']>>) {
 		if (!(msgWithComponents instanceof Message) || !msgWithComponents.components.length) return;

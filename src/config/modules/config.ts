@@ -39,8 +39,8 @@ const config = {
 
 export enum ColourScheme {
 	'Success' = '#77B155',
-	'Danger' = '#ff0000',
-	'Warning' = '#ffff00'
+	'Danger' = '#DB2E43',
+	'Warning' = '#FFFF00'
 }
 
 export enum ResponseEmojis {

@@ -24,6 +24,6 @@ export default class SetPointer implements BaseCommand {
 		const wantedPointer = handler.commandInteraction.options.getInteger('value') || 1;
 		const newPointer = await youtubeInterface.setPointer(wantedPointer);
 
-		handler.editWithEmoji(`Pointer set to \`${newPointer}\``, ResponseEmojis.Success);
+		handler.respondWithEmoji(`Pointer set to \`${newPointer}\``, ResponseEmojis.Success);
 	}
 }

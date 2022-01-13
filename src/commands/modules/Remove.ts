@@ -28,7 +28,7 @@ export default class Remove implements BaseCommand {
 
 		const removed = await youtubeInterface.queue.delete(itemToDeleteIndex - 1);
 
-		if (removed) await handler.editWithEmoji(`Removed \`${removedTitle}\`.`, ResponseEmojis.Success);
+		if (removed) await handler.respondWithEmoji(`Removed \`${removedTitle}\`.`, ResponseEmojis.Success);
 		else throw new CmdRequirementError('🚨 There was a problem removing the item.');
 	}
 }

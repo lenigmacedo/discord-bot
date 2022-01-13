@@ -23,7 +23,7 @@ export default class Playlist implements BaseCommand {
 
 		if (!youtubePlaylist.id) throw new CmdRequirementError('URL provided is not valid, try again?');
 
-		await handler.editWithEmoji('Searching for videos in the playlist. Please wait...', ResponseEmojis.Loading);
+		await handler.respondWithEmoji('Searching for videos in the playlist. Please wait...', ResponseEmojis.Loading);
 
 		const videoIdsFromPlaylist = await youtubePlaylist.fetchVideosStr('id');
 		const awaitingAppendedIds = videoIdsFromPlaylist.map(id => audioInterface.queue.add(id)); // .map(audioInterface.queue.add) won't work.
@@ -32,7 +32,7 @@ export default class Playlist implements BaseCommand {
 		const totalAppendedIds = filteredAppendedIds.length;
 
 		if (totalAppendedIds > 0) {
-			await handler.editWithEmoji(`Added ${totalAppendedIds} video${totalAppendedIds > 1 ? 's' : ''} to the queue.`, ResponseEmojis.Success);
+			await handler.respondWithEmoji(`Added ${totalAppendedIds} video${totalAppendedIds > 1 ? 's' : ''} to the queue.`, ResponseEmojis.Success);
 		} else {
 			throw new CmdRequirementError('Failed to add playlist items to the queue. Is the URL valid?');
 		}

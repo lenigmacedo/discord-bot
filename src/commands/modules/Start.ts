@@ -20,15 +20,15 @@ export default class Start implements BaseCommand {
 		if (!queue.length) throw new CmdRequirementError('The queue is empty.');
 		if (audioInterface.busy) throw new CmdRequirementError('I am busy!');
 
-		await handler.editWithEmoji('Preparing to play...', ResponseEmojis.Loading);
+		await handler.respondWithEmoji('Preparing to play...', ResponseEmojis.Loading);
 
 		const audioItem = await audioInterface.getItemId();
 		if (!audioItem) throw new CmdRequirementError('Unable to play the track.');
 
 		const title = await YouTubeVideo.fromId(audioItem).info<string>('.videoDetails.title');
 
-		if (title) await handler.editWithEmoji(`I am now playing the queue. First up \`${title}\`!`, ResponseEmojis.Speaker);
-		else await handler.editWithEmoji('I am now playing the queue.', ResponseEmojis.Speaker); // If the video is invalid, the queue should handle it and skip it.
+		if (title) await handler.respondWithEmoji(`I am now playing the queue. First up \`${title}\`!`, ResponseEmojis.Speaker);
+		else await handler.respondWithEmoji('I am now playing the queue.', ResponseEmojis.Speaker); // If the video is invalid, the queue should handle it and skip it.
 
 		await audioInterface.runner(handler);
 	}

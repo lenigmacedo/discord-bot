@@ -14,24 +14,12 @@ export class QueueManager {
 	}
 
 	/**
-	 * Open a connection to Redis.
-	 */
-	async open() {
-		if (!this.client.isOpen) await this.client.connect();
-	}
-
-	/**
-	 * Close the connection to Redis.
-	 */
-	async close() {
-		if (this.client.isOpen) await this.client.disconnect();
-	}
-
-	/**
+	 * Get a new instance of QueueManager using a guild instance.
 	 *
 	 * @param guild The Discord.js Guild instance.
-	 * @param namespace The namespace to organise multiple queues for a guild.
-	 * As this takes an array, it will be joined with a ':' during construction.
+	 * @param namespace A list for the namespace to organise multiple queues for a guild.
+	 *
+	 * @returns QueueManager
 	 */
 	static fromGuild(guild: Guild, namespaces: string[]) {
 		return new this(guild.id, namespaces);
@@ -45,7 +33,8 @@ export class QueueManager {
 	}
 
 	/**
-	 * Append an item to the queue.
+	 * Add an item to the end of the queue.
+	 *
 	 * @param value A value to add.
 	 * @returns A number of how many values were added.
 	 */
@@ -54,7 +43,8 @@ export class QueueManager {
 	}
 
 	/**
-	 * Add a video id to the left side of the queue.
+	 * Add a video to position 1 in the queue.
+	 *
 	 * @param value A value to prepend.
 	 * @returns A number of how many values were added.
 	 */
@@ -64,22 +54,23 @@ export class QueueManager {
 
 	/**
 	 * Get multiple items in the queue. By default it gets the first page.
+	 *
 	 * @param page The page you want to get. By default it is page 1.
 	 * @param limit How many items in the page do you want to get.
-	 * @returns An array of string values.
+	 * @returns string[] Array of values.
 	 */
 	getSome(page = 1, limit: number = config.paginateMaxLength) {
 		const pageIndex = page - 1; // Redis starts from index 0
 		const startIndex = pageIndex * limit;
 		const endIndex = pageIndex * limit + limit - 1;
+
 		return this.client.LRANGE(this.namespace, startIndex, endIndex);
 	}
 
 	/**
-	 * Get multiple items in the queue. By default it gets the first page.
-	 * @param page The page you want to get. By default it is page 1.
-	 * @param limit How many items in the page do you want to get.
-	 * @returns An array of string values.
+	 * Get all items in the queue.
+	 *
+	 * @returns Promise<string[]>
 	 */
 	getAll() {
 		return this.client.LRANGE(this.namespace, 0, -1);
@@ -87,6 +78,7 @@ export class QueueManager {
 
 	/**
 	 * Get a queue item via its index.
+	 *
 	 * @param index Queue index number.
 	 */
 	async get(index: number) {
@@ -95,7 +87,9 @@ export class QueueManager {
 	}
 
 	/**
-	 * Get the #1 item in the guild's queue.
+	 * Get the item in position 1 of the queue.
+	 *
+	 * @returns Promise<string | null>
 	 */
 	async first() {
 		const result = await this.get(0);
@@ -106,7 +100,9 @@ export class QueueManager {
 
 	/**
 	 * Delete an item from the queue.
+	 *
 	 * @param index The item index of the queue.
+	 * @returns Promise<number> a number indicating how many items were removed.
 	 */
 	async delete(index: number) {
 		const queueItem = await this.get(index);
@@ -116,6 +112,8 @@ export class QueueManager {
 
 	/**
 	 * Delete the #1 item in the queue.
+	 *
+	 * @returns Promise<string | null>
 	 */
 	deleteFirst() {
 		return this.client.LPOP(this.namespace);
@@ -123,13 +121,17 @@ export class QueueManager {
 
 	/**
 	 * Get how long the queue is.
+	 *
+	 * @returns Promise<number>
 	 */
 	length() {
 		return this.client.LLEN(this.namespace);
 	}
 
 	/**
-	 * Is the queue empty?
+	 * Identify if the queue is empty.
+	 *
+	 * @returns Promise<boolean> true indicates yes, false indicates no.
 	 */
 	async empty() {
 		const queueLength = await this.length();
@@ -138,6 +140,8 @@ export class QueueManager {
 
 	/**
 	 * Delete all items in the queue for the guild.
+	 *
+	 * @returns Promise<boolean> true indicates the operation was successful, false indicates there was nothing to delete.
 	 */
 	async purge() {
 		const queueLength = await this.length();

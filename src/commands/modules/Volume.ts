@@ -21,7 +21,7 @@ export default class Volume implements BaseCommand {
 		const volumeLevel = handler.commandInteraction.options.getInteger('level', true);
 		const isSet = audioInterface.setVolume(volumeLevel);
 
-		if (isSet) handler.editWithEmoji(`Set volume to \`${volumeLevel}%\``, ResponseEmojis.Speaker);
+		if (isSet) handler.respondWithEmoji(`Set volume to \`${volumeLevel}%\``, ResponseEmojis.Speaker);
 		else throw new CmdRequirementError('Could not set the volume! Make sure it is between 0 and 100.');
 	}
 }

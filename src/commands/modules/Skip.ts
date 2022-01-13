@@ -17,7 +17,7 @@ export default class Skip implements BaseCommand {
 		const audioInterface = YouTubeInterface.fromGuild(handler.guild);
 		const skipped = audioInterface.emitAudioFinish();
 
-		if (skipped) await handler.editWithEmoji('The audio has been skipped.', ResponseEmojis.ArrowRight);
-		else await handler.editWithEmoji('I cannot skip as I am not playing anything!', ResponseEmojis.Danger);
+		if (skipped) await handler.respondWithEmoji('The audio has been skipped.', ResponseEmojis.ArrowRight);
+		else await handler.respondWithEmoji('I cannot skip as I am not playing anything!', ResponseEmojis.Danger);
 	}
 }

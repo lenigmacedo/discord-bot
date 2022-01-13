@@ -26,7 +26,7 @@ export default class Enqueue implements BaseCommand {
 
 		const appended = await youtubeInterface.queue.add(youtubeVideo.id);
 
-		if (appended) await handler.editWithEmoji(`Enqueued \`${title}\`.`, ResponseEmojis.Success);
+		if (appended) await handler.respondWithEmoji(`Enqueued \`${title}\`.`, ResponseEmojis.Success);
 		else throw new CmdRequirementError('I could not add that item to the queue. Is it a valid URL?');
 	}
 }

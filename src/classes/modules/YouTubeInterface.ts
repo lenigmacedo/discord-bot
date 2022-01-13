@@ -47,9 +47,10 @@ export class YouTubeInterface implements BaseAudioInterface {
 	}
 
 	/**
-	 * This returns a queue with the scope being the user
+	 * This returns a queue with the scope being the user.
+	 *
 	 * @param member
-	 * @returns
+	 * @returns YouTubeInterface an existing or new instance.
 	 */
 	static fromGuildMember(member: GuildMember) {
 		return this.fromGuild(member.guild, member.id);
@@ -57,6 +58,7 @@ export class YouTubeInterface implements BaseAudioInterface {
 
 	/**
 	 * Set a connection instance to the guild.
+	 *
 	 * @param connection Connection to set.
 	 */
 	setConnection(connection: VoiceConnection) {
@@ -65,21 +67,9 @@ export class YouTubeInterface implements BaseAudioInterface {
 	}
 
 	/**
-	 * Open the database connection.
-	 */
-	async open() {
-		await this.queue.open();
-	}
-
-	/**
-	 * Close the database connection.
-	 */
-	async close() {
-		this.queue.close();
-	}
-
-	/**
 	 * Get the item index the bot will or is currently playing.
+	 *
+	 * @returns number
 	 */
 	get currentPointer() {
 		return this.pointer;
@@ -100,7 +90,9 @@ export class YouTubeInterface implements BaseAudioInterface {
 	}
 
 	/**
-	 * Trigger actions when events are fired.
+	 * The event instance for this instance.
+	 *
+	 * @returns YouTubeInterfaceEvents
 	 */
 	get events() {
 		return this.eventEmitter;
@@ -108,14 +100,17 @@ export class YouTubeInterface implements BaseAudioInterface {
 
 	/**
 	 * Get the connection instance associated with this guild.
+	 *
+	 * @returns VoiceConnection | null
 	 */
 	get connection() {
 		return this.voiceConnection || null;
 	}
 
 	/**
-	 * Get the video ID or String from its index.
-	 * @param queueItemIndex The queue item index. By default it gets the item the pointer is set to.
+	 * Get the video ID.
+	 *
+	 * @param index The queue item index. By default it gets the item the pointer is set to.
 	 */
 	getItemId(index = this.pointer - 1) {
 		return this.queue.get(index);
@@ -123,6 +118,8 @@ export class YouTubeInterface implements BaseAudioInterface {
 
 	/**
 	 * Get the player instance associated with this guild.
+	 *
+	 * @returns AudioPlayer
 	 */
 	get player() {
 		return this.audioPlayer;
@@ -130,6 +127,8 @@ export class YouTubeInterface implements BaseAudioInterface {
 
 	/**
 	 * Is the bot playing audio in thie guild?
+	 *
+	 * @returns boolean true indicates busy, false indicates not busy.
 	 */
 	get busy() {
 		const status = this.voiceConnection?.state.status;
@@ -250,6 +249,8 @@ export class YouTubeInterface implements BaseAudioInterface {
 	/**
 	 * Set if this player should loop the playlist.
 	 * All this does is let the runner know that instead of deleting the video after play, just re-add it to the end of the queue.
+	 *
+	 * @param option boolean
 	 */
 	set loop(option: boolean) {
 		this.looped = option;
@@ -257,13 +258,17 @@ export class YouTubeInterface implements BaseAudioInterface {
 
 	/**
 	 * Is the player looping the playlist?
+	 *
+	 * @returns boolean true indicates yes, false inficates no.
 	 */
 	get isLooped() {
 		return this.looped;
 	}
 
 	/**
-	 * Destroy the connection instance associated with this guild
+	 * Destroy the connection instance associated with this guild.
+	 *
+	 * @returns boolean true indicates the connection has been deletes, false indicates it has not.
 	 */
 	deleteConnection() {
 		this.currentResource = undefined;
@@ -280,7 +285,9 @@ export class YouTubeInterface implements BaseAudioInterface {
 	}
 
 	/**
-	 * Get the current audio resource
+	 * Get the current audio resource.
+	 *
+	 * @returns AudioResource<unknown> | null
 	 */
 	get currentAudioResource() {
 		return this.currentResource || null;
@@ -288,15 +295,16 @@ export class YouTubeInterface implements BaseAudioInterface {
 
 	/**
 	 * Set the audible volume of the bot.
+	 *
 	 * @param volume Volume between 0 and 100
+	 * @returns boolean true indicates the operation was successful, false indicates otherwise.
 	 */
-	setVolume(volume: number): boolean {
+	setVolume(volume: number) {
 		try {
-			if (volume < 0 || volume > 100) {
-				return false;
-			}
+			const validatedVolume = numClamp(volume, 0, 100);
 
-			this.audioVolume = volume / 100; // 0 is mute, 1 is max volume.
+			this.audioVolume = validatedVolume / 100; // 0 is mute, 1 is max volume.
+
 			const currentAudioResource = this.currentAudioResource;
 
 			if (currentAudioResource) {
@@ -313,6 +321,8 @@ export class YouTubeInterface implements BaseAudioInterface {
 
 	/**
 	 * The current volume level for this instance.
+	 *
+	 * @returns number percentage
 	 */
 	get volume() {
 		return this.audioVolume * 100;
@@ -320,6 +330,8 @@ export class YouTubeInterface implements BaseAudioInterface {
 
 	/**
 	 * Emit the exact event that will happen when the bot gets to the end of its current audio track. Useful for skipping.
+	 *
+	 * @returns boolean true indicates the operation was successful, false indicates otherwise.
 	 */
 	emitAudioFinish() {
 		const currentAudioResource = this.currentAudioResource;

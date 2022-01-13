@@ -34,9 +34,9 @@ export function command(options: CommandOptions = {}) {
 
 			try {
 				// All checks below will throw if criteria is not met.
-				if (enforceVoiceConnection) handler.enforceVoiceChannel();
+				if (enforceVoiceConnection) handler.voiceChannel;
 				if (enforceGuild) handler.guild;
-				if (requires) handler.enforcePermissions(requires);
+				if (requires) handler.checkPermissions(requires);
 
 				const subcommand = handler.commandInteraction.options.getSubcommand(false);
 				if (subcommand && runnerSubcommandName !== subcommand) {
@@ -48,10 +48,10 @@ export function command(options: CommandOptions = {}) {
 				if (error instanceof CmdRequirementError) {
 					const trimmedMessage = error?.message?.substring(0, 1500);
 					const message = error.message ? trimmedMessage : 'There was a problem executing your request. The reason is unknown.';
-					await handler.editWithEmoji(message, ResponseEmojis.Danger);
+					await handler.respondWithEmoji(message, ResponseEmojis.Danger);
 				} else {
 					console.error(error);
-					await handler.editWithEmoji(
+					await handler.respondWithEmoji(
 						'There was a critical error whilst handling your request. Please report this to your admin.',
 						ResponseEmojis.Danger
 					);

@@ -10,7 +10,9 @@ export class YouTubePlaylist extends YouTubeBase {
 
 	/**
 	 * Get a new instance of this class using the resource ID.
+	 *
 	 * @param id The resource ID
+	 * @returns YouTubePlaylist
 	 */
 	static fromId(id: string) {
 		return new this(`https://www.youtube.com/playlist?list=${id}`);
@@ -18,7 +20,9 @@ export class YouTubePlaylist extends YouTubeBase {
 
 	/**
 	 * Get a new instance of this class using a video URL.
+	 *
 	 * @param url The playlist URL.
+	 * @returns YouTubePlaylist
 	 */
 	static fromUrl(url: string) {
 		return new this(url);
@@ -26,7 +30,9 @@ export class YouTubePlaylist extends YouTubeBase {
 
 	/**
 	 * Validate a given ID.
+	 *
 	 * @param id The playlist ID.
+	 * @returns boolean true indicates valid, false indicates not valid.
 	 */
 	private static validateId(id: string) {
 		const regex = /^([a-zA-Z0-9-_]{34}|[a-zA-Z0-9-_]{13}|[a-zA-Z0-9-_]{18})$/;
@@ -35,6 +41,9 @@ export class YouTubePlaylist extends YouTubeBase {
 
 	/**
 	 * Get the playlist ID.
+	 *
+	 * @returns string
+	 * @throws TypeError if ID cannot be found.
 	 */
 	get id() {
 		const id = this.urlInstance.searchParams.get('list');
@@ -48,6 +57,8 @@ export class YouTubePlaylist extends YouTubeBase {
 
 	/**
 	 * Fetch all the video resources using the playlist URL within this instance.
+	 *
+	 * @returns Promise<youtube_v3.Schema$PlaylistItem[]>
 	 */
 	async fetchVideos() {
 		try {
@@ -112,6 +123,8 @@ export class YouTubePlaylist extends YouTubeBase {
 
 	/**
 	 * Fetch all video URLs or IDs within this playlist.
+	 *
+	 * @returns Promise<string[]>
 	 */
 	async fetchVideosStr(type: 'id' | 'url' = 'id') {
 		const videos = await this.fetchVideos();
