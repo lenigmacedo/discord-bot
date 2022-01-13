@@ -1,6 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { CmdRequirementError, CommandInteractionHelper, YouTubeInterface } from 'bot-classes';
-import { ResponseEmojis } from 'bot-config';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
 
@@ -20,6 +19,6 @@ export default class Stop implements BaseCommand {
 
 		audioInterface.deleteConnection();
 
-		await handler.respondWithEmoji('I have been stopped.', ResponseEmojis.Success);
+		await handler.commandInteraction.deleteReply();
 	}
 }

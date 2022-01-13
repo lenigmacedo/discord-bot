@@ -22,6 +22,16 @@ export default class Controls implements BaseCommand {
 		if (!queueLength) throw new CmdRequirementError('There is nothing in the queue.');
 		if (!youtubeInterface.busy) throw new CmdRequirementError('Please start the bot with `/start` or `/play` to make use of this command.');
 
+		await Controls.generateControls(handler, youtubeInterface);
+	}
+
+	/**
+	 * Generate interactive controls for the user.
+	 *
+	 * @param handler The handler to set the controls to.
+	 * @param youtubeInterface The YouTubeInterface instance to read from.
+	 */
+	static async generateControls(handler: CommandInteractionHelper, youtubeInterface: YouTubeInterface) {
 		const mediaControls = MediaControls.fromGuild(handler.guild, handler, getCurrentHandler => {
 			youtubeInterface.events
 				.on('next', async () => await mediaControls.refreshContent())

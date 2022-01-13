@@ -1,8 +1,8 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { CmdRequirementError, CommandInteractionHelper, YouTubeInterface, YouTubeVideo } from 'bot-classes';
-import { ResponseEmojis } from 'bot-config';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
+import Controls from './Controls';
 
 export default class Play implements BaseCommand {
 	register() {
@@ -31,13 +31,10 @@ export default class Play implements BaseCommand {
 		const youtubeVideo = YouTubeVideo.fromId(video.id.videoId);
 
 		await youtubeInterface.queue.prepend(youtubeVideo.id);
-		await handler.respondWithEmoji('Preparing to play...', ResponseEmojis.Loading);
 
-		const title = await youtubeVideo.info<string>('.videoDetails.title');
+		youtubeInterface.setPointer(1);
 
-		if (title) await handler.commandInteraction.editReply(`🔊 Playing \`${title}\`.`);
-		else throw new CmdRequirementError('Unable to play the video. It might be private, age restricted or something else. It will be skipped.');
-
+		await Controls.generateControls(handler, youtubeInterface);
 		await youtubeInterface.runner(handler);
 	}
 }

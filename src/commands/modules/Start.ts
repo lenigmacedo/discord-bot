@@ -1,8 +1,8 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CmdRequirementError, CommandInteractionHelper, YouTubeInterface, YouTubeVideo } from 'bot-classes';
-import { ResponseEmojis } from 'bot-config';
+import { CmdRequirementError, CommandInteractionHelper, YouTubeInterface } from 'bot-classes';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
+import Controls from './Controls';
 
 export default class Start implements BaseCommand {
 	register() {
@@ -14,22 +14,13 @@ export default class Start implements BaseCommand {
 		enforceVoiceConnection: true
 	})
 	async runner(handler: CommandInteractionHelper) {
-		const audioInterface = YouTubeInterface.fromGuild(handler.guild);
-		const queue = await audioInterface.queue.getSome();
+		const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
+		const queue = await youtubeInterface.queue.getSome();
 
 		if (!queue.length) throw new CmdRequirementError('The queue is empty.');
-		if (audioInterface.busy) throw new CmdRequirementError('I am busy!');
+		if (youtubeInterface.busy) throw new CmdRequirementError('I am busy!');
 
-		await handler.respondWithEmoji('Preparing to play...', ResponseEmojis.Loading);
-
-		const audioItem = await audioInterface.getItemId();
-		if (!audioItem) throw new CmdRequirementError('Unable to play the track.');
-
-		const title = await YouTubeVideo.fromId(audioItem).info<string>('.videoDetails.title');
-
-		if (title) await handler.respondWithEmoji(`I am now playing the queue. First up \`${title}\`!`, ResponseEmojis.Speaker);
-		else await handler.respondWithEmoji('I am now playing the queue.', ResponseEmojis.Speaker); // If the video is invalid, the queue should handle it and skip it.
-
-		await audioInterface.runner(handler);
+		await Controls.generateControls(handler, youtubeInterface);
+		await youtubeInterface.runner(handler);
 	}
 }
