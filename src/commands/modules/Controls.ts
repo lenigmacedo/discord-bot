@@ -22,7 +22,14 @@ export default class Controls implements BaseCommand {
 		if (!queueLength) throw new CmdRequirementError('There is nothing in the queue.');
 		if (!youtubeInterface.busy) throw new CmdRequirementError('Please start the bot with `/start` or `/play` to make use of this command.');
 
-		const mediaControls = MediaControls.fromGuild(handler.guild, handler);
+		const mediaControls = MediaControls.fromGuild(handler.guild, handler, getCurrentHandler => {
+			youtubeInterface.events
+				.on('next', async () => await mediaControls.refreshContent())
+				.on('stop', async () => {
+					const latestHandler = getCurrentHandler();
+					await latestHandler.editWithEmoji({ content: 'The audio has been stopped.', embeds: [], components: [] }, ResponseEmojis.Info);
+				});
+		});
 
 		mediaControls.clearEvents();
 
@@ -30,23 +37,21 @@ export default class Controls implements BaseCommand {
 			.on('resume', () => youtubeInterface.resume())
 			.on('pause', () => youtubeInterface.pause())
 			.on('next', () => youtubeInterface.emitAudioFinish())
-			.on('stop', async () => {
-				await handler.editWithEmoji({ content: 'The audio has been stopped.', embeds: [], components: [] }, ResponseEmojis.Info);
-				youtubeInterface.deleteConnection();
-			});
+			.on('stop', () => youtubeInterface.deleteConnection());
 
 		mediaControls.addContentFunction(async () => {
-			const nextVideo = await youtubeInterface.queue.first();
+			const nextVideo = await youtubeInterface.getItemId();
 
 			if (!nextVideo) return null;
 
 			const queueLength = await youtubeInterface.queue.length();
+			const pointer = youtubeInterface.currentPointer;
 			const videoInfo = await YouTubeVideo.fromId(nextVideo).info<YtdlVideoInfoResolved['videoDetails']>('.videoDetails').catch(console.error);
 			const { title, video_url, likes, author, thumbnails, viewCount } = videoInfo || {};
 
 			const content = {
 				title: title || 'No URL',
-				description: `Items: \`${queueLength}\` | ${video_url || 'Video URL not found.'}`,
+				description: `Playing: \`${pointer}\`/\`${queueLength}\` | ${video_url || 'Video URL not found.'}`,
 				likes: `${likes}` || '?',
 				views: `${viewCount}` || '?',
 				author: author?.name || '?',
@@ -55,9 +60,6 @@ export default class Controls implements BaseCommand {
 
 			return content;
 		});
-
-		youtubeInterface.events.removeListener('next', async () => await mediaControls.refreshContent());
-		youtubeInterface.events.on('next', async () => await mediaControls.refreshContent());
 
 		await mediaControls.start();
 	}

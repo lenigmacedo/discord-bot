@@ -9,8 +9,9 @@ import {
 	VoiceConnection,
 	VoiceConnectionStatus
 } from '@discordjs/voice';
-import { QueueManager, YouTubeVideo } from 'bot-classes';
+import { CmdRequirementError, CommandInteractionHelper, QueueManager, YouTubeVideo } from 'bot-classes';
 import { config, globals } from 'bot-config';
+import { numClamp, numWrap } from 'bot-functions';
 import { Guild, GuildMember } from 'discord.js';
 import { EventEmitter } from 'events';
 import { TypedEmitter } from 'tiny-typed-emitter';
@@ -23,6 +24,7 @@ export class YouTubeInterface implements BaseAudioInterface {
 	private currentResource?: AudioResource;
 	private eventEmitter: YouTubeInterfaceEvents;
 	private looped = false;
+	private pointer = 1; // What the bot is playing or what it should play.
 	queue: QueueManager;
 
 	private constructor(guild: Guild, queueName = 'global') {
@@ -77,6 +79,27 @@ export class YouTubeInterface implements BaseAudioInterface {
 	}
 
 	/**
+	 * Get the item index the bot will or is currently playing.
+	 */
+	get currentPointer() {
+		return this.pointer;
+	}
+
+	/**
+	 * Set the pointer!
+	 *
+	 * @returns the new pointer.
+	 */
+	async setPointer(value: number) {
+		const queueLength = await this.queue.length();
+		const validatedPointer = numClamp(value, 1, queueLength);
+
+		this.pointer = validatedPointer;
+
+		return this.pointer;
+	}
+
+	/**
 	 * Trigger actions when events are fired.
 	 */
 	get events() {
@@ -92,9 +115,9 @@ export class YouTubeInterface implements BaseAudioInterface {
 
 	/**
 	 * Get the video ID or String from its index.
-	 * @param queueItemIndex The queue item index.
+	 * @param queueItemIndex The queue item index. By default it gets the item the pointer is set to.
 	 */
-	getItemId(index = 0) {
+	getItemId(index = this.pointer - 1) {
 		return this.queue.get(index);
 	}
 
@@ -118,83 +141,80 @@ export class YouTubeInterface implements BaseAudioInterface {
 	/**
 	 * What should this player do when the audio has finished?
 	 * By default it removes the current audio track. But if looped is set to true, it will re-add the track to the end of the queue.
-	 * @param byError Did the player encounter an error? If so, this will delete the video and ignore re-adding it if the player is looped.
 	 */
-	private async handleFinish(byError = false) {
-		if (this.looped && !byError) {
-			const currentVideo = await this.queue.first();
+	private async handleFinish() {
+		const queueLength = await this.queue.length();
 
-			if (!currentVideo) return;
-
-			await this.queue.add(currentVideo);
+		if (this.isLooped) {
+			this.pointer = numWrap(this.pointer, 1, queueLength);
+			this.events.emit('next');
+			return true;
 		}
 
-		await this.queue.deleteFirst();
-		this.events.emit('next');
+		if (this.pointer < queueLength) {
+			this.pointer++;
+			this.events.emit('next');
+			return true;
+		} else {
+			this.pointer = 1;
+		}
+
+		this.events.emit('stop');
+		return false;
 	}
 
 	/**
 	 * Start the execution of the queue by joining the bot and playing audio.
 	 * To use this, await this method in a while loop. Will resolve true to indicate finish, and null to stop.
 	 */
-	runner(): Promise<true | null> {
-		// The async promise executor is warranted, because the resolving of this promise is a big delayed task and the code will look very ugly without async.
-		/* eslint-disable no-async-promise-executor */
-		return new Promise(async resolve => {
-			try {
-				const player = this.player;
-				const videoId = await this.queue.first(); // Video ID
-				const queueLength = await this.queue.length();
+	async runner(handler: CommandInteractionHelper) {
+		if (this.busy) throw new CmdRequirementError('I am busy!');
 
-				if (!videoId || !queueLength) {
-					resolve(null);
-					return;
-				}
+		this.setConnection(handler.joinVoiceChannel());
 
-				const youtubeVideo = YouTubeVideo.fromId(videoId);
-				const audioResource = await youtubeVideo.download();
+		// Resolves when the item has finished playing.
+		while (
+			/* eslint-disable no-async-promise-executor */
+			await new Promise(async resolve => {
+				try {
+					const videoId = await this.queue.get(this.pointer - 1);
 
-				const onIdleCallback = async (oldState: AudioPlayerState, newState: AudioPlayerState) => {
-					if (oldState.status === 'playing' && newState.status === 'idle') {
-						player.removeListener('stateChange', onIdleCallback);
-						await this.handleFinish();
-						resolve(true);
-					}
-				};
+					this.player.removeAllListeners('error');
+					this.player.removeAllListeners('stateChange');
 
-				player.on('stateChange', onIdleCallback);
+					const youtubeVideo = YouTubeVideo.fromId(videoId);
+					const audioResource = await youtubeVideo.download();
 
-				if (!audioResource) {
-					console.error('Audio playback skipped due to no audio resource being detected.');
-					player.removeListener('stateChange', onIdleCallback);
-					await this.handleFinish(true);
+					if (!audioResource) throw Error('Could not resolve the audio resource from YouTube.');
+
+					this.currentResource = audioResource;
+					this.currentResource.volume?.setVolume(this.audioVolume);
+					this.player.play(this.currentResource);
+
+					this.player.once('error', () => {
+						throw Error('Bad audio resource, cannot continue.');
+					});
+
+					this.player.on('stateChange', async (oldState: AudioPlayerState, newState: AudioPlayerState) => {
+						if (oldState.status === 'playing' && newState.status === 'idle') {
+							const toResolve = await this.handleFinish();
+							resolve(toResolve);
+						}
+					});
+				} catch (error) {
+					console.error(error);
+					this.events.emit('next');
+					this.queue.delete(this.pointer - 1);
 					resolve(true);
-					return;
 				}
+			})
+			/* eslint-enable no-async-promise-executor */
+		);
 
-				this.currentResource = audioResource;
-				this.currentResource.volume?.setVolume(this.audioVolume);
-				player.play(this.currentResource);
+		this.deleteConnection();
+		this.events.emit('stop');
 
-				// Ytdl core sometimes does not reliably download the audio data, so this handles the error.
-				player.once('error', async () => {
-					console.error('Audio playback skipped due to invalid stream data!');
-					await this.handleFinish(true);
-					player.removeListener('stateChange', onIdleCallback);
-					resolve(true);
-				});
-
-				this.events.on('stop', () => {
-					player.removeAllListeners();
-					this.events.removeAllListeners();
-				});
-			} catch (error) {
-				console.error(error);
-				await this.handleFinish(true);
-				resolve(true);
-			}
-		});
-		/* eslint-enable no-async-promise-executor */
+		return;
 	}
 
 	/**
@@ -256,7 +276,7 @@ export class YouTubeInterface implements BaseAudioInterface {
 			return true;
 		}
 
-		return null;
+		return false;
 	}
 
 	/**
@@ -303,8 +323,8 @@ export class YouTubeInterface implements BaseAudioInterface {
 	 */
 	emitAudioFinish() {
 		const currentAudioResource = this.currentAudioResource;
-		const player = this.player;
-		if (!(currentAudioResource instanceof AudioResource)) return null;
+
+		if (!(currentAudioResource instanceof AudioResource)) return false;
 
 		const oldState: AudioPlayerPlayingState = {
 			status: AudioPlayerStatus.Playing,
@@ -318,7 +338,7 @@ export class YouTubeInterface implements BaseAudioInterface {
 			status: AudioPlayerStatus.Idle
 		};
 
-		player.emit('stateChange', oldState, newState);
+		this.player.emit('stateChange', oldState, newState);
 
 		return true;
 	}

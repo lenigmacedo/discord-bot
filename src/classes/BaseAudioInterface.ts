@@ -1,4 +1,5 @@
 import { AudioPlayer, AudioResource, VoiceConnection } from '@discordjs/voice';
+import { CommandInteractionHelper } from 'bot-classes';
 
 export interface BaseAudioInterface {
 	/**
@@ -19,7 +20,7 @@ export interface BaseAudioInterface {
 	/**
 	 * A runner method that resolves to true when the track is finished, and null when there is no more audio resources to play.
 	 */
-	runner(): Promise<true | null>;
+	runner(handler: CommandInteractionHelper): Promise<void>;
 
 	/**
 	 * Get the voice connection.
@@ -40,5 +41,5 @@ export interface BaseAudioInterface {
 	/**
 	 * Emit a fake audio finish event to be used to simulate a track finishing. Useful for skipping.
 	 */
-	emitAudioFinish(): true | null;
+	emitAudioFinish(): boolean;
 }

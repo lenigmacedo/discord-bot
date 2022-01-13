@@ -23,17 +23,20 @@ export class MediaControls {
 	private latestComponentCollector?: InteractionCollector<MessageComponentInteraction<CacheType>>;
 	private contentFunction?: () => Promise<MediaControlsContent | null>;
 
-	private constructor(handler: CommandInteractionHelper) {
+	private constructor(handler: CommandInteractionHelper, externalEvents?: (getCurrentHandler: () => CommandInteractionHelper) => void) {
 		this.handler = handler;
+		externalEvents?.(() => this.getHandler());
 	}
 
 	/**
 	 * This class powers an interactive media control center through a message.
 	 * This method will return an existing instance if one already exists.
+	 *
+	 * @param externalEvents This is a function that will be assigned ONCE to this instance, to prevent event leaks.
 	 */
-	static fromGuild(guild: Guild, handler: CommandInteractionHelper) {
+	static fromGuild(guild: Guild, handler: CommandInteractionHelper, externalEvents?: (getCurrentHandler: () => CommandInteractionHelper) => void) {
 		if (!MediaControls.instances.has(guild.id)) {
-			MediaControls.instances.set(guild.id, new this(handler));
+			MediaControls.instances.set(guild.id, new this(handler, externalEvents));
 		}
 
 		const instance = MediaControls.instances.get(guild.id) as MediaControls;
@@ -136,6 +139,10 @@ export class MediaControls {
 
 	private updateHandler(handler: CommandInteractionHelper) {
 		this.handler = handler;
+	}
+
+	private getHandler() {
+		return this.handler;
 	}
 
 	private async createMessageEmbed() {
