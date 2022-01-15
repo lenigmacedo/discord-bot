@@ -63,6 +63,8 @@ Advantages of v13:
 
 6. Run `docker-compose up --build --detach`. This will build the bot, and run it.
 
+_Note: Commands will not immediately appear in Discord, and can take up to 1 hour to register to Discord's servers. Just keep checking, and they should appear soon (assuming everything is set up properly!)_
+
 ## How to update the bot
 
 1. Pull the latest code from this repository with `git pull`. This will not override your .env file, but it is a good idea to check the .env-example file to ensure you meet the latest environment variable requirements.
