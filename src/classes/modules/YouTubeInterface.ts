@@ -9,7 +9,7 @@ import {
 	VoiceConnection,
 	VoiceConnectionStatus
 } from '@discordjs/voice';
-import { CmdRequirementError, CommandInteractionHelper, QueueManager, YouTubeVideo } from 'bot-classes';
+import { CommandInteractionHelper, QueueManager, YouTubeVideo } from 'bot-classes';
 import { config, globals } from 'bot-config';
 import { numClamp, numWrap } from 'bot-functions';
 import { Guild, GuildMember } from 'discord.js';
@@ -167,7 +167,10 @@ export class YouTubeInterface implements BaseAudioInterface {
 	 * To use this, await this method in a while loop. Will resolve true to indicate finish, and null to stop.
 	 */
 	async runner(handler: CommandInteractionHelper) {
-		if (this.busy) throw new CmdRequirementError('I am busy!');
+		if (this.busy) {
+			console.error('A new runner was attempted to have been spawned whilst another runner was active. Aborted.');
+			return;
+		}
 
 		this.setConnection(handler.joinVoiceChannel());
 

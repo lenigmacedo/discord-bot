@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { CmdRequirementError, CommandInteractionHelper, YouTubeInterface, YouTubeVideo } from 'bot-classes';
+import { ResponseEmojis } from 'bot-config';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
 import Controls from './Controls';
@@ -21,20 +22,20 @@ export default class Play implements BaseCommand {
 	async runner(handler: CommandInteractionHelper) {
 		const query = handler.commandInteraction.options.getString('query', true);
 		const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
-
-		if (youtubeInterface.busy) throw new CmdRequirementError('I am busy!');
-
 		const [video] = await YouTubeVideo.search(query, 1);
 
 		if (!video?.id?.videoId) throw new CmdRequirementError('I could not find a video. Try something less specific?');
 
 		const youtubeVideo = YouTubeVideo.fromId(video.id.videoId);
 
-		await youtubeInterface.queue.prepend(youtubeVideo.id);
-
-		youtubeInterface.setPointer(1);
-
-		await Controls.generateControls(handler, youtubeInterface);
-		await youtubeInterface.runner(handler);
+		if (youtubeInterface.busy) {
+			await handler.respondWithEmoji('As I am currently busy, I will add the video to the end of the queue.', ResponseEmojis.Info);
+			await youtubeInterface.queue.add(youtubeVideo.id);
+		} else {
+			await youtubeInterface.queue.prepend(youtubeVideo.id);
+			youtubeInterface.setPointer(1);
+			await Controls.generateControls(handler, youtubeInterface);
+			await youtubeInterface.runner(handler);
+		}
 	}
 }
