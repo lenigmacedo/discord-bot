@@ -1,16 +1,15 @@
-import { config } from 'bot-config';
+import { config, globals } from 'bot-config';
 import { Guild } from 'discord.js';
-import { createClient } from 'redis';
 
 export class QueueManager {
-	static client = createClient({ url: `redis://${config.redisHost}:${config.redisPort}` });
+	static client = globals.redisClient;
 	namespace: string;
 
 	/**
 	 * An easy dependencyless queue manager for managing dynamic lists using Redis.
 	 */
-	constructor(guildId: string, namespaces: string[]) {
-		this.namespace = `${config.redisNamespace}:${guildId}:queue:${namespaces.join(':')}`; // appname:guildid:queue:custom
+	constructor(id: string, namespaces: string[]) {
+		this.namespace = `${config.redisNamespace}:${id}:queue:${namespaces.join(':')}`; // appname:guildid:queue:custom
 	}
 
 	/**
@@ -152,5 +151,3 @@ export class QueueManager {
 		return true;
 	}
 }
-
-QueueManager.client.connect();

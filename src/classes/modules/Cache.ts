@@ -1,8 +1,7 @@
-import { config } from 'bot-config';
-import { createClient } from 'redis';
+import { config, globals } from 'bot-config';
 
 export class Cache {
-	static client = createClient({ url: `redis://${config.redisHost}:${config.redisPort}` });
+	static client = globals.redisClient;
 	private namespace: string;
 
 	/**
@@ -57,5 +56,3 @@ export class Cache {
 		return this.client.EXISTS(this.namespace);
 	}
 }
-
-Cache.client.connect();

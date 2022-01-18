@@ -4,6 +4,8 @@ services:
   redis:
     container_name: redis
     image: redislabs/rejson
+    sysctls:
+      - net.core.somaxconn=1024
     restart: always
 
   bot:
