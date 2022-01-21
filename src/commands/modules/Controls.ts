@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { CmdRequirementError, CommandInteractionHelper, MediaControls, YouTubeInterface } from 'bot-classes';
 import { YouTubeVideo, YtdlVideoInfoResolved } from 'bot-classes/modules/YouTubeVideo';
-import { ResponseEmojis } from 'bot-config';
+import { config, ResponseEmojis } from 'bot-config';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
 
@@ -59,9 +59,11 @@ export default class Controls implements BaseCommand {
 			const videoInfo = await YouTubeVideo.fromId(nextVideo).info<YtdlVideoInfoResolved['videoDetails']>('.videoDetails').catch(console.error);
 			const { title, video_url, likes, author, thumbnails, viewCount } = videoInfo || {};
 
+			const status = config.forgetItemsOnFinish ? `Items left: \`${queueLength}\`` : `Playing: \`${pointer}\`/\`${queueLength}\``;
+
 			const content = {
 				title: title || 'No URL',
-				description: `Playing: \`${pointer}\`/\`${queueLength}\` | ${video_url || 'Video URL not found.'}`,
+				description: `${status} | ${video_url || 'Video URL not found.'}`,
 				likes: `${likes}` || '?',
 				views: `${viewCount}` || '?',
 				author: author?.name || '?',

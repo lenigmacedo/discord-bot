@@ -34,7 +34,7 @@ export class QueueManager {
 	 * Add an item to the end of the queue.
 	 *
 	 * @param value A value to add.
-	 * @returns A number of how many values were added.
+	 * @returns A number of how many values now exist.
 	 */
 	add(value: string) {
 		return this.client.RPUSH(this.namespace, value);
@@ -44,7 +44,7 @@ export class QueueManager {
 	 * Add a video to position 1 in the queue.
 	 *
 	 * @param value A value to prepend.
-	 * @returns A number of how many values were added.
+	 * @returns A number of how many values now exist.
 	 */
 	prepend(value: string) {
 		return this.client.LPUSH(this.namespace, value);

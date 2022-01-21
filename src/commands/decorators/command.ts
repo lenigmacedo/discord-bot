@@ -34,7 +34,7 @@ export function command(options: CommandOptions = {}) {
 
 			try {
 				// All checks below will throw if criteria is not met.
-				if (enforceVoiceConnection) handler.voiceChannel;
+				if (enforceVoiceConnection && !handler.guildMember.voice.channel) throw new CmdRequirementError('You must be connected to a voice channel.');
 				if (enforceGuild) handler.guild;
 				if (requires) handler.checkPermissions(requires);
 

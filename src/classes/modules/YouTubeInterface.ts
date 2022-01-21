@@ -15,9 +15,8 @@ import { numClamp, numWrap } from 'bot-functions';
 import { Guild, GuildMember } from 'discord.js';
 import { EventEmitter } from 'events';
 import { TypedEmitter } from 'tiny-typed-emitter';
-import { BaseAudioInterface } from '../BaseAudioInterface';
 
-export class YouTubeInterface implements BaseAudioInterface {
+export class YouTubeInterface {
 	private audioPlayer: AudioPlayer;
 	private audioVolume: number;
 	private voiceConnection?: VoiceConnection;
@@ -151,7 +150,8 @@ export class YouTubeInterface implements BaseAudioInterface {
 		}
 
 		if (this.pointer < queueLength) {
-			this.pointer++;
+			config.forgetItemsOnFinish ? await this.queue.delete(this.pointer - 1) : this.pointer++;
+
 			this.events.emit('next');
 			return true;
 		} else {
