@@ -1,7 +1,6 @@
 import { config, globals } from 'bot-config';
 
 export class Cache {
-	static client = globals.redisClient;
 	private namespace: string;
 
 	/**
@@ -17,7 +16,7 @@ export class Cache {
 	 * The Redis client is stored outside of the prototype. This is a helper method to retrieve when in instance context.
 	 */
 	get client() {
-		return Cache.client;
+		return globals.redisClient;
 	}
 
 	/**

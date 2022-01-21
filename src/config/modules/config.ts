@@ -5,9 +5,10 @@ env();
 
 /**
  * CONFIG
- * Set values that are meant to be user-changeable here!
+ *
+ * This bot has a lot of options for defaults. Feel free to change them (if you know what you are doing!)
  */
-const config = {
+export const config = {
 	// TOKENS
 	discordToken: process.env.DISCORD_TOKEN,
 	googleApiToken: process.env.GOOGLE_API_TOKEN,
@@ -36,23 +37,3 @@ const config = {
 
 	numberFormat: 'en-GB'
 };
-
-export enum ColourScheme {
-	'Success' = '#77B155',
-	'Danger' = '#DB2E43',
-	'Warning' = '#FFFF00'
-}
-
-export enum ResponseEmojis {
-	'Success' = '✅',
-	'Info' = 'ℹ️',
-	'Loading' = '🔃',
-	'Danger' = '🚨',
-	'ArrowRight' = '➡️',
-	'Rubbish' = '🚮',
-	'Speaker' = '🔊',
-	'Scroll' = '📃',
-	'Pensive' = '😔'
-}
-
-export default config;

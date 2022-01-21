@@ -2,7 +2,6 @@ import { config, globals } from 'bot-config';
 import { Guild } from 'discord.js';
 
 export class QueueManager {
-	static client = globals.redisClient;
 	namespace: string;
 
 	/**
@@ -28,7 +27,7 @@ export class QueueManager {
 	 * Get the static Redis client instance on this object.
 	 */
 	get client() {
-		return QueueManager.client;
+		return globals.redisClient;
 	}
 
 	/**

@@ -6,9 +6,10 @@ import { createClient } from 'redis';
 
 /**
  * GLOBALS
- * Set values that should NOT be user changeable yet used throughout many parts of the code as reference.
+ *
+ * You should not need to touch these unless you are a developer. These values are services/stores the bot requires to function.
  */
-const globals = {
+export const globals = {
 	redisClient: createClient({ url: `redis://${config.redisHost}:${config.redisPort}` }),
 	numberToLocale: new Intl.NumberFormat(config.numberFormat),
 	youtubeApi: youtube({ version: 'v3', auth: config.googleApiToken }),
@@ -17,5 +18,3 @@ const globals = {
 };
 
 globals.redisClient.connect();
-
-export default globals;
