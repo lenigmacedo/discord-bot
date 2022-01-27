@@ -1,2 +1,2 @@
-export { default as interactionCreate } from './modules/interactionCreate';
-export { default as ready } from './modules/ready';
+export { interactionCreate } from './modules/interactionCreate';
+export { ready } from './modules/ready';

@@ -8,5 +8,7 @@ console.log(`Environment: ${config.environment}`);
 console.log(`Redis host: ${config.redisHost}`);
 
 client.on('ready', () => ready(client));
+client.on('error', console.error);
 client.on('interactionCreate', interactionCreate);
+
 client.login(config.discordToken);

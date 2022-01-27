@@ -3,8 +3,8 @@
 	"version": "1.0.0",
 	"description": "A Discord bot powered by Discord.js v13 and TypeScript for YouTube playback.",
 	"scripts": {
+		"bot": "ts-node src/index.ts -p tsconfig.builds.json",
 		"dev": "cross-env NODE_ENV=development nodemon src/index.ts",
-		"bot": "cross-env NODE_ENV=production ts-node src/index.ts -p tsconfig.builds.json",
 		"test": "jest --detectOpenHandles"
 	},
 	"workspaces": [

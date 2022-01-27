@@ -1,8 +1,12 @@
-FROM node:16
+FROM node:16-alpine
 
-WORKDIR /home/app
+ENV NODE_ENV production
 
-COPY . .
+WORKDIR /home/node
+
+COPY --chown=node:node . .
+
+USER node
 
 RUN npm i
 

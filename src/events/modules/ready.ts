@@ -1,7 +1,7 @@
 import { registerCommands } from 'bot-functions';
 import { Client } from 'discord.js';
 
-const ready = async (client: Client) => {
+const ready = (client: Client) => {
 	console.log(`Bot logged in as ${client.user?.username}!`);
 
 	client.user?.setActivity({
@@ -12,4 +12,4 @@ const ready = async (client: Client) => {
 	registerCommands();
 };
 
-export default ready;
+export { ready };
