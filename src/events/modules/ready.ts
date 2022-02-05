@@ -1,3 +1,4 @@
+import { globals } from 'bot-config';
 import { registerCommands } from 'bot-functions';
 import { Client } from 'discord.js';
 
@@ -10,6 +11,7 @@ const ready = (client: Client) => {
 	});
 
 	registerCommands();
+	globals.redisClient.connect();
 };
 
 export { ready };

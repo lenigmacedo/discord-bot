@@ -5,7 +5,7 @@
 	"scripts": {
 		"bot": "ts-node src/index.ts -p tsconfig.builds.json",
 		"dev": "cross-env NODE_ENV=development nodemon src/index.ts",
-		"test": "jest --detectOpenHandles"
+		"test": "jest"
 	},
 	"workspaces": [
 		"src/config",

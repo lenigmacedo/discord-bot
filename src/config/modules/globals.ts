@@ -16,5 +16,3 @@ export const globals = {
 	youtubePlayers: new Map<Guild['id'], YouTubeInterface>(),
 	commandModules: new Map<string, any>() // Would be glad if someone could get a type that represents any class that implements a specific interface. I don't like using "any"!
 };
-
-globals.redisClient.connect();

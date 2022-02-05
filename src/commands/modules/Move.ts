@@ -30,7 +30,7 @@ export default class Move implements BaseCommand {
 		else if (toPosition > queueLength || toPosition < 1) throw new CmdRequirementError('`To` position is out of range!');
 
 		const currentItems = await queue.getAll();
-		const alteredQueue = moveArrItem(currentItems, fromPosition - 1, toPosition - 1);
+		const alteredQueue = moveArrItem<string>(currentItems, fromPosition - 1, toPosition - 1);
 
 		await queue.purge(); // Redis does not support moving items in a list. We'll let JS do it.
 
