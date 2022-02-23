@@ -27,7 +27,8 @@ export function command(options: CommandOptions = {}) {
 				ephemeral = true,
 				enforceVoiceConnection = false,
 				enforceGuild = true,
-				runnerSubcommandName = ''
+				runnerSubcommandName = '',
+				msgOnExpire
 			} = options;
 
 			const handler = await new CommandInteractionHelper(commandInteraction).init(ephemeral);
@@ -37,14 +38,19 @@ export function command(options: CommandOptions = {}) {
 				if (enforceVoiceConnection && !handler.guildMember.voice.channel) throw new CmdRequirementError('You must be connected to a voice channel.');
 				if (enforceGuild) handler.guild;
 				if (requires) handler.checkPermissions(requires);
+				if (msgOnExpire) handler.handleExpire(msgOnExpire);
 
 				const subcommand = handler.commandInteraction.options.getSubcommand(false);
 				if (subcommand && runnerSubcommandName !== subcommand) {
-					return await target[subcommand].call(target, handler);
+					await target[subcommand].call(target, handler);
 				}
 
-				return await method.call(target, handler);
+				await method.call(target, handler);
+
+				handler.status = 'SUCCESS';
 			} catch (error: any) {
+				handler.status = 'ERROR';
+
 				if (error instanceof CmdRequirementError) {
 					const trimmedMessage = error?.message?.substring(0, 1500);
 					const message = error.message ? trimmedMessage : 'There was a problem executing your request. The reason is unknown.';
@@ -96,4 +102,12 @@ interface CommandOptions {
 	 * This is because the methods of the command class are automatically executed by subcommand name.
 	 */
 	runnerSubcommandName?: string;
+
+	/**
+	 * Discord.js interactive components expire after 15 minutes.
+	 *
+	 * If no message is specified, the expiry message will not happen.
+	 * If one is, then the message will automatically notify the user in 15 minutes.
+	 */
+	msgOnExpire?: string;
 }

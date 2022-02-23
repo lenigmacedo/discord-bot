@@ -13,7 +13,9 @@ export default class Queue implements BaseCommand {
 			.addIntegerOption(option => option.setName('page').setDescription('Page number for if your queue is really long!'));
 	}
 
-	@command()
+	@command({
+		msgOnExpire: 'This interaction has expired. Please use `/queue` again to get another interactive queue.'
+	})
 	async runner(handler: CommandInteractionHelper) {
 		const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
 		const queueLength = await youtubeInterface.queue.length();

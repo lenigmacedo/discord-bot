@@ -15,7 +15,8 @@ export default class Play implements BaseCommand {
 
 	@command({
 		ephemeral: false,
-		enforceVoiceConnection: true
+		enforceVoiceConnection: true,
+		msgOnExpire: 'Controls has expired. Please use `/controls` to get get it back for another 15 minutes.'
 	})
 	async runner(handler: CommandInteractionHelper) {
 		const query = handler.commandInteraction.options.getString('query');
@@ -35,11 +36,17 @@ export default class Play implements BaseCommand {
 				await youtubeInterface.queue.prepend(youtubeVideo.id);
 				youtubeInterface.setPointer(1);
 				await Controls.generateControls(handler, youtubeInterface);
+
+				handler.status = 'SUCCESS';
+
 				await youtubeInterface.runner(handler);
 			}
 		} else if (!youtubeInterface.busy) {
 			youtubeInterface.setPointer(1);
 			await Controls.generateControls(handler, youtubeInterface);
+
+			handler.status = 'SUCCESS';
+
 			await youtubeInterface.runner(handler);
 		} else {
 			throw new CmdRequirementError('I am busy!');

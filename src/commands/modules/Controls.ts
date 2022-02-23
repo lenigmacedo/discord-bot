@@ -13,7 +13,8 @@ export default class Controls implements BaseCommand {
 	@command({
 		enforceGuild: true,
 		enforceVoiceConnection: true,
-		ephemeral: false
+		ephemeral: false,
+		msgOnExpire: 'Controls has expired. Please use `/controls` to get get it back for another 15 minutes.'
 	})
 	async runner(handler: CommandInteractionHelper) {
 		const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);

@@ -112,9 +112,7 @@ export class QueueReader {
 
 		if (!(botReply instanceof Message)) return;
 
-		const collector = botReply.createMessageComponentCollector({
-			time: config.queueButtonExpiryMilliseconds // Expires for memory reasons.
-		});
+		const collector = botReply.createMessageComponentCollector();
 
 		// This removes the buttons when the buttons expire as they no longer work.
 		collector.on('end', async () => {

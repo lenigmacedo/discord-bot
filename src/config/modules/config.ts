@@ -30,8 +30,6 @@ export const config = {
 	forgetItemsOnFinish: true, // Remove items from the queue when they have finished playing
 	paginateMaxLength: 5,
 	playlistImportMaxSize: 50, // For every 50 items, 1 unit of your YouTube API quota will be consumed. Increase this with caution!
-	searchExpiryMilliseconds: 60 * 1000,
-	queueButtonExpiryMilliseconds: 600 * 1000,
 	cacheExpiryHours: 24,
 	audioVolume: 0.8,
 	minimumDefaultPermissions: ['SPEAK'], // By default, the user should have these privileges unless the command has been overridden.

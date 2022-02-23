@@ -1,5 +1,5 @@
 import { DiscordGatewayAdapterCreator, joinVoiceChannel } from '@discordjs/voice';
-import { ColourScheme, config, ResponseEmojis } from 'bot-config';
+import { ColourScheme, ResponseEmojis } from 'bot-config';
 import {
 	CollectorFilter,
 	CommandInteraction,
@@ -18,6 +18,7 @@ import { CmdRequirementError } from '..';
 export class CommandInteractionHelper {
 	protected interaction: CommandInteraction;
 	protected invoked: Date; // A Date instance representing when this command was run.
+	status: Status = 'PENDING';
 
 	/**
 	 * A helper class to make utilising the CommandInteraction instance a little easier.
@@ -42,6 +43,24 @@ export class CommandInteractionHelper {
 		}
 
 		throw new CmdRequirementError('Unable to retrieve command name.');
+	}
+
+	/**
+	 * The command interaction is only valid for 15 minutes. This function will automatically run when that time is up.
+	 */
+	handleExpire(message: string) {
+		setTimeout(() => {
+			if (this.status !== 'SUCCESS') return; // You wouldn't want to say an interaction has expired when errors aren't interactive!
+
+			this.respondWithEmoji(
+				{
+					components: [],
+					embeds: [],
+					content: message
+				},
+				ResponseEmojis.Info
+			);
+		}, 900_000 - 10000); // 15 minutes minus 10 seconds to be safe (network latency and all that).
 	}
 
 	/**
@@ -186,11 +205,7 @@ export class CommandInteractionHelper {
 			return messageComponentInteraction.user.id === this.commandInteraction.member?.user.id;
 		};
 
-		const collector = msgWithComponents.createMessageComponentCollector({
-			max: 1,
-			time: config.searchExpiryMilliseconds,
-			filter
-		});
+		const collector = msgWithComponents.createMessageComponentCollector({ max: 1, filter });
 
 		collector.on('end', async collected => {
 			const message = collected.first();
@@ -206,3 +221,5 @@ export class CommandInteractionHelper {
 		});
 	}
 }
+
+type Status = 'SUCCESS' | 'ERROR' | 'PENDING';

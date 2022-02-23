@@ -126,6 +126,10 @@ export class MediaControls {
 						break;
 				}
 			});
+
+		setTimeout(() => {
+			this.latestComponentCollector?.removeAllListeners();
+		}, 900_000 - 10000);
 	}
 
 	/**

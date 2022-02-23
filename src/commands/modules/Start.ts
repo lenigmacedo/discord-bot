@@ -11,7 +11,8 @@ export default class Start implements BaseCommand {
 
 	@command({
 		ephemeral: false,
-		enforceVoiceConnection: true
+		enforceVoiceConnection: true,
+		msgOnExpire: 'Controls has expired. Please use `/controls` to get get it back for another 15 minutes.'
 	})
 	async runner(handler: CommandInteractionHelper) {
 		const youtubeInterface = YouTubeInterface.fromGuild(handler.guild);
@@ -21,6 +22,9 @@ export default class Start implements BaseCommand {
 		if (youtubeInterface.busy) throw new CmdRequirementError('I am busy!');
 
 		await Controls.generateControls(handler, youtubeInterface);
+
+		handler.status = 'SUCCESS';
+
 		await youtubeInterface.runner(handler);
 	}
 }

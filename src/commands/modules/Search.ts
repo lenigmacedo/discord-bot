@@ -15,7 +15,8 @@ export default class Search implements BaseCommand {
 	}
 
 	@command({
-		enforceVoiceConnection: true
+		enforceVoiceConnection: true,
+		msgOnExpire: 'This interaction has expired. Please use `/search` if you would like to try again!'
 	})
 	async runner(handler: CommandInteractionHelper) {
 		await handler.respondWithEmoji('Searching YouTube. Please wait...', ResponseEmojis.Loading);
