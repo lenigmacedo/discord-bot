@@ -197,6 +197,8 @@ export class YouTubeInterface {
 						throw Error('Bad audio resource, cannot continue.');
 					});
 
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore Incorrect type error: Argument of type '"stateChange"' is not assignable to parameter of type 'AudioPlayerStatus.Idle'.
 					this.player.on('stateChange', async (oldState: AudioPlayerState, newState: AudioPlayerState) => {
 						if (oldState.status === 'playing' && newState.status === 'idle') {
 							const toResolve = await this.handleFinish();

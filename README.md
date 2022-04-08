@@ -71,10 +71,6 @@ _Note: Commands will not immediately appear in Discord, and can take up to 1 hou
 2. Rebuild the Docker containers with `docker-compose up --build`.
 3. Done!
 
-## Plans
-
-This bot is in continuous development, and is only in its beginning phase. Then I will continue to make the bot more versatile and powerful! Not yet sure what those features may be!
-
 ## Licensed under the GNU GPL v3
 
 Discord YouTube Bot, an open source Discord YouTube Bot.
