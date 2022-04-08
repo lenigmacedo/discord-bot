@@ -6,14 +6,12 @@
 			"request": "launch",
 			"name": "Debug Bot",
 			"protocol": "inspector",
-			"args": ["${workspaceRoot}/src/index.ts"],
+			"runtimeExecutable": "npm",
 			"env": {
 				"NODE_ENV": "development",
 				"REDIS_HOST": "localhost"
 			},
-			"cwd": "${workspaceRoot}",
-			"runtimeArgs": ["-r", "ts-node/register/transpile-only"],
-			"internalConsoleOptions": "neverOpen",
+			"runtimeArgs": ["run", "dev"],
 			"restart": true
 		}
 	]
