@@ -1,5 +1,5 @@
-import { YouTubeInterface } from 'bot-classes';
-import { ResponseEmojis } from 'bot-config';
+import { YouTubeInterface } from '../../../classes';
+import { ResponseEmojis } from '../../../config';
 import { Guild } from 'discord.js';
 import { MessageComponentHandler } from '../MessageComponentHandler.types';
 

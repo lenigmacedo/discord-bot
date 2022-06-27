@@ -1,5 +1,0 @@
-{
-	"name": "bot-classes",
-	"description": "Essential classes for the bot.",
-	"main": "index.ts"
-}

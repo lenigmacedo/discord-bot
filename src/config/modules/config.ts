@@ -26,7 +26,7 @@ export const config = {
 	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MESSAGE_TYPING],
 
 	// CONFIG
-	redisNamespace: 'discord-youtube-bot',
+	redisNamespace: 'redis', //Nome do container do redis
 	forgetItemsOnFinish: true, // Remove items from the queue when they have finished playing
 	paginateMaxLength: 5,
 	playlistImportMaxSize: 50, // For every 50 items, 1 unit of your YouTube API quota will be consumed. Increase this with caution!

@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CmdRequirementError, CommandInteractionHelper, YouTubeVideo } from 'bot-classes';
-import { YtdlVideoInfoResolved } from 'bot-classes/modules/YouTubeVideo';
-import { globals, ResponseEmojis } from 'bot-config';
+import { CmdRequirementError, CommandInteractionHelper, YouTubeVideo } from '../../classes';
+import { YtdlVideoInfoResolved } from '../../classes/modules/YouTubeVideo';
+import { globals, ResponseEmojis } from '../../config';
 import { MessageActionRow, MessageSelectMenu, MessageSelectOptionData } from 'discord.js';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';

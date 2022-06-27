@@ -1,4 +1,4 @@
-import { config, globals } from 'bot-config';
+import { config, globals } from '../../config';
 import { Guild } from 'discord.js';
 
 export class QueueManager {

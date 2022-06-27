@@ -1,4 +1,4 @@
-import { globals } from 'bot-config';
+import { globals } from '../../config';
 import { Interaction } from 'discord.js';
 
 /**

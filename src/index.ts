@@ -1,5 +1,7 @@
-import { config } from 'bot-config';
-import { interactionCreate, ready } from 'bot-events';
+import { config } from  './config';
+import { interactionCreate, ready } from './events';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-ignore
 import { Client } from 'discord.js';
 
 const client = new Client({ intents: config.intents });

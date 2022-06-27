@@ -1,5 +1,0 @@
-{
-	"name": "bot-config",
-	"description": "A global config for the bot.",
-	"main": "index.ts"
-}

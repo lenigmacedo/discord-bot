@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from '@discordjs/builders';
-import { CommandInteractionHelper } from 'bot-classes';
+import { CommandInteractionHelper } from '../classes';
 
 export interface BaseCommand {
 	/**

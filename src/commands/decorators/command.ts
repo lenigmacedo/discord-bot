@@ -1,5 +1,5 @@
-import { CmdRequirementError, CommandInteractionHelper } from 'bot-classes';
-import { config, ResponseEmojis } from 'bot-config';
+import { CmdRequirementError, CommandInteractionHelper } from '../../classes';
+import { config, ResponseEmojis } from '../../config';
 import { CommandInteraction, PermissionString } from 'discord.js';
 
 /**

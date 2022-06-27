@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CmdRequirementError, CommandInteractionHelper, YouTubeInterface } from 'bot-classes';
+import { CmdRequirementError, CommandInteractionHelper, YouTubeInterface } from '../../classes';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
 

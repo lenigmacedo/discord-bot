@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
 	AudioPlayer,
 	AudioPlayerIdleState,
@@ -9,9 +10,9 @@ import {
 	VoiceConnection,
 	VoiceConnectionStatus
 } from '@discordjs/voice';
-import { CommandInteractionHelper, QueueManager, YouTubeVideo } from 'bot-classes';
-import { config, globals } from 'bot-config';
-import { numClamp, numWrap } from 'bot-functions';
+import { CommandInteractionHelper, QueueManager, YouTubeVideo } from '../../classes';
+import { config, globals } from '../../config';
+import { numClamp, numWrap } from '../../functions';
 import { Guild, GuildMember } from 'discord.js';
 import { EventEmitter } from 'events';
 import { TypedEmitter } from 'tiny-typed-emitter';
@@ -180,7 +181,6 @@ export class YouTubeInterface {
 			await new Promise(async resolve => {
 				try {
 					const videoId = await this.queue.get(this.pointer - 1);
-
 					this.player.removeAllListeners('error');
 					this.player.removeAllListeners('stateChange');
 

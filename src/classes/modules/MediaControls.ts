@@ -1,5 +1,5 @@
-import { CommandInteractionHelper } from 'bot-classes';
-import { ResponseEmojis } from 'bot-config';
+import { CommandInteractionHelper } from '../../classes';
+import { ResponseEmojis } from '../../config';
 import {
 	CacheType,
 	CollectorFilter,

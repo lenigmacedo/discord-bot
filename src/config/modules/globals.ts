@@ -1,6 +1,8 @@
 import { youtube } from '@googleapis/youtube';
-import { YouTubeInterface } from 'bot-classes';
-import { config } from 'bot-config';
+import { YouTubeInterface } from '../../classes';
+import { config } from '../../config';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-ignore
 import { Guild } from 'discord.js';
 import { createClient } from 'redis';
 

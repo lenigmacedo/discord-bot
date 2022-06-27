@@ -1,6 +1,6 @@
 import { youtube_v3 } from '@googleapis/youtube';
-import { YouTubeVideo } from 'bot-classes';
-import { config, globals } from 'bot-config';
+import { YouTubeVideo } from '../../classes';
+import { config, globals } from '../../config';
 import { YouTubeBase } from './YouTubeBase';
 
 export class YouTubePlaylist extends YouTubeBase {

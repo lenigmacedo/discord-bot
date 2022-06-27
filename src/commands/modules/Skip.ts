@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteractionHelper, YouTubeInterface } from 'bot-classes';
-import { ResponseEmojis } from 'bot-config';
+import { CommandInteractionHelper, YouTubeInterface } from '../../classes';
+import { ResponseEmojis } from '../../config';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
 

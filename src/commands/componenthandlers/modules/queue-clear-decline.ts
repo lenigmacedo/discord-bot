@@ -1,4 +1,4 @@
-import { ResponseEmojis } from 'bot-config';
+import { ResponseEmojis } from '../../../config';
 import { Guild } from 'discord.js';
 import { MessageComponentHandler } from '../MessageComponentHandler.types';
 

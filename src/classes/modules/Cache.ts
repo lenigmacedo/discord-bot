@@ -1,4 +1,4 @@
-import { config, globals } from 'bot-config';
+import { config, globals } from '../../config';
 
 export class Cache {
 	private namespace: string;

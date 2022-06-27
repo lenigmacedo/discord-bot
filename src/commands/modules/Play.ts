@@ -1,6 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CmdRequirementError, CommandInteractionHelper, YouTubeInterface, YouTubeVideo } from 'bot-classes';
-import { ResponseEmojis } from 'bot-config';
+import { MessageEmbed } from 'discord.js';
+import { CmdRequirementError, CommandInteractionHelper, YouTubeInterface, YouTubeVideo } from '../../classes';
+import { YtdlVideoInfoResolved } from '../../classes/modules/YouTubeVideo';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
 import Controls from './Controls';
@@ -29,8 +30,29 @@ export default class Play implements BaseCommand {
 
 			const youtubeVideo = YouTubeVideo.fromId(video.id.videoId);
 
+			const videoInfo = await youtubeVideo.info<YtdlVideoInfoResolved['videoDetails']>('.videoDetails').catch((e) => console.log(e, "erro"));
+			const { title, video_url, likes, author, thumbnails, viewCount } = videoInfo || {};
+
+			const content = {
+				title: title || 'No URL',
+				description: `${video_url || 'Video URL not found.'}`,
+				likes: `${likes}` || '?',
+				views: `${viewCount}` || '?',
+				author: author?.name || '?',
+				thumbnailUrl: thumbnails?.[3]?.url || 'No URL'
+			};
+
+			const message = await new MessageEmbed()
+				.setTitle(`Vou tocar ${content.title} logo em breve`)
+				.setDescription(content.description.substring(0, 200))
+				.addField('Channel', content.author)
+				.addField('Likes', content.likes)
+				.addField('Views', content.views)
+				.setThumbnail(content.thumbnailUrl);
+
+
 			if (youtubeInterface.busy) {
-				await handler.respondWithEmoji('As I am currently busy, I will add the video to the end of the queue.', ResponseEmojis.Info);
+				handler.commandInteraction.editReply({ embeds: [message] });
 				await youtubeInterface.queue.add(youtubeVideo.id);
 			} else {
 				await youtubeInterface.queue.prepend(youtubeVideo.id);

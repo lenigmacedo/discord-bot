@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CmdRequirementError, CommandInteractionHelper, QueueReader, YouTubeInterface, YouTubeVideo } from 'bot-classes';
-import { YtdlVideoInfoResolved } from 'bot-classes/modules/YouTubeVideo';
-import { config, ResponseEmojis } from 'bot-config';
+import { CmdRequirementError, CommandInteractionHelper, QueueReader, YouTubeInterface, YouTubeVideo } from '../../classes';
+import { YtdlVideoInfoResolved } from '../../classes/modules/YouTubeVideo';
+import { config, ResponseEmojis } from '../../config';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
 

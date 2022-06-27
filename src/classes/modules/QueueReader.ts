@@ -1,6 +1,6 @@
-import { CommandInteractionHelper } from 'bot-classes';
-import { ColourScheme, config } from 'bot-config';
-import { numClamp } from 'bot-functions';
+import { CommandInteractionHelper } from '../../classes';
+import { ColourScheme, config } from '../../config';
+import { numClamp } from '../../functions';
 import { ColorResolvable, Message, MessageActionRow, MessageButton, MessageButtonStyleResolvable, MessageEmbed } from 'discord.js';
 
 export class QueueReader {

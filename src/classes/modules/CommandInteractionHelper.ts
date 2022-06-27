@@ -1,5 +1,5 @@
 import { DiscordGatewayAdapterCreator, joinVoiceChannel } from '@discordjs/voice';
-import { ColourScheme, ResponseEmojis } from 'bot-config';
+import { ColourScheme, ResponseEmojis } from '../../config';
 import {
 	CollectorFilter,
 	CommandInteraction,

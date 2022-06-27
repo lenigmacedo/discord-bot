@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CmdRequirementError, CommandInteractionHelper, MediaControls, YouTubeInterface } from 'bot-classes';
-import { YouTubeVideo, YtdlVideoInfoResolved } from 'bot-classes/modules/YouTubeVideo';
-import { config, ResponseEmojis } from 'bot-config';
+import { CmdRequirementError, CommandInteractionHelper, MediaControls, YouTubeInterface } from '../../classes';
+import { YouTubeVideo, YtdlVideoInfoResolved } from '../../classes/modules/YouTubeVideo';
+import { config, ResponseEmojis } from '../../config';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
 
@@ -43,7 +43,6 @@ export default class Controls implements BaseCommand {
 		});
 
 		mediaControls.clearEvents();
-
 		mediaControls.events
 			.on('resume', () => youtubeInterface.resume())
 			.on('pause', () => youtubeInterface.pause())

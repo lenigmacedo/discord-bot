@@ -1,7 +1,7 @@
 import { createAudioResource } from '@discordjs/voice';
 import { youtube_v3 } from '@googleapis/youtube';
-import { Cache } from 'bot-classes';
-import { config, globals } from 'bot-config';
+import { Cache } from '../../classes';
+import { config, globals } from '../../config';
 import ytdl from 'ytdl-core-discord';
 import { YouTubeBase } from './YouTubeBase';
 

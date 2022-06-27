@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { CmdRequirementError, CommandInteractionHelper, QueueManager } from 'bot-classes';
-import { ResponseEmojis } from 'bot-config';
-import { moveArrItem } from 'bot-functions';
+import { CmdRequirementError, CommandInteractionHelper, QueueManager } from '../../classes';
+import { ResponseEmojis } from '../../config';
+import { moveArrItem } from '../../functions';
 import { BaseCommand } from '../BaseCommand';
 import { command } from '../decorators/command';
 
