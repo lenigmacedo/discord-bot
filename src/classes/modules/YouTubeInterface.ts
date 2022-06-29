@@ -155,6 +155,9 @@ export class YouTubeInterface {
 
 			this.events.emit('next');
 			return true;
+		} else if (this.pointer <= queueLength) {
+			await this.queue.delete(this.pointer - 1);
+		
 		} else {
 			this.pointer = 1;
 		}
